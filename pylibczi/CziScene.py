@@ -19,16 +19,13 @@
 # Reader for Zeiss czi file images and associated metadata for parsing "scenes" or "ribbons".
 
 import numpy as np
-import argparse
 import time
 
 import scipy.spatial.distance as scidist
 
-# xxx - some better way to handle import if running from command line?
-try:
-    from .CziFile import CziFile
-except ImportError as exc:
-    from CziFile import CziFile
+from .exceptions import CziFileNotMultiSceneError
+from .CziFile import CziFile
+
 
 class CziScene(CziFile):
     """Zeiss CZI scene image and metadata.
@@ -74,6 +71,8 @@ class CziScene(CziFile):
         self.cziscene_verbose = verbose
         self.meta_loaded = False
         self.scene_loaded = False
+        self.n_scenes = None
+        self.scale = None
 
         if not self.use_pylibczi:
             # czi file object with image data and meta
@@ -107,14 +106,19 @@ class CziScene(CziFile):
         #   So, load all the scene position and size information for calculating the bounding box.
         # Empirically determined that this bounding box is only used if there is more than one scene.
         #   xxx - is  this parameterized somewhere in the meta, or just an annoying Zeiss design decision?
-        scenes = self.meta_root.xpath(self.xml_paths['Scenes'])[0].findall('Scene'); self.nscenes = len(scenes)
-        center_positions = np.zeros((self.nscenes,2), dtype=np.double)
-        contour_sizes = np.zeros((self.nscenes,2), dtype=np.double)
+
+        scenes = self.meta_root.xpath(self.xml_paths['Scenes'])
+        self.n_scenes = 0 if len(scenes) == 0 else len(scenes[0].findall('Scene'))
+        if self.n_scenes == 0:
+            raise CziFileNotMultiSceneError("Error, Single Scene File. Use CziFile not CziScene to access the data.")
+        scenes = scenes[0].findall('Scene')
+        center_positions = np.zeros((self.n_scenes, 2), dtype=np.double)
+        contour_sizes = np.zeros((self.n_scenes, 2), dtype=np.double)
         found = False
         for scene in scenes:
             i = int(scene.attrib['Index'])
-            center_positions[i,:] = np.array([float(x) for x in scene.find('CenterPosition').text.split(',')])
-            contour_sizes[i,:] = np.array([float(x) for x in scene.find('ContourSize').text.split(',')])
+            center_positions[i, :] = np.array([float(x) for x in scene.find('CenterPosition').text.split(',')])
+            contour_sizes[i, :] = np.array([float(x) for x in scene.find('ContourSize').text.split(',')])
             found = (found or (i == load_scene))
         assert(found) # bad scene number
         center_position = center_positions[load_scene,:]
@@ -312,7 +316,7 @@ class CziScene(CziFile):
             print('Loading czi image for scene %d' % (load_scene+1,)); t = time.time()
         docrop = True
         if self.use_pylibczi:
-            if self.nscenes==1:
+            if self.n_scenes==1:
                 # meh, thanks Zeiss, determined empirically, need flag?
                 img = self.czilib.cziread_scene(self.czi_filename, np.zeros((1,), dtype=np.int64))
             else:
@@ -433,7 +437,7 @@ class CziScene(CziFile):
         return ret
 
     @staticmethod
-    def _addArgs(p):
+    def add_args(p):
         # adds arguments required for this object to specified ArgumentParser object
         p.add_argument('--czi-filename', nargs=1, type=str, default=[''], help='Input czi file')
         p.add_argument('--scene', nargs=1, type=int, default=[0], metavar='S', help='Specify scene to use in czi-file')
@@ -441,12 +445,4 @@ class CziScene(CziFile):
         p.add_argument('--tifffile-out', nargs=1, type=str, default=[''], help='Tiff file out (optional)')
         p.add_argument('--cziscene-verbose', action='store_true', help='Verbose output')
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Scene image and meta data for Zeiss czi files',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    CziScene._addArgs(parser)
-    args = parser.parse_args()
 
-    scene = CziScene.readScene(args)
-    if scene.tifffile_out: scene.export_tiff()
-    scene.plot_scene()
