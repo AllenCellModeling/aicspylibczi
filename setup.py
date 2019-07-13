@@ -138,16 +138,17 @@ else: # POSIX
     extra_objects += ['{}/lib{}.a'.format(d, l) for d,l in zip(static_lib_dirs, static_libraries)]
     include_dirs.append('/usr/local/include')
     library_dirs.append('/usr/local/lib')
+    include_dirs.append('_pylibczi')
 
 sources = ['_pylibczi.cpp']
 version = open("pylibczi/_version.py").readlines()[-1].split()[-1].strip("\"'")
 
 module1 = Extension('_pylibczi',
-                    define_macros = [('PYLIBCZI_VERSION', version),],
-                    include_dirs = include_dirs,
-                    libraries = libraries,
-                    library_dirs = library_dirs,
-                    sources = [os.path.join('_pylibczi',x) for x in sources],
+                    define_macros=[('PYLIBCZI_VERSION', version),],
+                    include_dirs=include_dirs,
+                    libraries=libraries,
+                    library_dirs=library_dirs,
+                    sources=[os.path.join('_pylibczi',x) for x in sources],
                     extra_compile_args=extra_compile_args,
                     extra_link_args=extra_link_args,
                     language='c++11',
@@ -177,15 +178,15 @@ class specialized_build_ext(build_ext):
 
 setup (name = 'pylibczi',
        version=version,
-       description = 'Python module utilizing libCZI for reading Zeiss CZI files.',
-       author = 'Paul Watkins',
-       author_email = 'pwatkins@gmail.com',
+       description='Python module utilizing libCZI for reading Zeiss CZI files.',
+       author='Paul Watkins',
+       author_email='pwatkins@gmail.com',
        url = 'https://github.com/elhuhdron/pylibczi',
-       long_description = '''
+       long_description='''
 Python module to expose libCZI functionality for reading (subset of) Zeiss CZI files and meta-data.
 ''',
-       ext_modules = [module1],
-       packages = ['pylibczi'],
+       ext_modules=[module1],
+       packages=['pylibczi'],
        #data_files = data_files, 
        install_requires=['scipy', 'numpy', 'lxml'],
        cmdclass={'build_ext': specialized_build_ext,

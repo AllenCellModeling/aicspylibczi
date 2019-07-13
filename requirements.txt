@@ -4,3 +4,5 @@ lxml
 scikit-image
 matplotlib>=2.0.0
 tifffile
+pytest
+pytest-raises

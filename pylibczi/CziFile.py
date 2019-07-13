@@ -66,7 +66,6 @@ class CziFile(object):
     def __init__(self, czi_filename: types.FileLike, metafile_out: types.PathLike = '', use_pylibczi:bool = True, verbose:bool = False):
         # Convert to BytesIO (bytestream)
         self._bytes = self.convert_to_buffer(czi_filename)
-        print(f"buffer type: {str(type(self._bytes))}")
         self.czi_filename = None
         self.metafile_out = metafile_out
         self.czifile_verbose = verbose
