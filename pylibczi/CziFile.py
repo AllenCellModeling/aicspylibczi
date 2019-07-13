@@ -16,10 +16,14 @@
 
 # Parent class for python wrapper to libczi file for accessing Zeiss czi image and metadata.
 
+import io
 import time
+from pathlib import Path
+from typing import Tuple
 
 import numpy as np
 from lxml import etree as etree
+from . import types
 
 
 class CziFile(object):
@@ -46,7 +50,7 @@ class CziFile(object):
     #   units for the scale in the xml file are not correct (says microns, given in meters)
     scale_units = 1e6
 
-    ### Dims as defined in libCZI
+    # Dims as defined in libCZI
     #
     # Z = 1  # The Z-dimension.
     # C = 2  # The C-dimension ("channel").
@@ -59,8 +63,11 @@ class CziFile(object):
     ####
     ZISRAW_DIMS = {'Z', 'C', 'T', 'R', 'S', 'I', 'H', 'V'}
 
-    def __init__(self, czi_filename, metafile_out='', use_pylibczi=True, verbose=False):
-        self.czi_filename = czi_filename
+    def __init__(self, czi_filename: types.FileLike, metafile_out: types.PathLike = '', use_pylibczi:bool = True, verbose:bool = False):
+        # Convert to BytesIO (bytestream)
+        self._bytes = self.convert_to_buffer(czi_filename)
+        print(f"buffer type: {str(type(self._bytes))}")
+        self.czi_filename = None
         self.metafile_out = metafile_out
         self.czifile_verbose = verbose
 
@@ -74,6 +81,40 @@ class CziFile(object):
             import czifile
             self.czilib = czifile
 
+    @staticmethod
+    def convert_to_buffer(file: types.FileLike) -> io.BufferedIOBase:
+        # Check path
+        if isinstance(file, (str, Path)):
+            # This will both fully expand and enforce that the filepath exists
+            f = Path(file).expanduser().resolve(strict=True)
+
+            # This will check if the above enforced filepath is a directory
+            if f.is_dir():
+                raise IsADirectoryError(f)
+
+            return open(f, "rb")
+
+        # Convert bytes
+        elif isinstance(file, bytes):
+            return io.BytesIO(file)
+
+        # Set bytes
+        elif isinstance(file, io.BytesIO):
+            return file
+
+        elif isinstance(file, io.BufferedReader):
+            return file
+
+        # Special case for ndarray because already in memory
+        elif isinstance(file, np.ndarray):
+            return file
+
+        # Raise
+        else:
+            raise TypeError(
+                f"Reader only accepts types: [str, pathlib.Path, bytes, io.BytesIO], received: {type(file)}"
+            )
+
     def read_meta(self):
         """Extract all metadata from czifile.
 
@@ -82,7 +123,7 @@ class CziFile(object):
 
         """
         if self.use_pylibczi:
-            self.meta_root = etree.fromstring(self.czilib.cziread_meta(self.czi_filename))
+            self.meta_root = etree.fromstring(self.czilib.cziread_meta_from_istream(self._bytes))
         else:
             # get the root of the metadata xml
             #root = ET.fromstring(metastr) # to convert to python etree
@@ -108,7 +149,7 @@ class CziFile(object):
             # xxx - this does not work for czifiles for which the subblocks have no dimension label.
             #   additionally it seems not possible to create an accessor without specifying a dimension label / index.
             #img = self.czilib.cziread_scene(self.czi_filename, -np.ones((1,), dtype=np.int64))
-            imgs, coords = self.czilib.cziread_allsubblocks(self.czi_filename)
+            imgs, coords = self.czilib.cziread_allsubblocks_from_istream(self._bytes)
             if len(imgs) > 1:
                 # xxx - was not clear what to do in the cases of many subblocks of different sizes.
                 #   could not find any other subblock attribute to indicate what the difference is between them.
@@ -135,11 +176,17 @@ class CziFile(object):
         shape = self.czilib.cziread_mosaic_shape(str(self.czi_filename))
         return shape
 
-    def read_mosaic(self, region = None, scale_factor: float = 1.0, **kwargs):
+    def read_mosaic(self, region: Tuple = None, scale_factor: float = 1.0, **kwargs):
         """
         reads a mosaic file and returns an image corresponding to the specified dimensions. If the file is more than
         a 2D sheet of pixels, meaning only one channel, z-slice, time-index, etc then the kwargs must specify the
         dimension with more than one possible value.
+
+        Example: Read in the C=1 channel of a mosaic file at 1/10th the size
+        ```
+        czi = CziFile(filename)
+        img = czi.read_mosaic(scale_factor=0.1, C=1)
+        ```
 
         :param region: a rectangle specifying the extraction box (x, y, width, height) specified in pixels
         :param scale_factor: amount to scale the data by, 0.1 would mean an image 1/10 the height and width of native

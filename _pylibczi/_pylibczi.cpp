@@ -20,12 +20,15 @@
 #define NPY_NO_DEPRECATED_API NPY_1_14_API_VERSION
 #include "numpy/arrayobject.h"
 
+#include <cstdio>
 #include <iostream>
 #include <tuple>
 #include <vector>
 #include <algorithm>
+#include <typeinfo>
 
 #include "inc_libCZI.h"
+#include "aics_added.hpp"
 
 // https://stackoverflow.com/questions/3342726/c-print-out-enum-value-as-text
 std::ostream& operator<<(std::ostream& out, const libCZI::PixelType value){
@@ -89,6 +92,10 @@ static PyMethodDef _pylibcziMethods[] = {
     {"cziread_allsubblocks", cziread_allsubblocks, METH_VARARGS, "Read czi image containing all scenes"},
     {"cziread_mosaic", cziread_mosaic, METH_VARARGS, "Read czi image from mosaic czi file"},
     {"cziread_mosaic_shape", cziread_mosaic_shape, METH_VARARGS, "Read czi image mosaic size in pixels"},
+// These are the extended functions in aics_added.hpp to use file streams
+    {"cziread_meta_from_istream", cziread_meta_from_istream, METH_VARARGS, "Read czi meta data"},
+    {"cziread_allsubblocks_from_istream", cziread_allsubblocks_from_istream, METH_VARARGS,
+        "Read czi image containing all scenes"},
 
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
@@ -534,3 +541,5 @@ std::shared_ptr<libCZI::ICZIReader> open_czireader_from_cfilename(char const *fn
 
     return cziReader;
 }
+
+
