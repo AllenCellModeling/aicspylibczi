@@ -113,4 +113,7 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-\.idea/
+.idea/
+*.ipynb
+.DS_Store
+cmake-build-debug/
