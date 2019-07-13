@@ -30,6 +30,7 @@
 #include <typeinfo>
 
 #include "inc_libCZI.h"
+#include "aics_added.hpp"
 
 // moved here to avoid compile error
 static PyObject *PylibcziError;
@@ -248,7 +249,6 @@ static PyObject *cziread_allsubblocks(PyObject *self, PyObject *args) {
 
 // Begin new code
 
-<<<<<<< HEAD
  static int convertDictToPlaneCoords(PyObject *obj, void * dim_p){
     if(!PyDict_Check(obj)){ // docs says it returns true/false but it returns an integer
         return 0; // not a dictionary somethings wrong

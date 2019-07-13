@@ -112,6 +112,7 @@ static PyObject *cziread_meta_from_istream(PyObject *self, PyObject *pyfp) {
         return nullptr;
     }
     auto stream = cziread_io_buffered_reader_to_istream(self, in_file);
+static PyObject *cziread_meta_from_istream(PyObject *self, PyObject *args)
     auto cziReader = open_czireader_from_istream(stream);
 
     // get the the document's metadata
