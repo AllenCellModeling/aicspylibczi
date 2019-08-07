@@ -91,7 +91,6 @@ static PyObject *cziread_mosaic(PyObject *self, PyObject *args);
 
 /* ==== Set up the methods table ====================== */
 static PyMethodDef _pylibcziMethods[] = {
-<<<<<<< HEAD
     {"cziread_meta", cziread_meta, METH_VARARGS, "Read czi meta data"},
     {"cziread_scene", cziread_scene, METH_VARARGS, "Read czi scene image"},
     {"cziread_allsubblocks", cziread_allsubblocks, METH_VARARGS, "Read czi image containing all scenes"},
@@ -99,8 +98,8 @@ static PyMethodDef _pylibcziMethods[] = {
     {"cziread_mosaic_shape", cziread_mosaic_shape, METH_VARARGS, "Read czi image mosaic size in pixels"},
 // These are the extended functions in aics_added.hpp to use file streams
     {"cziread_meta_from_istream", cziread_meta_from_istream, METH_VARARGS, "Read czi meta data"},
-    {"cziread_allsubblocks_from_istream", cziread_allsubblocks_from_istream, METH_VARARGS,
-        "Read czi image containing all scenes"},
+    {"cziread_allsubblocks_from_istream", cziread_allsubblocks_from_istream, METH_VARARGS, "Read czi image containing all scenes"},
+    {"cziread_shape_from_istream", cziread_shape_from_istream, METH_VARARGS, "Read czi Dimensions"},
 
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
