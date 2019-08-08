@@ -80,6 +80,15 @@ class CziFile(object):
             import czifile
             self.czilib = czifile
 
+    def dims(self):
+        """
+        Get the dimensions for the opened file from the binary data (not the metadata
+        :return: A dictionary containing Dimension / depth, a file with 3 scenes, 7 time-points and 4 z slices
+         would have {'S': 3, 'T': 7, 'Z':4}
+        """
+        if self.use_pylibczi:
+            return self.czilib.cziread_shape_from_istream(self._bytes);
+
     @staticmethod
     def convert_to_buffer(file: types.FileLike) -> io.BufferedIOBase:
         # Check path
