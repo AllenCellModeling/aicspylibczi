@@ -161,6 +161,7 @@ static PyObject *cziread_allsubblocks(PyObject *self, PyObject *args) {
 
     // count all the subblocks
     npy_intp subblock_count = 0;
+
     cziReader->EnumerateSubBlocks(
         [&subblock_count](int idx, const libCZI::SubBlockInfo& info)
     {
@@ -321,7 +322,6 @@ PyArrayObject* copy_bitmap_to_numpy_array(std::shared_ptr<libCZI::IBitmapData> p
     }
 
     // allocate the numpy matrix to copy image into
-    //cout << size_x << " " << size_y << endl;
     auto size = pBitmap->GetSize();
     int size_x = size.w, size_y = size.h;
     PyArrayObject *img;
@@ -339,19 +339,14 @@ PyArrayObject* copy_bitmap_to_numpy_array(std::shared_ptr<libCZI::IBitmapData> p
     }
     void *pointer = PyArray_DATA(img);
 
-    // copy from the czi lib image pointer to the numpy array pointer
-    auto bitmap = pBitmap->Lock();
-    //cout << "sixe_x " << size_x << " size y " << size_y << endl;
-    //cout << "stride " << bitmap.stride << " size " << bitmap.size << endl;
-    // can not do a single memcpy call because the stride does not necessarily match the row size.
-    npy_byte *cptr = (npy_byte*)pointer, *cimgptr = (npy_byte*)bitmap.ptrDataRoi;
-    // stride units is not documented but emperically means the row (x) stride in bytes, not in pixels.
-    int rowsize = pixel_size_bytes * size_x; //, imgrowsize = pixel_size_bytes * bitmap.stride;
-    for( int y=0; y < size_y; y++ ) {
-        std::memcpy(cptr, cimgptr, rowsize);
-        cptr += rowsize; cimgptr += bitmap.stride;
+    {
+        libCZI::ScopedBitmapLockerP lckScoped{pBitmap.get()};
+        for (std::uint32_t h = 0; h < pBitmap->GetHeight(); ++h) {
+            auto ptr = (((npy_byte *) lckScoped.ptrDataRoi) + h * lckScoped.stride);
+            auto target = (((npy_byte *) pointer) + h * lckScoped.stride);
+            std::memcpy(target, ptr, lckScoped.stride);
+        }
     }
-    pBitmap->Unlock();
 
     // transpose to convert from F-order to C-order array
     return (PyArrayObject*) PyArray_SwapAxes(img,swap_axes[0],swap_axes[1]);
