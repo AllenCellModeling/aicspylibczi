@@ -165,7 +165,6 @@ static PyObject *cziread_mosaic_shape(PyObject *self, PyObject *args) {
 
     auto cziReader = open_czireader_from_cfilename(filename_buf);
     auto statistics = cziReader->GetStatistics();
-    std::cout << "got statistics" << std::endl;
     // handle the case where the function was called with no selection rectangle
     libCZI::IntRect box = statistics.boundingBox;
     return Py_BuildValue("(iiii)", box.x, box.y, box.w, box.h);
@@ -251,7 +250,7 @@ static PyObject *cziread_allsubblocks(PyObject *self, PyObject *args) {
          PyObject *pyInt = PyDict_GetItemString(obj, kv.first.c_str() );
          if(pyInt != NULL){
              dims->Set(kv.second, static_cast<int>(PyLong_AsLong(pyInt)));
-             if( PyErr_Occured() != NULL) {
+             if( PyErr_Occurred() != NULL) {
                  PyErr_SetString(PylibcziError,
                                  "problem converting Dictionary of dims, should be C=1 meaning Dimension = Integer");
                  return 0;
@@ -283,7 +282,7 @@ static int listToIntRect(PyObject *obj, void * rect_p){
     rect->y = static_cast<int>(PyLong_AsLong(PyTuple_GetItem(obj, 1)));
     rect->w = static_cast<int>(PyLong_AsLong(PyTuple_GetItem(obj, 2)));
     rect->h = static_cast<int>(PyLong_AsLong(PyTuple_GetItem(obj, 3)));
-    if( PyErr_Occured() != NULL) { // collectively check if an PyErr occurred
+    if( PyErr_Occurred() != NULL) { // collectively check if an PyErr occurred
         PyErr_SetString(PylibcziError, "problem converting region=(x: [Int], y: [Int], w: [Int], h: [Int])");
         return 0;
     }
@@ -301,7 +300,7 @@ static PyObject *cziread_mosaic(PyObject *self, PyObject *args) {
                           &listToIntRect, &imBox,
                           &scaleFactor)
             ){
-        PyErr_SetString(PylibcziError, "Error: conversion of arguments failed. Check arguments." << std::endl;
+        PyErr_SetString(PylibcziError, "Error: conversion of arguments failed. Check arguments." );
         return nullptr;
     }
 
