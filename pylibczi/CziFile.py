@@ -17,7 +17,6 @@
 # Parent class for python wrapper to libczi file for accessing Zeiss czi image and metadata.
 
 import time
-from typing import List, Set
 
 import numpy as np
 from lxml import etree as etree
