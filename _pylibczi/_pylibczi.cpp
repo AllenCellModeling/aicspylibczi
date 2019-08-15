@@ -248,16 +248,15 @@ static PyObject *cziread_allsubblocks(PyObject *self, PyObject *args) {
             {"Z", libCZI::DimensionIndex::Z}
     };
     std::for_each(tbl.begin(), tbl.end(), [&](std::pair< const std::string, libCZI::DimensionIndex > &kv){
-        PyObject *pyLetter;
-        PyObject *pyInt;
-        pyLetter = Py_BuildValue("s",kv.first.c_str());
-        if(PyDict_Contains(obj, pyLetter)){
-            int dimValue = 0;
-            pyInt = PyDict_GetItem(obj, pyLetter);
-            dimValue = static_cast<int>(PyLong_AsLong(pyInt));
-            dims->Set(kv.second, dimValue);
+            PyObject *pyInt = PyDict_GetItemString(obj, kv.first.c_str() );
+            if(pyInt != NULL){
+                dims->Set(kv.second, static_cast<int>(PyLong_AsLong(pyInt)));
+                if( PyErr_Occured() != NULL) {
+                    PyErr_SetString(PylibcziError,
+                                    "problem converting region=(x: [Int], y: [Int], w: [Int], h: [Int])");
+                    return 0;
+                }
         }
-        Py_DecRef(pyLetter);
     });
     return 1; // success
 }
@@ -270,11 +269,13 @@ static int listToIntRect(PyObject *obj, void * rect_p){
     }
 
     if(!PyTuple_Check(obj)){
-        std::cout << "region not a Tuple!" << std::endl;
+        PyErr_SetString(PylibcziError, "region not set to a tuple, please use correct syntax");
+        return 0;
     }
 
     if(PyTuple_Size(obj) != 4){
-        std::cerr << "Error: format for region (x, y, w, h)! " << std::endl;
+        PyErr_SetString(PylibcziError,
+                        "(Error) Syntax: region=(x, y, w, h) w/ x y w h all integers.");
         return 0;
     }
 
@@ -296,12 +297,13 @@ static PyObject *cziread_mosaic(PyObject *self, PyObject *args) {
                           &listToIntRect, &imBox,
                           &scaleFactor)
             ){
-        std::cout << "conversion of sOOf failed!" << std::endl;
+        PyErr_SetString(PylibcziError, "Error: conversion of arguments failed. Check arguments." << std::endl;
         return nullptr;
     }
 
     auto cziReader = open_czireader_from_cfilename(filename_buf);
     auto statistics = cziReader->GetStatistics();
+
     // handle the case where the function was called with no selection rectangle
     if ( imBox.w == 0 || imBox.h == 0 ) imBox = statistics.boundingBox;
 
@@ -313,6 +315,7 @@ static PyObject *cziread_mosaic(PyObject *self, PyObject *args) {
     });
 
     auto accessor = cziReader->CreateSingleChannelScalingTileAccessor();
+
     // multiTile accessor is not compatible with S, it composites the Scenes and the mIndexs together
     auto multiTileComposit = accessor->Get(
             imBox,
@@ -458,12 +461,13 @@ PyArrayObject* copy_bitmap_to_numpy_array(std::shared_ptr<libCZI::IBitmapData> p
     }
     void *pointer = PyArray_DATA(img);
 
+    std::size_t rowsize =  size_x * pixel_size_bytes;
     {
         libCZI::ScopedBitmapLockerP lckScoped{pBitmap.get()};
         for (std::uint32_t h = 0; h < pBitmap->GetHeight(); ++h) {
             auto ptr = (((npy_byte *) lckScoped.ptrDataRoi) + h * lckScoped.stride);
-            auto target = (((npy_byte *) pointer) + h * lckScoped.stride);
-            std::memcpy(target, ptr, lckScoped.stride);
+            auto target = (((npy_byte *) pointer) + h * rowsize);
+            std::memcpy(target, ptr, rowsize);
         }
     }
     // transpose to convert from F-order to C-order array
