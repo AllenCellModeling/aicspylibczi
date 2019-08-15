@@ -203,7 +203,7 @@ static PyObject *cziread_allsubblocks(PyObject *self, PyObject *args) {
 
     npy_intp cnt = 0;
     cziReader->EnumerateSubBlocks(
-        [&cziReader, &subblock_count, &cnt, images, coords](int idx, const libCZI::SubBlockInfo& info)
+        [&cziReader, &cnt, images, coords](int idx, const libCZI::SubBlockInfo& info)
     {
         //std::cout << "Index " << idx << ": " << libCZI::Utils::DimCoordinateToString(&info.coordinate)
         //  << " Rect=" << info.logicalRect << " M-index " << info.mIndex << std::endl;
@@ -246,24 +246,26 @@ static PyObject *cziread_allsubblocks(PyObject *self, PyObject *args) {
             {"C", libCZI::DimensionIndex::C},
             {"Z", libCZI::DimensionIndex::Z}
     };
-     std::for_each(tbl.begin(), tbl.end(), [&](std::pair< const std::string, libCZI::DimensionIndex > &kv){
+
+    int ret_val = 1;
+     std::for_each(tbl.begin(), tbl.end(), [&](std::pair< const std::string, libCZI::DimensionIndex > &kv)->void{
          PyObject *pyInt = PyDict_GetItemString(obj, kv.first.c_str() );
          if(pyInt != NULL){
              dims->Set(kv.second, static_cast<int>(PyLong_AsLong(pyInt)));
              if( PyErr_Occurred() != NULL) {
                  PyErr_SetString(PylibcziError,
                                  "problem converting Dictionary of dims, should be C=1 meaning Dimension = Integer");
-                 return 0;
+                 ret_val = 0;
              }
          }
      });
-     return 1; // success
+     return ret_val; // success
  }
 
 static int listToIntRect(PyObject *obj, void * rect_p){
     libCZI::IntRect *rect = static_cast<libCZI::IntRect *>(rect_p);
     if( obj == Py_None ){
-        rect->x = rect->y = rect->w = rect->h = 0;
+        rect->x = rect->y = rect->w = rect->h = -1;
         return 1;
     }
 
@@ -289,6 +291,35 @@ static int listToIntRect(PyObject *obj, void * rect_p){
     return 1;
 }
 
+bool isValidRegion(const libCZI::IntRect &inBox, const libCZI::IntRect &cziBox ){
+    bool ans = true;
+    // check origin is in domain
+    if( inBox.x < cziBox.x || cziBox.x + cziBox.w < inBox.x) ans = false;
+    if( inBox.y < cziBox.y || cziBox.y + cziBox.h < inBox.y) ans = false;
+
+    // check  (x1, y1) point is in domain
+    int x1 = inBox.x + inBox.w;
+    int y1 = inBox.y + inBox.h;
+    if( x1 < cziBox.x || cziBox.x + cziBox.w < x1) ans = false;
+    if( y1 < cziBox.y || cziBox.y + cziBox.h < y1) ans = false;
+
+    if(!ans) {
+        std::cerr << "Conflict region requested("
+                  << inBox.x << ", " << inBox.y << ", " << inBox.w << ", " << inBox.h
+                  << ") in plane ("
+                  << cziBox.x << ", " << cziBox.y << ", " << cziBox.w << ", " << cziBox.h << ")!"
+                  << std::endl;
+    }
+
+    if(inBox.w < 1 || 1 > inBox.h){
+        std::cerr << "Ill-defined region, with and heigh must be positive values! ("
+                << inBox.x << ", " << inBox.y << ", " << inBox.w << ", " << inBox.h << ")" << std::endl;
+        ans = false;
+    }
+
+    return ans;
+}
+
 static PyObject *cziread_mosaic(PyObject *self, PyObject *args) {
     char *filename_buf;
     float scaleFactor;
@@ -307,8 +338,13 @@ static PyObject *cziread_mosaic(PyObject *self, PyObject *args) {
     auto cziReader = open_czireader_from_cfilename(filename_buf);
     auto statistics = cziReader->GetStatistics();
 
-    // handle the case where the function was called with no selection rectangle
-    if ( imBox.w == 0 || imBox.h == 0 ) imBox = statistics.boundingBox;
+    // handle the case where the function was called with region=None (default to all)
+    if ( imBox.w == -1 && imBox.h == -1 ) imBox = statistics.boundingBox;
+    if (!isValidRegion(imBox, statistics.boundingBox)){
+        PyErr_SetString(PylibcziError, "Error:  region not contained in specified CZI plane." );
+        return nullptr;
+    }
+
 
     std::map< libCZI::DimensionIndex, std::pair< int, int> > limitTbl;
 
