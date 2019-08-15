@@ -247,19 +247,19 @@ static PyObject *cziread_allsubblocks(PyObject *self, PyObject *args) {
             {"C", libCZI::DimensionIndex::C},
             {"Z", libCZI::DimensionIndex::Z}
     };
-    std::for_each(tbl.begin(), tbl.end(), [&](std::pair< const std::string, libCZI::DimensionIndex > &kv){
-            PyObject *pyInt = PyDict_GetItemString(obj, kv.first.c_str() );
-            if(pyInt != NULL){
-                dims->Set(kv.second, static_cast<int>(PyLong_AsLong(pyInt)));
-                if( PyErr_Occured() != NULL) {
-                    PyErr_SetString(PylibcziError,
-                                    "problem converting Dictionary of dims, should be C=1 meaning Dimension = Integer");
-                    return 0;
-                }
-        }
-    });
-    return 1; // success
-}
+     std::for_each(tbl.begin(), tbl.end(), [&](std::pair< const std::string, libCZI::DimensionIndex > &kv){
+         PyObject *pyInt = PyDict_GetItemString(obj, kv.first.c_str() );
+         if(pyInt != NULL){
+             dims->Set(kv.second, static_cast<int>(PyLong_AsLong(pyInt)));
+             if( PyErr_Occured() != NULL) {
+                 PyErr_SetString(PylibcziError,
+                                 "problem converting Dictionary of dims, should be C=1 meaning Dimension = Integer");
+                 return 0;
+             }
+         }
+     });
+     return 1; // success
+ }
 
 static int listToIntRect(PyObject *obj, void * rect_p){
     libCZI::IntRect *rect = static_cast<libCZI::IntRect *>(rect_p);
