@@ -158,7 +158,7 @@ static PyObject *cziread_meta(PyObject *self, PyObject *args) {
 }
 
 static PyObject *cziread_mosaic_shape(PyObject *self, PyObject *args) {
-    char *filename_buf;
+    char *filename_buf = nullptr;
     // parse arguments
     if (!PyArg_ParseTuple(args, "s", &filename_buf))
         return NULL;
@@ -253,7 +253,7 @@ static PyObject *cziread_allsubblocks(PyObject *self, PyObject *args) {
                 dims->Set(kv.second, static_cast<int>(PyLong_AsLong(pyInt)));
                 if( PyErr_Occured() != NULL) {
                     PyErr_SetString(PylibcziError,
-                                    "problem converting region=(x: [Int], y: [Int], w: [Int], h: [Int])");
+                                    "problem converting Dictionary of dims, should be C=1 meaning Dimension = Integer");
                     return 0;
                 }
         }
@@ -283,6 +283,10 @@ static int listToIntRect(PyObject *obj, void * rect_p){
     rect->y = static_cast<int>(PyLong_AsLong(PyTuple_GetItem(obj, 1)));
     rect->w = static_cast<int>(PyLong_AsLong(PyTuple_GetItem(obj, 2)));
     rect->h = static_cast<int>(PyLong_AsLong(PyTuple_GetItem(obj, 3)));
+    if( PyErr_Occured() != NULL) { // collectively check if an PyErr occurred
+        PyErr_SetString(PylibcziError, "problem converting region=(x: [Int], y: [Int], w: [Int], h: [Int])");
+        return 0;
+    }
     return 1;
 }
 
