@@ -21,7 +21,9 @@
 #include "numpy/arrayobject.h"
 
 #include <iostream>
+#include <tuple>
 #include <vector>
+#include <algorithm>
 
 #include "inc_libCZI.h"
 
@@ -77,12 +79,16 @@ std::ostream& operator<<(std::ostream& out, const libCZI::DimensionIndex value){
 static PyObject *cziread_meta(PyObject *self, PyObject *args);
 static PyObject *cziread_scene(PyObject *self, PyObject *args);
 static PyObject *cziread_allsubblocks(PyObject *self, PyObject *args);
+static PyObject *cziread_mosaic_shape(PyObject *self, PyObject *args);
+static PyObject *cziread_mosaic(PyObject *self, PyObject *args);
 
 /* ==== Set up the methods table ====================== */
 static PyMethodDef _pylibcziMethods[] = {
     {"cziread_meta", cziread_meta, METH_VARARGS, "Read czi meta data"},
     {"cziread_scene", cziread_scene, METH_VARARGS, "Read czi scene image"},
     {"cziread_allsubblocks", cziread_allsubblocks, METH_VARARGS, "Read czi image containing all scenes"},
+    {"cziread_mosaic", cziread_mosaic, METH_VARARGS, "Read czi image from mosaic czi file"},
+    {"cziread_mosaic_shape", cziread_mosaic_shape, METH_VARARGS, "Read czi image mosaic size in pixels"},
 
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
@@ -151,6 +157,21 @@ static PyObject *cziread_meta(PyObject *self, PyObject *args) {
     return pystring;
 }
 
+static PyObject *cziread_mosaic_shape(PyObject *self, PyObject *args) {
+    char *filename_buf;
+    // parse arguments
+    if (!PyArg_ParseTuple(args, "s", &filename_buf))
+        return NULL;
+
+    auto cziReader = open_czireader_from_cfilename(filename_buf);
+    auto statistics = cziReader->GetStatistics();
+    std::cout << "got statistics" << std::endl;
+    // handle the case where the function was called with no selection rectangle
+    libCZI::IntRect box = statistics.boundingBox;
+    return Py_BuildValue("(iiii)", box.x, box.y, box.w, box.h);
+}
+
+
 static PyObject *cziread_allsubblocks(PyObject *self, PyObject *args) {
     char *filename_buf;
     // parse arguments
@@ -207,6 +228,104 @@ static PyObject *cziread_allsubblocks(PyObject *self, PyObject *args) {
 
     return Py_BuildValue("OO", images, (PyObject *) coordinates);
 }
+
+// Begin new code
+
+ static int convertDictToPlaneCoords(PyObject *obj, void * dim_p){
+    if(!PyDict_Check(obj)){ // docs says it returns true/false but it returns an integer
+        return 0; // not a dictionary somethings wrong
+    };
+
+    libCZI::CDimCoordinate *dims = static_cast<libCZI::CDimCoordinate *>(dim_p);
+    std::map < std::string, libCZI::DimensionIndex > tbl{
+            {"V", libCZI::DimensionIndex::V},
+            {"H", libCZI::DimensionIndex::H},
+            {"I", libCZI::DimensionIndex::I},
+            {"S", libCZI::DimensionIndex::S},
+            {"R", libCZI::DimensionIndex::R},
+            {"T", libCZI::DimensionIndex::T},
+            {"C", libCZI::DimensionIndex::C},
+            {"Z", libCZI::DimensionIndex::Z}
+    };
+    std::for_each(tbl.begin(), tbl.end(), [&](std::pair< const std::string, libCZI::DimensionIndex > &kv){
+        PyObject *pyLetter;
+        PyObject *pyInt;
+        pyLetter = Py_BuildValue("s",kv.first.c_str());
+        if(PyDict_Contains(obj, pyLetter)){
+            int dimValue = 0;
+            pyInt = PyDict_GetItem(obj, pyLetter);
+            dimValue = static_cast<int>(PyLong_AsLong(pyInt));
+            dims->Set(kv.second, dimValue);
+        }
+        Py_DecRef(pyLetter);
+    });
+    return 1; // success
+}
+
+static int listToIntRect(PyObject *obj, void * rect_p){
+    libCZI::IntRect *rect = static_cast<libCZI::IntRect *>(rect_p);
+    if( obj == Py_None ){
+        rect->x = rect->y = rect->w = rect->h = 0;
+        return 1;
+    }
+
+    if(!PyTuple_Check(obj)){
+        std::cout << "region not a Tuple!" << std::endl;
+    }
+
+    if(PyTuple_Size(obj) != 4){
+        std::cerr << "Error: format for region (x, y, w, h)! " << std::endl;
+        return 0;
+    }
+
+    rect->x = static_cast<int>(PyLong_AsLong(PyTuple_GetItem(obj, 0)));
+    rect->y = static_cast<int>(PyLong_AsLong(PyTuple_GetItem(obj, 1)));
+    rect->w = static_cast<int>(PyLong_AsLong(PyTuple_GetItem(obj, 2)));
+    rect->h = static_cast<int>(PyLong_AsLong(PyTuple_GetItem(obj, 3)));
+    return 1;
+}
+
+static PyObject *cziread_mosaic(PyObject *self, PyObject *args) {
+    char *filename_buf;
+    float scaleFactor;
+    libCZI::CDimCoordinate planeCoord;
+    libCZI::IntRect imBox{0,0,0,0};
+    // parse arguments
+    if (!PyArg_ParseTuple(args, "sO&O&f", &filename_buf,
+                          &convertDictToPlaneCoords, &planeCoord,
+                          &listToIntRect, &imBox,
+                          &scaleFactor)
+            ){
+        std::cout << "conversion of sOOf failed!" << std::endl;
+        return nullptr;
+    }
+
+    auto cziReader = open_czireader_from_cfilename(filename_buf);
+    auto statistics = cziReader->GetStatistics();
+    // handle the case where the function was called with no selection rectangle
+    if ( imBox.w == 0 || imBox.h == 0 ) imBox = statistics.boundingBox;
+
+    std::map< libCZI::DimensionIndex, std::pair< int, int> > limitTbl;
+
+    statistics.dimBounds.EnumValidDimensions([&limitTbl](libCZI::DimensionIndex di, int start, int size)->bool{
+        limitTbl.emplace( di, std::make_pair(start, size));
+        return true;
+    });
+
+    auto accessor = cziReader->CreateSingleChannelScalingTileAccessor();
+    // multiTile accessor is not compatible with S, it composites the Scenes and the mIndexs together
+    auto multiTileComposit = accessor->Get(
+            imBox,
+            &planeCoord,
+            scaleFactor,
+            nullptr);   // use default options
+
+    PyArrayObject* img = copy_bitmap_to_numpy_array(multiTileComposit);
+    cziReader->Close();
+    return (PyObject*) img;
+}
+
+// end new code
 
 static PyObject *cziread_scene(PyObject *self, PyObject *args) {
     char *filename_buf;
@@ -347,7 +466,6 @@ PyArrayObject* copy_bitmap_to_numpy_array(std::shared_ptr<libCZI::IBitmapData> p
             std::memcpy(target, ptr, lckScoped.stride);
         }
     }
-
     // transpose to convert from F-order to C-order array
     return (PyArrayObject*) PyArray_SwapAxes(img,swap_axes[0],swap_axes[1]);
 }

@@ -16,11 +16,14 @@
 
 # Parent class for python wrapper to libczi file for accessing Zeiss czi image and metadata.
 
-import numpy as np
 import time
-#import os
+from typing import List, Set
 
+import numpy as np
 from lxml import etree as etree
+
+
+# import os
 
 class CziFile(object):
     """Zeiss CZI file object.
@@ -45,6 +48,19 @@ class CziFile(object):
     # xxx - likely this is a Zeiss bug,
     #   units for the scale in the xml file are not correct (says microns, given in meters)
     scale_units = 1e6
+
+    ### Dims as defined in libCZI
+    #
+    # Z = 1  # The Z-dimension.
+    # C = 2  # The C-dimension ("channel").
+    # T = 3  # The T-dimension ("time").
+    # R = 4  # The R-dimension ("rotation").
+    # S = 5  # The S-dimension ("scene").
+    # I = 6  # The I-dimension ("illumination").
+    # H = 7  # The H-dimension ("phase").
+    # V = 8  # The V-dimension ("view").
+    ####
+    ZISRAW_DIMS = {'Z', 'C', 'T', 'R', 'S', 'I', 'H', 'V'}
 
     def __init__(self, czi_filename, metafile_out='', use_pylibczi=True, verbose=False):
         self.czi_filename = czi_filename
@@ -114,6 +130,39 @@ class CziFile(object):
 
         return img
 
+    def read_mosaic_size(self):
+        """
+        Get the size of the entire mosaic image
+        :return: (x, y, w, h)
+        """
+        shape = self.czilib.cziread_mosaic_shape(str(self.czi_filename))
+        return shape
+
+    def read_mosaic(self, region = None, scale_factor: float = 1.0, **kwargs):
+        """
+        reads a mosaic file and returns an image corresponding to the specified dimensions. If the file is more than
+        a 2D sheet of pixels, meaning only one channel, z-slice, time-index, etc then the kwargs must specify the
+        dimension with more than one possible value.
+
+        :param region: a rectangle specifying the extraction box (x, y, width, height) specified in pixels
+        :param scale_factor: amount to scale the data by, 0.1 would mean an image 1/10 the height and width of native
+        :param kwargs: The keywords below allow you to specify the dimension plane that constrains the 2D data. If the
+        constraints are underspecified the function will fail.
+            Z = 1   # The Z-dimension.
+            C = 2   # The C-dimension ("channel").
+            T = 3   # The T-dimension ("time").
+            R = 4   # The R-dimension ("rotation").
+            S = 5   # The S-dimension ("scene").
+            I = 6   # The I-dimension ("illumination").
+            H = 7   # The H-dimension ("phase").
+            V = 8   # The V-dimension ("view").
+        """
+        plane_constraints = {k: v for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS}
+
+        img = self.czilib.cziread_mosaic(str(self.czi_filename), plane_constraints, region, scale_factor)
+
+        return img
+
     @staticmethod
     def plot_image(image, figno=1, doplots_ds=1, reduce=np.mean, interp_string='nearest', show=True):
         """Generic image plot using matplotlib.
@@ -180,13 +229,13 @@ class CziFile(object):
         sz_out = np.ceil(np.nanmax(corners + img_shapes[:,::-1], axis=0)).astype(np.int64)[::-1]
         image = np.empty(sz_out, dtype=img_dtype); image.fill(bg)
 
-        # convert the image coorners to subscripts.
+        # convert the image corners to subscripts.
         corners = np.round(corners).astype(np.int64)
         c = corners[:,::-1]
 
         for i in range(nimages):
             if images[i] is None or not (img_shapes[i,:] > 0).all(): continue
             s = img_shapes[i,:]
-            image[c[i,0]:c[i,0]+s[0],c[i,1]:c[i,1]+s[1]] = images[i]
+            image[c[i, 0]:c[i, 0] + s[0], c[i, 1]:c[i, 1] + s[1]] = images[i]
 
         return image, corners
