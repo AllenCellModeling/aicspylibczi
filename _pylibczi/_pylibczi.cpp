@@ -30,6 +30,10 @@
 #include <typeinfo>
 
 #include "inc_libCZI.h"
+
+// moved here to avoid compile error
+static PyObject *PylibcziError;
+
 #include "aics_added.hpp"
 
 // moved here to avoid compile error
