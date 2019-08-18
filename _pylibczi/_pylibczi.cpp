@@ -18,7 +18,7 @@
 
 #include "Python.h"
 
-#define NPY_NO_DEPRECATED_API NPY_1_14_API_VERSION
+#define NPY_NO_DEPRECATED_API NPY_1_16_API_VERSION
 
 #include "numpy/arrayobject.h"
 
@@ -30,6 +30,10 @@
 #include <typeinfo>
 
 #include "inc_libCZI.h"
+
+// moved here to avoid compile error
+static PyObject *PylibcziError;
+
 #include "aics_added.hpp"
 
 // https://stackoverflow.com/questions/3342726/c-print-out-enum-value-as-text
@@ -100,6 +104,7 @@ static PyMethodDef _pylibcziMethods[] = {
     {"cziread_meta_from_istream", cziread_meta_from_istream, METH_VARARGS, "Read czi meta data"},
     {"cziread_allsubblocks_from_istream", cziread_allsubblocks_from_istream, METH_VARARGS, "Read czi image containing all scenes"},
     {"cziread_shape_from_istream", cziread_shape_from_istream, METH_VARARGS, "Read czi Dimensions"},
+    {"cziread_selected", cziread_selected, METH_VARARGS, "Read subblocks specified with dictionary"},
 
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
@@ -120,7 +125,7 @@ static struct PyModuleDef moduledef = {
 };
 
 // generic exception for any errors encountered here
-static PyObject *PylibcziError;
+// static PyObject *PylibcziError; ****** moved up to top
 
 extern "C" {
 PyMODINIT_FUNC PyInit__pylibczi(void) {
@@ -142,8 +147,8 @@ PyMODINIT_FUNC PyInit__pylibczi(void) {
 /* #### Helper prototypes ################################### */
 
 std::shared_ptr <libCZI::ICZIReader> open_czireader_from_cfilename(char const *fn);
-
 PyArrayObject *copy_bitmap_to_numpy_array(std::shared_ptr <libCZI::IBitmapData> pBitmap);
+int listToIntRect(PyObject *obj, void * rect_p);
 
 /* #### Extended modules #################################### */
 
@@ -243,6 +248,7 @@ static PyObject *cziread_allsubblocks(PyObject *self, PyObject *args) {
 
 // Begin new code
 
+<<<<<<< HEAD
  static int convertDictToPlaneCoords(PyObject *obj, void * dim_p){
     if(!PyDict_Check(obj)){ // docs says it returns true/false but it returns an integer
         return 0; // not a dictionary somethings wrong
@@ -379,6 +385,8 @@ static PyObject *cziread_mosaic(PyObject *self, PyObject *args) {
     cziReader->Close();
     return (PyObject*) img;
 }
+
+
 
 // end new code
 

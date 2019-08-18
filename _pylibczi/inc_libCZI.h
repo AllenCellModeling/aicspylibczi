@@ -33,3 +33,5 @@
 #include "libCZI/BitmapOperations.h"
 
 #include "libCZI/CziSubBlockDirectory.h"
+
+#include "libCZI/libCZI_DimCoordinate.h"

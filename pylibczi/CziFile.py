@@ -215,6 +215,14 @@ class CziFile(object):
 
         return img
 
+    def read_selection(self, m_index: [int, None] = None, **kwargs):
+        plane_constraints = {k: v for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS}
+
+        img = self.czilib.cziread_selected(self._bytes, plane_constraints, m_index)
+        print(f"length: {len(img[0])}")
+        x = 10
+        return img[0]
+
     @staticmethod
     def plot_image(image, figno=1, doplots_ds=1, reduce=np.mean, interp_string='nearest', show=True):
         """Generic image plot using matplotlib.

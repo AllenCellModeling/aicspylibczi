@@ -16,14 +16,19 @@
 
 using namespace std;
 
+// extern PyObject *PylibcziError; add back in when I split out into a cpp and hpp file
 
 /// @brief Function Prototypes
 class CSimpleStreamImplFromFP;
+int convertDictToPlaneCoords(PyObject *obj, void * dim_p);
+bool isPyramid0(const libCZI::SubBlockInfo &info);
+bool dimsMatch(const libCZI::CDimCoordinate &targetDims, const libCZI::CDimCoordinate &cziDims);
 std::shared_ptr <CSimpleStreamImplFromFP> cziread_io_buffered_reader_to_istream(PyObject *self, PyObject *args);
 std::shared_ptr <libCZI::ICZIReader> open_czireader_from_istream(std::shared_ptr <CSimpleStreamImplFromFP> stream);
 PyArrayObject *copy_bitmap_to_numpy_array(std::shared_ptr <libCZI::IBitmapData> pBitmap);
 PyObject *get_shape_from_fp(std::shared_ptr <libCZI::ICZIReader> &czi);
 PyObject *cziread_shape_from_istream(PyObject *self, PyObject *args);
+PyObject *cziread_selected(PyObject *self, PyObject *args);
 
 
 /// <summary>	A wrapper that takes a FILE * and creates an libCZI::IStream object out of it
@@ -63,12 +68,50 @@ class BadArgsException : public std::exception {
     }
 };
 
+int convertDictToPlaneCoords(PyObject *obj, void * dim_p){
+    if(!PyDict_Check(obj)){ // docs says it returns true/false but it returns an integer
+        return 0; // not a dictionary somethings wrong
+    };
+
+    libCZI::CDimCoordinate *dims = static_cast<libCZI::CDimCoordinate *>(dim_p);
+    std::map < std::string, libCZI::DimensionIndex > tbl{
+            {"V", libCZI::DimensionIndex::V},
+            {"H", libCZI::DimensionIndex::H},
+            {"I", libCZI::DimensionIndex::I},
+            {"S", libCZI::DimensionIndex::S},
+            {"R", libCZI::DimensionIndex::R},
+            {"T", libCZI::DimensionIndex::T},
+            {"C", libCZI::DimensionIndex::C},
+            {"Z", libCZI::DimensionIndex::Z}
+    };
+
+    int ret_val = 1;
+    std::for_each(tbl.begin(), tbl.end(), [&](std::pair< const std::string, libCZI::DimensionIndex > &kv)->void{
+        PyObject *pyInt = PyDict_GetItemString(obj, kv.first.c_str() );
+        if(pyInt != NULL){
+            dims->Set(kv.second, static_cast<int>(PyLong_AsLong(pyInt)));
+            if( PyErr_Occurred() != NULL) {
+                PyErr_SetString(PylibcziError,
+                                "problem converting Dictionary of dims, should be C=1 meaning Dimension = Integer");
+                ret_val = 0;
+            }
+        }
+    });
+    return ret_val; // success
+}
+
+
 /// Read the metadata from the python file stream and return it as a string
 /// \param self PyObject * to the object that called this code -- not used here but being consistent with convention
 /// \param pyfp The python PyObject BytesIO object or relative there of the opened file
 /// \return A string containing the XML metadata
 static PyObject *cziread_meta_from_istream(PyObject *self, PyObject *pyfp) {
-    auto stream = cziread_io_buffered_reader_to_istream(self, pyfp);
+    PyObject *in_file = nullptr;
+    if (!PyArg_ParseTuple(pyfp, "O", &in_file)){
+        PyErr_SetString(PylibcziError, "Error: conversion of arguments failed. Check arguments." );
+        return nullptr;
+    }
+    auto stream = cziread_io_buffered_reader_to_istream(self, in_file);
     auto cziReader = open_czireader_from_istream(stream);
 
     // get the the document's metadata
@@ -84,44 +127,6 @@ static PyObject *cziread_meta_from_istream(PyObject *self, PyObject *pyfp) {
     return pystring;
 }
 
-/// @brief remap libCZI::DimensionIndex from an integer Enum to a character Z(1) to 'Z', S(5) to 'S'
-/// \param x the libCZI::DimensionIndex to map to the appropriate character
-/// \return The character used to represent the DimensionIndex, one of {Z,C,T,R,S,I,H,V,B}
-std::string map2String(const libCZI::DimensionIndex x){
-    std::string ans;
-    switch(x) {
-        case libCZI::DimensionIndex::Z:
-            ans = "Z";            ///< The Z-dimension.
-            break;
-        case libCZI::DimensionIndex::C:
-            ans = "C";           ///< The C-dimension ("channel")
-            break;
-        case libCZI::DimensionIndex::T:
-            ans = "T";
-            break;
-        case libCZI::DimensionIndex::R:
-            ans = "R";
-            break;
-        case libCZI::DimensionIndex::S:
-            ans = "S";
-            break;
-        case libCZI::DimensionIndex::I:
-            ans = "I";
-            break;
-        case libCZI::DimensionIndex::H:
-            ans = "H";
-            break;
-        case libCZI::DimensionIndex::V:
-            ans = "V";
-            break;
-        case libCZI::DimensionIndex::B:
-            ans = "B";
-            break;
-        default:
-            throw std::out_of_range("Unsupported DimensionIndex!");
-    }
-    return ans;
-}
 
 /// @brief get_shape_from_fp returns the Dimensions of a ZISRAW/CZI when provided a ICZIReader object
 /// \param czi: a shared_ptr to an initialized CziReader object
@@ -138,7 +143,7 @@ PyObject *get_shape_from_fp(std::shared_ptr <libCZI::ICZIReader> &czi){
 
     PyObject* pyDict = PyDict_New();
     std::for_each(tbl.begin(), tbl.end(), [&pyDict](const std::pair< libCZI::DimensionIndex, std::pair<int, int> >& pare){
-        std::string tmp = map2String(pare.first);
+        std::string tmp(1, libCZI::Utils::DimensionToChar(pare.first));
         PyObject *key = Py_BuildValue("s", tmp.c_str());
         PyObject *value = Py_BuildValue("i", (pare.second.second));
         PyDict_SetItem(pyDict, key, value);
@@ -163,8 +168,13 @@ PyObject *get_shape_from_fp(std::shared_ptr <libCZI::ICZIReader> &czi){
 /// \return a dictionary with {'Channel': Depth} -> {'S': 5, 'C':2} would be a 5 Scene 2 Channel image
 PyObject *cziread_shape_from_istream(PyObject *self, PyObject *pyfp) {
     PyObject *ans = nullptr;
+    PyObject *in_file = nullptr;
     try {
-        auto stream = cziread_io_buffered_reader_to_istream(self, pyfp);
+        if (!PyArg_ParseTuple(pyfp, "O", &in_file)){
+            PyErr_SetString(PylibcziError, "Error: conversion of arguments failed. Check arguments." );
+            return nullptr;
+        }
+        auto stream = cziread_io_buffered_reader_to_istream(self, in_file);
         auto cziReader = open_czireader_from_istream(stream);
         ans = get_shape_from_fp(cziReader);
     } catch (const exception &e){
@@ -174,11 +184,16 @@ PyObject *cziread_shape_from_istream(PyObject *self, PyObject *pyfp) {
 }
 
 
-static PyObject *cziread_allsubblocks_from_istream(PyObject *self, PyObject *args) {
+static PyObject *cziread_allsubblocks_from_istream(PyObject *self, PyObject *pyfp) {
     using namespace std::placeholders; // enable _1 _2 _3 type placeholders
+    PyObject *in_file = nullptr;
     // parse arguments
     try {
-        auto stream = cziread_io_buffered_reader_to_istream(self, args);
+        if (!PyArg_ParseTuple(pyfp, "O", &in_file)){
+            PyErr_SetString(PylibcziError, "Error: conversion of arguments failed. Check arguments." );
+            return nullptr;
+        }
+        auto stream = cziread_io_buffered_reader_to_istream(self, in_file);
         auto cziReader = open_czireader_from_istream(stream);
         // count all the subblocks
 
@@ -246,14 +261,108 @@ static PyObject *cziread_allsubblocks_from_istream(PyObject *self, PyObject *arg
     return NULL;
 }
 
+bool isPyramid0(const libCZI::SubBlockInfo &info){
+    return ( info.logicalRect.w == info.physicalSize.w && info.logicalRect.h == info.physicalSize.h);
+}
+
+bool dimsMatch(const libCZI::CDimCoordinate &targetDims, const libCZI::CDimCoordinate &cziDims){
+    bool ans = true;
+    targetDims.EnumValidDimensions([&](libCZI::DimensionIndex dim, int value)->bool{
+        int cziDimValue = 0;
+        if( cziDims.TryGetPosition(dim, &cziDimValue) ){
+          ans = (cziDimValue == value);
+        }
+        return ans;
+    });
+    return ans;
+}
+
+PyObject *cziread_selected(PyObject *self, PyObject *args){
+    // (fp, dict, mIndex)
+    PyObject *in_file = nullptr;
+    PyObject *pyMIndex = nullptr;
+    libCZI::CDimCoordinate planeCoord;
+    if (!PyArg_ParseTuple(args, "OO&O", &in_file, &convertDictToPlaneCoords, &planeCoord, &pyMIndex)) {
+        PyErr_SetString(PylibcziError, "Error: conversion of arguments failed. Check arguments.");
+        return nullptr;
+    }
+    std::cout << "check1" << std::endl;
+    auto stream = cziread_io_buffered_reader_to_istream(self, in_file);
+    std::cout << "check1.5" << std::endl;
+    auto cziReader = open_czireader_from_istream(stream);
+
+    std::cout << "check2" << std::endl;
+    // convert mIndex
+    int mIndex = -1;
+    if(pyMIndex != Py_None) mIndex = static_cast<int>(PyLong_AsLong(pyMIndex));
+
+    std::cout << "check3" << std::endl;
+    // count the matching subblocks
+    npy_intp matching_subblock_count = 0;
+    cziReader->EnumerateSubBlocks([&](int idx, const libCZI::SubBlockInfo &info)->bool{
+        if( isPyramid0(info) && dimsMatch(planeCoord, info.coordinate) )  matching_subblock_count++;
+        return true;
+    });
+
+    std::cout << "check4" << std::endl;
+    auto statistics = cziReader->GetStatistics();
+
+    // get scene index if specified
+    int scene_index = -1;
+    libCZI::IntRect sceneBox = {0, 0, -1, -1};
+    if( planeCoord.TryGetPosition(libCZI::DimensionIndex::S, &scene_index)  ){
+        auto itt = statistics.sceneBoundingBoxes.find(scene_index);
+        if( itt == statistics.sceneBoundingBoxes.end() ) sceneBox = itt->second.boundingBoxLayer0; // layer0 specific
+        else sceneBox.Invalidate();
+    }else{
+        std::cout << "You are attempting to extract a scene from a single scene czi." << std::endl;
+        scene_index = -1;
+    }
+
+    std::cout << "check5" << std::endl;
+    PyObject *images = PyList_New(matching_subblock_count);
+    npy_intp eshp[2];
+    eshp[0] = matching_subblock_count;
+    eshp[1] = 2;
+    PyArrayObject *coordinates = (PyArrayObject *) PyArray_Empty(2, eshp, PyArray_DescrFromType(NPY_INT32), 0);
+    npy_int32 *coords = (npy_int32 *) PyArray_DATA(coordinates);
+
+    npy_intp cnt = 0;
+    cziReader->EnumerateSubBlocks([&](int idx, const libCZI::SubBlockInfo &info) {
+
+        if( !isPyramid0(info) ) return true;
+        if( sceneBox.IsValid() && !sceneBox.IntersectsWith(info.logicalRect) ) return true;
+        if( !dimsMatch(planeCoord, info.coordinate) ) return true;
+        if( mIndex != -1 && info.mIndex != std::numeric_limits<int>::max() && mIndex != info.mIndex ) return true;
+
+        // add the sub-block image
+        PyList_SetItem(images, cnt,
+                       (PyObject *) copy_bitmap_to_numpy_array(cziReader->ReadSubBlock(idx)->CreateBitmap()));
+        // add the coordinates
+        coords[2 * cnt] = info.logicalRect.x;
+        coords[2 * cnt + 1] = info.logicalRect.y;
+
+        //info.coordinate.EnumValidDimensions([](libCZI::DimensionIndex dim, int value)
+        //{
+        //    //valid_dims[(int) dim] = true;
+        //    cout << "Dimension  " << dim << " value " << value << endl;
+        //    return true;
+        //});
+
+        cnt++;
+        return true;
+    });
+
+    return Py_BuildValue("OO", images, (PyObject *) coordinates);
+}
+
+
 /// @brief Convert the python BytesIO / IOBufferedReader object to a child of libCZI::IStream
 /// \param self PyObject * to the object that made the call -- not used here
 /// \param pyfp PyObject * to the IOBufferedReader / BytesIO python stream of file contents
 /// \return a shared_ptr to a CSimpleStreamImplFromFp -- a wrapper of a file pointer that is compatible with libCZI
-std::shared_ptr <CSimpleStreamImplFromFP> cziread_io_buffered_reader_to_istream(PyObject *self, PyObject *pyfp) {
+std::shared_ptr <CSimpleStreamImplFromFP> cziread_io_buffered_reader_to_istream(PyObject *self, PyObject *in_file) {
     // parse arguments
-    PyObject *in_file;
-    if (!PyArg_ParseTuple(pyfp, "O", &in_file)) throw BadArgsException();
     int fdescript = PyObject_AsFileDescriptor(in_file);
     if (fdescript == -1) throw BadFileDescriptorException();
     FILE *fp = fdopen(fdescript, "r");
