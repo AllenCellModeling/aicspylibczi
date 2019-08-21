@@ -1,3 +1,4 @@
 [submodule "libCZI"]
 	path = libCZI
-	url = https://github.com/elhuhdron/libCZI.git
+	url = https://github.com/zeiss-microscopy/libCZI.git
+	branch = master
