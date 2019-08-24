@@ -25,6 +25,7 @@
 //#define _STATICLIBBUILD
 
 #include "libCZI/libCZI.h"
+#include "libCZI/CZIReader.h"
 
 #include "libCZI/splines.h"
 
@@ -35,3 +36,4 @@
 #include "libCZI/CziSubBlockDirectory.h"
 
 #include "libCZI/libCZI_DimCoordinate.h"
+#include "libCZI/libCZI_Utilities.h"
