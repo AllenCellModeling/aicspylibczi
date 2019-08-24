@@ -6,6 +6,7 @@
 #include "inc_libCZI.h"
 #include "aics_added.h"
 #include "IndexMap.h"
+#include "exceptions.h"
 
 
 PYBIND11_MODULE(_pylibczi, m) {
@@ -24,7 +25,7 @@ PYBIND11_MODULE(_pylibczi, m) {
 		B = 9,			///< The B-dimension ("block") - its use is deprecated.
      *
     // could add this in but I don't think I need it, it provides a wrapper for the C++ object in python rather
-     than casting it from one side to the other. 
+     than casting it from one side to the other.
     py::enum_<libCZI::DimensionIndex>(m, "DimIndex")
         .value("invalid", libCZI::DimensionIndex::invalid)
         .value("Z", libCZI::DimensionIndex::Z)
@@ -39,6 +40,10 @@ PYBIND11_MODULE(_pylibczi, m) {
         .export_values();
 
      */
+
+    py::register_exception<pylibczi::FilePtrException>(m, "PyBytesIO2FilePtrException");
+    py::register_exception<pylibczi::PixelTypeException>(m, "PyPixelTypeException");
+
     py::class_<pylibczi::Reader>(m, "Reader")
         .def(py::init<FILE *>())
         .def("is_mosaic_file", &pylibczi::Reader::isMosaicFile)
