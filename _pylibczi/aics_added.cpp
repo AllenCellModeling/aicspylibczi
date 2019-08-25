@@ -25,6 +25,17 @@ namespace pylibczi {
         m_statistics = m_czireader->GetStatistics();
     }
 
+    std::string
+    Reader::cziread_meta(){
+        // get the the document's metadata
+        auto mds = m_czireader->ReadMetadataSegment();
+        auto md = mds->CreateMetaFromMetadataSegment();
+        //auto docInfo = md->GetDocumentInfo();
+        //auto dsplSettings = docInfo->GetDisplaySettings();
+        std::string xml = md->GetXml();
+        return xml;
+    }
+
     bool Reader::isMosaicFile(void) {
         return (m_statistics.maxMindex > 0);
     }
