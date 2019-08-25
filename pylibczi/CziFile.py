@@ -22,8 +22,6 @@ import numpy as np
 from lxml import etree as etree
 
 
-# import os
-
 class CziFile(object):
     """Zeiss CZI file object.
 

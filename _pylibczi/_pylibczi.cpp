@@ -166,6 +166,7 @@ static PyObject *cziread_mosaic_shape(PyObject *self, PyObject *args) {
     auto cziReader = open_czireader_from_cfilename(filename_buf);
     auto statistics = cziReader->GetStatistics();
     // handle the case where the function was called with no selection rectangle
+    // by loading the bounding box from the file statistics block below
     libCZI::IntRect box = statistics.boundingBox;
     return Py_BuildValue("(iiii)", box.x, box.y, box.w, box.h);
 }
@@ -248,14 +249,14 @@ static PyObject *cziread_allsubblocks(PyObject *self, PyObject *args) {
     };
 
     int ret_val = 1;
-     std::for_each(tbl.begin(), tbl.end(), [&](std::pair< const std::string, libCZI::DimensionIndex > &kv)->void{
+    std::for_each(tbl.begin(), tbl.end(), [&](std::pair< const std::string, libCZI::DimensionIndex > &kv)->void{
          PyObject *pyInt = PyDict_GetItemString(obj, kv.first.c_str() );
          if(pyInt != NULL){
              dims->Set(kv.second, static_cast<int>(PyLong_AsLong(pyInt)));
              if( PyErr_Occurred() != NULL) {
                  PyErr_SetString(PylibcziError,
                                  "problem converting Dictionary of dims, should be C=1 meaning Dimension = Integer");
-                 ret_val = 0;
+                 return 0;
              }
          }
      });
@@ -312,7 +313,7 @@ bool isValidRegion(const libCZI::IntRect &inBox, const libCZI::IntRect &cziBox )
     }
 
     if(inBox.w < 1 || 1 > inBox.h){
-        std::cerr << "Ill-defined region, with and heigh must be positive values! ("
+        std::cerr << "Ill-defined region, width and height must be positive values! ("
                 << inBox.x << ", " << inBox.y << ", " << inBox.w << ", " << inBox.h << ")" << std::endl;
         ans = false;
     }
