@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8.12)
 set(CMAKE_MACOSX_RPATH 1)
 project(_pylibczi)
 # build problems with library dependencies if I go above C++14
+# namely the dependencies on the Eigen library and they have to update
+# their use of std::bind2nd / std::bind1st to std::bind
 #set(CMAKE_CXX_COMPILER /Applications/CLion.app/Contents/bin/clang)
 set(CMAKE_CXX_STANDARD 14)
 set(PYBIND11_CPP_STANDARD -std=c++14)
