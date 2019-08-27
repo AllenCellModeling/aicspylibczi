@@ -36,7 +36,7 @@ include_directories(libCZI/Src)
 
 find_library(libCZI REQUIRED PATHS ${CMAKE_SOURCE_DIR}/libCZI)
 
-set(PYLIBCZI_C_SRC _pylibczi/aics_added.cpp _pylibczi/IndexMap.cpp)
+set(PYLIBCZI_C_SRC _pylibczi/Reader.cpp _pylibczi/IndexMap.cpp)
 set(PYLIBCZI_PYBIND11 _pylibczi/pb_bindings.cpp
         _pylibczi/pb_caster_BytesIO.h _pylibczi/pb_caster_libCZI_DimensionIndex.h)
 

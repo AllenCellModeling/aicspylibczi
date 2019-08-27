@@ -4,7 +4,7 @@
 
 #include <pybind11/pybind11.h>
 #include "inc_libCZI.h"
-#include "aics_added.h"
+#include "Reader.h"
 #include "IndexMap.h"
 #include "exceptions.h"
 
@@ -12,24 +12,6 @@
 PYBIND11_MODULE(_pylibczi, m) {
 
     namespace py = pybind11;
-
-    /*
-    // could add this in but I don't think I need it, it provides a wrapper for the C++ object in python rather
-     than casting it from one side to the other.
-    py::enum_<libCZI::DimensionIndex>(m, "DimIndex")
-        .value("invalid", libCZI::DimensionIndex::invalid)
-        .value("Z", libCZI::DimensionIndex::Z)
-        .value("C", libCZI::DimensionIndex::C)
-        .value("T", libCZI::DimensionIndex::T)
-        .value("R", libCZI::DimensionIndex::R)
-        .value("S", libCZI::DimensionIndex::S)
-        .value("I", libCZI::DimensionIndex::I)
-        .value("H", libCZI::DimensionIndex::H)
-        .value("V", libCZI::DimensionIndex::V)
-        .value("B", libCZI::DimensionIndex::B)
-        .export_values();
-
-     */
 
     py::register_exception<pylibczi::FilePtrException>(m, "PyBytesIO2FilePtrException");
     py::register_exception<pylibczi::PixelTypeException>(m, "PyPixelTypeException");
