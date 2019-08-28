@@ -26,7 +26,7 @@ namespace pylibczi {
     }
 
     std::string
-    Reader::cziread_meta(){
+    Reader::read_meta(){
         // get the the document's metadata
         auto mds = m_czireader->ReadMetadataSegment();
         auto md = mds->CreateMetaFromMetadataSegment();
@@ -44,7 +44,7 @@ namespace pylibczi {
     /// \param czi: a shared_ptr to an initialized CziReader object
     /// \return A Python Dictionary as a PyObject*
     Reader::mapDiP
-    Reader::get_shape() {
+    Reader::read_dims() {
         mapDiP tbl;
 
         m_statistics.dimBounds.EnumValidDimensions([&tbl](libCZI::DimensionIndex di, int start, int size) -> bool {
@@ -57,7 +57,7 @@ namespace pylibczi {
 
 
     Reader::tuple_ans
-    Reader::cziread_selected(libCZI::CDimCoordinate &planeCoord, int mIndex) {
+    Reader::read_selected(libCZI::CDimCoordinate &planeCoord, int mIndex) {
         // count the matching subblocks
         ssize_t matching_subblock_count = 0;
         std::vector<IndexMap>  order_mapping;
@@ -152,91 +152,70 @@ namespace pylibczi {
                   [](IndexMap &a, IndexMap &b) -> bool { return a.lessThanSubblock(b); });
     }
 
-    py::array
-    Reader::copy_bitmap_to_numpy_array(std::shared_ptr<libCZI::IBitmapData> pBitmap) {
-        // define numpy types/shapes and bytes per pixel depending on the zeiss bitmap pixel type.
-        py::detail::npy_api::constants numpy_type = py::detail::npy_api::constants::NPY_UINT16_;
-        std::string np_name;
-
-        int pixel_size_bytes = 0;
-        int channels = 1;
-        auto size = pBitmap->GetSize();
-        std::vector<py::ssize_t> shp{size.w, size.h};
-        py::array img;
-        // images in czi file are in F-order, set F-order flag (last argument to PyArray_Empty)
-        switch (pBitmap->GetPixelType()) {
-        case libCZI::PixelType::Gray8: // uint8
-            pixel_size_bytes = 1;
-            channels = 1;
-            img = py::array_t<uint8_t, py::array::f_style>(shp);
-            break;
-        case libCZI::PixelType::Gray16: // uint16
-            pixel_size_bytes = 2;
-            channels = 1;
-            img = py::array_t<uint16_t, py::array::f_style>(shp);
-            break;
-        case libCZI::PixelType::Bgr48: // uint16
-            pixel_size_bytes = 6;
-            channels = 3;
-            shp.emplace(shp.begin(), channels); // {channels, size.w, size.h};
-            img = py::array_t<uint16_t, py::array::f_style>(shp);
-            break;
-        default:throw PixelTypeException(pBitmap->GetPixelType(), "Unsupported type, ask libCZI to add support.");
-        }
-
-        // copy from the czi lib image pointer to the numpy array pointer
-        void *pointer = img.mutable_data();
-        std::size_t rowsize = size.w * pixel_size_bytes;
+    template<typename T, size_t W, size_t H, size_t C>
+    unique_ptr< std::array< std::array<std::array<T, W>, H>, C> >
+    Reader::copy_bitmap_to_array(const std::shared_ptr<libCZI::IBitmapData>& pBitmap) {
+        // this structure should be fordered but possibly with jumps between rows
+        auto u_ptr = std::make_unique(std::array< std::array<std::array<T, W>, H>, C>{});
+        // pixel_size = C * sizeof(T);
+        size_t rowsize = W * C * sizeof(T);
         {
+            size_t i = 0;
             libCZI::ScopedBitmapLockerP lckScoped{pBitmap.get()};
-            for (std::uint32_t h = 0; h < pBitmap->GetHeight(); ++h) {
-                auto ptr = (((uint8_t *) lckScoped.ptrDataRoi) + h * lckScoped.stride);
-                auto target = (((uint8_t *) pointer) + h * rowsize);
-                std::memcpy(target, ptr, rowsize);
-            }
+            for( auto c : *u_ptr.get() )
+                for( auto h : c) {
+                    auto src = static_cast<T *>(static_cast<uint8_t *>(lckScoped.ptrDataRoi)
+                        + (&h - c.begin()) * lckScoped.stride);
+                    std::copy(src, src + h.size(), h.begin());
+                }
         }
-        return img;
+        return u_ptr;
     }
 
+
+    bool
+    Reader::isValidRegion(const libCZI::IntRect &inBox, const libCZI::IntRect &cziBox ){
+        bool ans = true;
+        // check origin is in domain
+        if( inBox.x < cziBox.x || cziBox.x + cziBox.w < inBox.x) ans = false;
+        if( inBox.y < cziBox.y || cziBox.y + cziBox.h < inBox.y) ans = false;
+
+        // check  (x1, y1) point is in domain
+        int x1 = inBox.x + inBox.w;
+        int y1 = inBox.y + inBox.h;
+        if( x1 < cziBox.x || cziBox.x + cziBox.w < x1) ans = false;
+        if( y1 < cziBox.y || cziBox.y + cziBox.h < y1) ans = false;
+
+        if(!ans) throw RegionSelectionException( inBox, cziBox, "Requested region not in image!" );
+        if(inBox.w < 1 || 1 > inBox.h)
+            throw RegionSelectionException( inBox, cziBox, "Requested region must have non-negative width and height!" );
+
+        return ans;
+    }
+
+    template<typename T, size_t W, size_t H, size_t C>
+    unique_ptr< std::array< std::array<std::array<T, W>, H>, C> >
+    Reader::read_mosaic(libCZI::IntRect imBox, const libCZI::CDimCoordinate &planeCoord, int scaleFactor) {
+        // handle the case where the function was called with region=None (default to all)
+        if ( imBox.w == -1 && imBox.h == -1 ) imBox = m_statistics.boundingBox;
+        isValidRegion(imBox, m_statistics.boundingBox); // if not throws RegionSelectionException
+
+        std::map< libCZI::DimensionIndex, std::pair< int, int> > limitTbl;
+        m_statistics.dimBounds.EnumValidDimensions([&limitTbl](libCZI::DimensionIndex di, int start, int size)->bool{
+          limitTbl.emplace( di, std::make_pair(start, size));
+          return true;
+        });
+
+        auto accessor = m_czireader->CreateSingleChannelScalingTileAccessor();
+
+        // multiTile accessor is not compatible with S, it composites the Scenes and the mIndexs together
+        auto multiTileComposit = accessor->Get(
+            imBox,
+            &planeCoord,
+            scaleFactor,
+            nullptr);   // use default options
+
+        auto img = copy_bitmap_to_array<T, W, H, C>(multiTileComposit);
+        return img;
+    }
 }
-/*
-/// @brief get_shape_from_fp returns the Dimensions of a ZISRAW/CZI when provided a ICZIReader object
-/// \param czi: a shared_ptr to an initialized CziReader object
-/// \return A Python Dictionary as a PyObject*
-    std::map<char, int>
-    get_shape_from_fp(std::shared_ptr<libCZI::ICZIReader> &czi) {
-    PyObject *ans = nullptr;
-    auto statistics = czi->GetStatistics();
-    std::map<libCZI::DimensionIndex, std::pair<int, int> > tbl;
-
-    statistics.dimBounds.EnumValidDimensions([&tbl](libCZI::DimensionIndex di, int start, int size) -> bool {
-      tbl.emplace(di, std::make_pair(start, size));
-      return true;
-    });
-
-    PyObject *pyDict = PyDict_New();
-    std::for_each(tbl.begin(), tbl.end(),
-                  [&pyDict](const std::pair<libCZI::DimensionIndex, std::pair<int, int> > &pare) {
-                    std::string tmp(1, libCZI::Utils::DimensionToChar(pare.first));
-                    PyObject *key = Py_BuildValue("s", tmp.c_str());
-                    PyObject *value = Py_BuildValue("i", (pare.second.second));
-                    PyDict_SetItem(pyDict, key, value);
-                    Py_DECREF(key);
-                    Py_DECREF(value);
-                  });
-    ans = pyDict;
-    return ans;
-}
-
-
-
-
-}
-
-PYBIND11_MODULE(example, m) {
-m.doc() = "pybind11 example plugin"; // optional module docstring
-
-m.def("add", &pylibczi::add, "A function which adds two numbers");
-}
-
- */

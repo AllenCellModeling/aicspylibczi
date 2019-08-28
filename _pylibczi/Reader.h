@@ -92,14 +92,13 @@ namespace pylibczi {
        *
        * @return A map< DimensionIndex, pair<int(start), int(size)> >
        */
-      Reader::mapDiP get_shape();
-
+      Reader::mapDiP read_dims();
 
       /*!
        * @brief Get the metadata from the CZI file.
        * @return A string containing the xml metadata from the file
        */
-      std::string cziread_meta();
+      std::string read_meta();
 
       /*!
        * @brief Given a CDimCoordinate, even an empty one, return the planes that match as a numpy ndarray
@@ -114,100 +113,28 @@ namespace pylibczi {
        * @param planeCoord A structure containing the Dimension constraints
        * @param mIndex Is only relevant for mosaic files, if you wish to select one frame.
        */
-      tuple_ans cziread_selected(libCZI::CDimCoordinate &planeCoord, int mIndex = -1);
+      tuple_ans read_selected(libCZI::CDimCoordinate &planeCoord, int mIndex = -1);
+
+      template<typename T, size_t W, size_t H, size_t C>
+      unique_ptr<std::array<std::array<std::array<T, W>, H>, C> >
+      read_mosaic(libCZI::IntRect imBox, const libCZI::CDimCoordinate &planeCoord, int scaleFactor);
 
     private:
       // int convertDictToPlaneCoords(PyObject *obj, void *dim_p);
-      py::array copy_bitmap_to_numpy_array(std::shared_ptr<libCZI::IBitmapData> pBitmap);
+      template<typename T, size_t W, size_t H, size_t C>
+      std::unique_ptr<std::array<std::array<std::array<T, W>, H>, C> >
+      copy_bitmap_to_array(const std::shared_ptr<libCZI::IBitmapData> &pBitmap);
 
-      bool dimsMatch(const libCZI::CDimCoordinate &targetDims, const libCZI::CDimCoordinate &cziDims);
+      static bool dimsMatch(const libCZI::CDimCoordinate &targetDims, const libCZI::CDimCoordinate &cziDims);
 
-      void add_sort_order_index(vector<IndexMap> &vec);
+      static void add_sort_order_index(vector<IndexMap> &vec);
 
       static bool isPyramid0(const libCZI::SubBlockInfo &info) {
           return (info.logicalRect.w == info.physicalSize.w && info.logicalRect.h == info.physicalSize.h);
       }
+
+      static bool isValidRegion(const libCZI::IntRect &inBox, const libCZI::IntRect &cziBox);
     };
-
-/*
-
-static PyObject *cziread_allsubblocks_from_istream(PyObject *self, PyObject *pyfp) {
-  using namespace std::placeholders; // enable _1 _2 _3 type placeholders
-  PyObject *in_file = nullptr;
-  // parse arguments
-  try {
-    if (!PyArg_ParseTuple(pyfp, "O", &in_file)) {
-      PyErr_SetString(PylibcziError, "Error: conversion of arguments failed. Check arguments.");
-      return nullptr;
-    }
-    auto stream = cziread_io_buffered_reader_to_istream(self, in_file);
-    auto cziReader = open_czireader_from_istream(stream);
-    // count all the subblocks
-
-    npy_intp subblock_count = 0;
-    auto count_blocks([&subblock_count](int idx, const libCZI::SubBlockInfo &info) -> bool {
-      subblock_count++;
-      return true;
-    });
-
-    // assignment warning is a CLION error it should be fine.
-    std::function<bool(int, const libCZI::SubBlockInfo &)> countLambdaAsFunc =
-        static_cast< std::function<bool(int, const libCZI::SubBlockInfo &)> >(count_blocks);
-
-    cziReader->EnumerateSubBlocks(countLambdaAsFunc);  // f_count_blocks);
-    std::cout << "Enumerated " << subblock_count << std::endl;
-
-    // meh - this seems to be not useful, what is an M-index? someone read the spec...
-    //auto stats = cziReader->GetStatistics();
-    //cout << stats.subBlockCount << " " << stats.maxMindex << endl;
-    //int subblock_count = stats.subBlockCount;
-
-    // copy the image data and coordinates into numpy arrays, return images as python list of numpy arrays
-    PyObject *images = PyList_New(subblock_count);
-    npy_intp eshp[2];
-    eshp[0] = subblock_count;
-    eshp[1] = 2;
-    PyArrayObject *coordinates = (PyArrayObject *) PyArray_Empty(2, eshp, PyArray_DescrFromType(NPY_INT32), 0);
-    npy_int32 *coords = (npy_int32 *) PyArray_DATA(coordinates);
-
-    npy_intp cnt = 0;
-    cziReader->EnumerateSubBlocks(
-        [&cziReader, &subblock_count, &cnt, images, coords](int idx, const libCZI::SubBlockInfo &info) {
-          //std::cout << "Index " << idx << ": " << libCZI::Utils::DimCoordinateToString(&info.coordinate)
-          //  << " Rect=" << info.logicalRect << " M-index " << info.mIndex << std::endl;
-
-          // add the sub-block image
-          PyList_SetItem(images, cnt,
-                         (PyObject *) copy_bitmap_to_numpy_array(
-                             cziReader->ReadSubBlock(idx)->CreateBitmap()));
-          // add the coordinates
-          coords[2 * cnt] = info.logicalRect.x;
-          coords[2 * cnt + 1] = info.logicalRect.y;
-
-          //info.coordinate.EnumValidDimensions([](libCZI::DimensionIndex dim, int value)
-          //{
-          //    //valid_dims[(int) dim] = true;
-          //    cout << "Dimension  " << dim << " value " << value << endl;
-          //    return true;
-          //});
-
-          cnt++;
-          return true;
-        });
-
-    return Py_BuildValue("OO", images, (PyObject *) coordinates);
-  }
-  catch (const BadArgsException &e) {
-    PyErr_SetString(PyExc_TypeError, "Unable to map args provided from python to c++.");
-    return NULL;
-  }
-  catch (const BadFileDescriptorException &fbad) {
-    PyErr_SetString(PyExc_IOError, "Unable to convert ByteIO object to File pointer.");
-    return NULL;
-  }
-  return NULL;
-}
-*/
 
 }
 

@@ -19,9 +19,9 @@ PYBIND11_MODULE(_pylibczi, m) {
     py::class_<pylibczi::Reader>(m, "Reader")
         .def(py::init<FILE *>())
         .def("is_mosaic_file", &pylibczi::Reader::isMosaicFile)
-        .def("get_shape", &pylibczi::Reader::get_shape)
-        .def("read_meta", &pylibczi::Reader::cziread_meta)
-        .def("read_selected", &pylibczi::Reader::cziread_selected);
+        .def("read_dims", &pylibczi::Reader::read_dims)
+        .def("read_meta", &pylibczi::Reader::read_meta)
+        .def("read_selected", &pylibczi::Reader::read_selected);
 
     py::class_<pylibczi::IndexMap>(m, "IndexMap")
         .def(py::init<>())
