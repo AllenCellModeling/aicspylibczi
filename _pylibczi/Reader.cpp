@@ -105,7 +105,8 @@ namespace pylibczi {
               return true;
 
           // add the sub-block image
-          images.append(copy_bitmap_to_numpy_array(m_czireader->ReadSubBlock(idx)->CreateBitmap()));
+          ImageFactory imageFactory;
+          images.append(imageFactory.construct_image(m_czireader->ReadSubBlock(idx)->CreateBitmap()));
 
           // add the coordinates
           coords[2 * cnt] = info.logicalRect.x;
@@ -152,26 +153,6 @@ namespace pylibczi {
                   [](IndexMap &a, IndexMap &b) -> bool { return a.lessThanSubblock(b); });
     }
 
-    template<typename T, size_t W, size_t H, size_t C>
-    unique_ptr< std::array< std::array<std::array<T, W>, H>, C> >
-    Reader::copy_bitmap_to_array(const std::shared_ptr<libCZI::IBitmapData>& pBitmap) {
-        // this structure should be fordered but possibly with jumps between rows
-        auto u_ptr = std::make_unique(std::array< std::array<std::array<T, W>, H>, C>{});
-        // pixel_size = C * sizeof(T);
-        size_t rowsize = W * C * sizeof(T);
-        {
-            size_t i = 0;
-            libCZI::ScopedBitmapLockerP lckScoped{pBitmap.get()};
-            for( auto c : *u_ptr.get() )
-                for( auto h : c) {
-                    auto src = static_cast<T *>(static_cast<uint8_t *>(lckScoped.ptrDataRoi)
-                        + (&h - c.begin()) * lckScoped.stride);
-                    std::copy(src, src + h.size(), h.begin());
-                }
-        }
-        return u_ptr;
-    }
-
 
     bool
     Reader::isValidRegion(const libCZI::IntRect &inBox, const libCZI::IntRect &cziBox ){
@@ -193,9 +174,8 @@ namespace pylibczi {
         return ans;
     }
 
-    template<typename T, size_t W, size_t H, size_t C>
-    unique_ptr< std::array< std::array<std::array<T, W>, H>, C> >
-    Reader::read_mosaic(libCZI::IntRect imBox, const libCZI::CDimCoordinate &planeCoord, int scaleFactor) {
+    std::shared_ptr<ImageBC>
+    Reader::read_mosaic(libCZI::IntRect imBox, const libCZI::CDimCoordinate &planeCoord, float scaleFactor) {
         // handle the case where the function was called with region=None (default to all)
         if ( imBox.w == -1 && imBox.h == -1 ) imBox = m_statistics.boundingBox;
         isValidRegion(imBox, m_statistics.boundingBox); // if not throws RegionSelectionException
@@ -215,7 +195,10 @@ namespace pylibczi {
             scaleFactor,
             nullptr);   // use default options
 
-        auto img = copy_bitmap_to_array<T, W, H, C>(multiTileComposit);
+        ImageFactory imageFactory;
+        auto img = imageFactory.construct_image(multiTileComposit);
         return img;
     }
+
+
 }

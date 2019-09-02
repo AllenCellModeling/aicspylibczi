@@ -17,6 +17,7 @@
 #include "inc_libCZI.h"
 #include "Python.h"
 #include "IndexMap.h"
+#include "Image.h"
 
 using namespace std;
 
@@ -115,15 +116,15 @@ namespace pylibczi {
        */
       tuple_ans read_selected(libCZI::CDimCoordinate &planeCoord, int mIndex = -1);
 
-      template<typename T, size_t W, size_t H, size_t C>
-      unique_ptr<std::array<std::array<std::array<T, W>, H>, C> >
-      read_mosaic(libCZI::IntRect imBox, const libCZI::CDimCoordinate &planeCoord, int scaleFactor);
+      std::shared_ptr<ImageBC>
+      read_mosaic(libCZI::IntRect imBox, const libCZI::CDimCoordinate &planeCoord, float scaleFactor);
+
+
+      virtual ~Reader(){
+          m_czireader->Close();
+      }
 
     private:
-      // int convertDictToPlaneCoords(PyObject *obj, void *dim_p);
-      template<typename T, size_t W, size_t H, size_t C>
-      std::unique_ptr<std::array<std::array<std::array<T, W>, H>, C> >
-      copy_bitmap_to_array(const std::shared_ptr<libCZI::IBitmapData> &pBitmap);
 
       static bool dimsMatch(const libCZI::CDimCoordinate &targetDims, const libCZI::CDimCoordinate &cziDims);
 
