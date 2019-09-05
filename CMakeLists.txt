@@ -44,6 +44,6 @@ pybind11_add_module(_pylibczi ${PYLIBCZI_C_SRC} ${PYLIBCZI_PYBIND11})
 set_target_properties(libCZI PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 target_link_libraries(_pylibczi PRIVATE libCZI)
 
-print_all_variables()
+#print_all_variables()
 
 

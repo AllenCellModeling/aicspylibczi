@@ -8,22 +8,11 @@
 #include <utility>
 
 #include "Image.h"
+#include "Iterator.h"
 #include "exceptions.h"
+#include "helper_algorithms.h"
 
 namespace pylibczi {
-
-    /*		Gray8 = 0,					///< Grayscale 8-bit unsinged.
-		Gray16 = 1,					///< Grayscale 16-bit unsinged.
-		Gray32Float = 2,			///< Grayscale 4 byte float.
-		Bgr24 = 3,					///< BGR-color 8-bytes triples (memory order B, G, R).
-		Bgr48 = 4,					///< BGR-color 16-bytes triples (memory order B, G, R).
-		Bgr96Float = 8,				///< BGR-color 4 byte float triples (memory order B, G, R).
-		Bgra32 = 9,					///< Currently not supported in libCZI.
-		Gray64ComplexFloat = 10,	///< Currently not supported in libCZI.
-		Bgr192ComplexFloat = 11,	///< Currently not supported in libCZI.
-		Gray32 = 12,				///< Currently not supported in libCZI.
-		Gray64Float = 13,			///< Currently not supported in libCZI.
-     */
 
     std::unique_ptr<std::map<libCZI::PixelType, std::string> > ImageBC::m_pixelToTypeName(
         new std::map<libCZI::PixelType, std::string>{
@@ -39,34 +28,6 @@ namespace pylibczi {
             {libCZI::PixelType::Gray32, typeid(nullptr).name()},    // unsupported by libCZI
             {libCZI::PixelType::Gray64Float, typeid(nullptr).name()}     // unsupported by libCZI
         });
-
-    size_t
-    ImageBC::n_of_channels() {
-        using PT = libCZI::PixelType;
-        switch (m_pixelType) {
-        case PT::Gray8:
-        case PT::Gray16:
-        case PT::Gray32Float:return 1;
-        case PT::Bgr24:
-        case PT::Bgr48:
-        case PT::Bgr96Float:return 3;
-        default:throw PixelTypeException(m_pixelType, "Pixel Type unsupported by libCZI.");
-        }
-    }
-
-    size_t
-    ImageBC::size_of_pixel_type(libCZI::PixelType pt) {
-        using PT = libCZI::PixelType;
-        switch (pt) {
-        case PT::Gray8:
-        case PT::Bgr24:return sizeof(uint8_t);
-        case PT::Gray16:
-        case PT::Bgr48:return sizeof(uint16_t);
-        case PT::Gray32Float:
-        case PT::Bgr96Float:return sizeof(float);
-        default:throw PixelTypeException(m_pixelType, "Pixel Type unsupported by libCZI.");
-        }
-    }
 
     size_t ImageBC::calculate_idx(const std::vector<size_t> &idxs) {
         if (idxs.size() != m_matrixSizes.size())
@@ -100,7 +61,7 @@ namespace pylibczi {
     }
 
     template<typename T>
-    T &Image<T>::operator[](std::vector<size_t> idxs) {
+    T &Image<T>::operator[](const std::vector<size_t>& idxs) {
         if (idxs.size() != m_matrixSizes.size())
             throw ImageAccessUnderspecifiedException(idxs.size(), m_matrixSizes.size(), "from Image.operator[].");
         size_t idx = calculate_idx(idxs);
@@ -120,11 +81,16 @@ namespace pylibczi {
             libCZI::ScopedBitmapLockerP lckScoped{pBitmap.get()};
 
 // TODO either put in a case statement or addapt the iterators to take the number of channels
-            auto sEnd = static_cast<uint8_t *>(lckScoped.ptrDataRoi);
-            SourceRange<T> sourceRange(static_cast<T *>(lckScoped.ptrDataRoi), (T *)(sEnd),lckScoped.stride, size.w);
-            TargetRange<T> targetRange(size.w, size.h, m_array.get(), m_array.get() + length());
+            auto sEnd = static_cast<uint8_t *>(lckScoped.ptrDataRoi) + size.h*lckScoped.stride;
+            SourceRange<T> sourceRange(channels, static_cast<T *>(lckScoped.ptrDataRoi), (T *)(sEnd),lckScoped.stride, size.w);
+            TargetRange<T> targetRange(channels, size.w, size.h, m_array.get(), m_array.get() + length());
             for (std::uint32_t h = 0; h < pBitmap->GetHeight(); ++h) {
-                std::copy(sourceRange.stride_begin(h), sourceRange.stride_end(h), targetRange.stride_begin(h));
+               paired_for_each(sourceRange.stride_begin(h), sourceRange.stride_end(h), targetRange.stride_begin(h),
+               [](std::vector<T*> src, std::vector<T*>tgt){
+                   paired_for_each(src.begin(), src.end(), tgt.begin(), [](T* s, T* t){
+                       *t = *s;
+                   });
+               });
             }
         }
     }
@@ -132,8 +98,8 @@ namespace pylibczi {
     ImageFactory::ConstrMap ImageFactory::m_pixelToImage{
         {PT::Gray8, [](V_ST shp, PT pt) { return std::shared_ptr<Image<uint8_t> >(new Image<uint8_t>( std::move(shp), pt)); }},
         {PT::Bgr24, [](V_ST shp, PT pt) { return std::shared_ptr<Image<uint8_t> >(new Image<uint8_t>( std::move(shp), pt)); }},
-        {PT::Gray16, [](V_ST shp, PT pt) { return std::shared_ptr<Image<uint16_t> >(new Image< uint16_t>(std::move(shp), pt)); }},
-        {PT::Bgr48, [](V_ST shp, PT pt) { return std::shared_ptr<Image<uint16_t> >(new Image< uint16_t>(std::move(shp), pt)); }},
+        {PT::Gray16, [](V_ST shp, PT pt) { return std::shared_ptr<Image<uint16_t> >(new Image< uint16_t>( std::move(shp), pt)); }},
+        {PT::Bgr48, [](V_ST shp, PT pt) { return std::shared_ptr<Image<uint16_t> >(new Image< uint16_t>( std::move(shp), pt)); }},
         {PT::Gray32Float, [](V_ST shp, PT pt) { return std::shared_ptr<Image<float> >(new Image<float>( std::move(shp), pt)); }},
         {PT::Bgr96Float, [](V_ST shp, PT pt) { return std::shared_ptr<Image<float> >(new Image<float>( std::move(shp), pt)); }}
     };
