@@ -16,7 +16,7 @@ namespace pylibczi {
             (*ptrBytesRead) = bytesRead;
     }
 
-    Reader::Reader(FILE *f_in) : m_czireader(unique_ptr<CCZIReader>()) {
+    Reader::Reader(FILE *f_in) : m_czireader(new CCZIReader)  {
         if (!f_in) {
             throw FilePtrException("Reader class received a bad FILE *!");
         }
@@ -56,7 +56,7 @@ namespace pylibczi {
     }
 
 
-    Reader::tuple_ans
+    std::unique_ptr< Reader::ImageVec >
     Reader::read_selected(libCZI::CDimCoordinate &planeCoord, int mIndex) {
         // count the matching subblocks
         ssize_t matching_subblock_count = 0;
@@ -85,14 +85,9 @@ namespace pylibczi {
             scene_index = -1;
         }
 
-        py::list images;
-        std::vector<ssize_t> eshp{matching_subblock_count, 2};
-        py::array_t<int32_t> coordinates(eshp);
+        std::unique_ptr< ImageVec > images(new ImageVec());
+        images->reserve(matching_subblock_count);
 
-        int32_t *coords = coordinates.mutable_data();
-        // npy_int32 *coords = (npy_int32 *) PyArray_DATA(coordinates);
-
-        ssize_t cnt = 0;
         m_czireader->EnumerateSubBlocks([&](int idx, const libCZI::SubBlockInfo &info) {
 
           if (!isPyramid0(info))
@@ -106,24 +101,13 @@ namespace pylibczi {
 
           // add the sub-block image
           ImageFactory imageFactory;
-          images.append(imageFactory.construct_image(m_czireader->ReadSubBlock(idx)->CreateBitmap()));
+          images->push_back(imageFactory.construct_image(m_czireader->ReadSubBlock(idx)->CreateBitmap(),
+                  &info.coordinate, info.logicalRect, info.mIndex));
 
-          // add the coordinates
-          coords[2 * cnt] = info.logicalRect.x;
-          coords[2 * cnt + 1] = info.logicalRect.y;
-
-          //info.coordinate.EnumValidDimensions([](libCZI::DimensionIndex dim, int value)
-          //{
-          //    //valid_dims[(int) dim] = true;
-          //    cout << "Dimension  " << dim << " value " << value << endl;
-          //    return true;
-          //});
-
-          cnt++;
           return true;
         });
 
-        return std::make_tuple(images, coordinates, order_mapping);
+        return images;
         // return images;
     }
 
@@ -175,7 +159,7 @@ namespace pylibczi {
     }
 
     std::shared_ptr<ImageBC>
-    Reader::read_mosaic(libCZI::IntRect imBox, const libCZI::CDimCoordinate &planeCoord, float scaleFactor) {
+    Reader::read_mosaic(const libCZI::CDimCoordinate &planeCoord, libCZI::IntRect imBox, float scaleFactor) {
         // handle the case where the function was called with region=None (default to all)
         if ( imBox.w == -1 && imBox.h == -1 ) imBox = m_statistics.boundingBox;
         isValidRegion(imBox, m_statistics.boundingBox); // if not throws RegionSelectionException
@@ -196,7 +180,7 @@ namespace pylibczi {
             nullptr);   // use default options
 
         ImageFactory imageFactory;
-        auto img = imageFactory.construct_image(multiTileComposit);
+        auto img = imageFactory.construct_image(multiTileComposit, &planeCoord, imBox, -1);
         return img;
     }
 

@@ -10,18 +10,14 @@
 #include <typeinfo>
 #include <functional>
 #include <vector>
-#include <pybind11/pybind11.h>
-#include <pybind11/numpy.h>
-#include <pybind11/stl.h>
 
 #include "inc_libCZI.h"
-#include "Python.h"
+//#include "Python.h"
 #include "IndexMap.h"
 #include "Image.h"
 
 using namespace std;
 
-namespace py = pybind11;
 
 namespace pylibczi {
 
@@ -32,7 +28,7 @@ namespace pylibczi {
       FILE *fp;
     public:
       CSimpleStreamImplFromFP() = delete;
-      explicit CSimpleStreamImplFromFP(FILE *file_pointer) : fp(file_pointer) {}
+      explicit CSimpleStreamImplFromFP(FILE *file_pointer) { fp = file_pointer; }
       ~CSimpleStreamImplFromFP() override { fclose(this->fp); };
       void Read(std::uint64_t offset, void *pv, std::uint64_t size, std::uint64_t *ptrBytesRead) override;
     };
@@ -47,12 +43,11 @@ namespace pylibczi {
      * https://github.com/elhuhdron/pylibczi
      */
     class Reader {
-      unique_ptr<CCZIReader> m_czireader;
+      CCZIReader *m_czireader;
       libCZI::SubBlockStatistics m_statistics;
     public:
       typedef std::map<libCZI::DimensionIndex, std::pair<int, int> > mapDiP;
-      typedef std::tuple<py::list, py::array_t<int32_t>, std::vector<IndexMap> > tuple_ans;
-
+      using ImageVec = std::vector< std::shared_ptr<ImageBC> >;
       /*!
        * @brief Construct the Reader and load the file statistics (dimensions etc)
        *
@@ -107,6 +102,8 @@ namespace pylibczi {
        * The plane coordinate acts as a constraint, in the example below the dims are a set of constraints.
        * What this means is that every image taken that has Z=8, T=0, C=1 will be returned.
        * @code
+       *    FILE *fp = std::fopen("mosaicfile.czi", "rb");
+       *    czi = pylibczi::Reader(fp);
        *    auto dims = CDimCoordinate{ { DimensionIndex::Z,8 } , { DimensionIndex::T,0 }, { DimensionIndex::C,1 } };
        *    auto img_coords_dims = czi.cziread_selected(dims)
        * @endcode
@@ -114,10 +111,31 @@ namespace pylibczi {
        * @param planeCoord A structure containing the Dimension constraints
        * @param mIndex Is only relevant for mosaic files, if you wish to select one frame.
        */
-      tuple_ans read_selected(libCZI::CDimCoordinate &planeCoord, int mIndex = -1);
+      std::unique_ptr< Reader::ImageVec > read_selected(libCZI::CDimCoordinate &planeCoord, int mIndex = -1);
 
+      /*!
+       * @brief If the czi file is a mosaic tiled image this function can be used to reconstruct it into an image.
+       * @param planeCoord A class constraining the data to an individual plane.
+       * @param scaleFactor (optional) The native size for mosaic files can be huge the scale factor allows one to get something back of a more reasonable size. The default is 0.1 meaning 10% of the native image.
+       * @param imBox (optional) The {x0, y0, width, height} of a sub-region, the default is the whole image.
+       * @return a shared pointer containing an ImageBC*. See description of Image<> and ImageBC.
+       *
+       * @code
+       *    FILE *fp = std::fopen("mosaicfile.czi", "rb");
+       *    czi = pylibczi::Reader(fp);
+       *    auto dims = czi.read_dims();  // dims = {{DimensionIndex::T, {0, 10}}, {DimensionIndex::C, {0,3}}
+       *    // the dims above mean that T and C need to be constrained to single values
+       *
+       *    auto c_dims = CDimCoordinate{ { DimensionIndex::T,0 }, { DimensionIndex::C,1 } };
+       *    auto img_p = czi.read_mosaic( c_dims, scaleFactor=0.15 );
+       *    if(img_p->is_type_match<uint16_t>(){ // supported types are uint8_t, uint16_t, and float
+       *        std::shared_ptr<uint16_t> img = img_p->get_derived<uint16_t>(); // cast the image to the memory size it was acquired as
+       *        // do what you like with the Image<uint16_t>
+       *    }
+       * @endcode
+       */
       std::shared_ptr<ImageBC>
-      read_mosaic(libCZI::IntRect imBox, const libCZI::CDimCoordinate &planeCoord, float scaleFactor);
+      read_mosaic( const libCZI::CDimCoordinate &planeCoord, libCZI::IntRect imBox = {.w = -1, .h = -1}, float scaleFactor=0.1);
 
 
       virtual ~Reader(){

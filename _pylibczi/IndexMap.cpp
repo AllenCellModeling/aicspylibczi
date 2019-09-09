@@ -9,7 +9,7 @@
 
 namespace pylibczi {
 
-    static const std::vector<libCZI::DimensionIndex> m_sortOrder = {
+     const std::vector<libCZI::DimensionIndex> IndexMap::m_sortOrder = {
         libCZI::DimensionIndex::V,
         libCZI::DimensionIndex::H,
         libCZI::DimensionIndex::I,

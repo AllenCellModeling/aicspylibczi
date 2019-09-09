@@ -5,6 +5,8 @@ project(_pylibczi)
 # namely the dependencies on the Eigen library and they have to update
 # their use of std::bind2nd / std::bind1st to std::bind
 #set(CMAKE_CXX_COMPILER /Applications/CLion.app/Contents/bin/clang)
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
 set(CMAKE_CXX_STANDARD 14)
 set(PYBIND11_CPP_STANDARD -std=c++14)
 
@@ -33,17 +35,29 @@ add_subdirectory(libCZI/Src/libCZI)
 add_subdirectory(pybind11)
 
 include_directories(libCZI/Src)
-
 find_library(libCZI REQUIRED PATHS ${CMAKE_SOURCE_DIR}/libCZI)
 
-set(PYLIBCZI_C_SRC _pylibczi/Reader.cpp _pylibczi/IndexMap.cpp _pylibczi/Image.cpp)
+set(PYLIBCZI_C_SRC_HEADERS _pylibczi/Reader.h _pylibczi/helper_algorithms.h
+        _pylibczi/exceptions.h _pylibczi/inc_libCZI.h _pylibczi/IndexMap.h _pylibczi/Image.h )
+
+set(PYLIBCZI_C_SRC  _pylibczi/Reader.cpp  _pylibczi/IndexMap.cpp _pylibczi/Image.cpp )
+
 set(PYLIBCZI_PYBIND11 _pylibczi/pb_bindings.cpp
         _pylibczi/pb_caster_BytesIO.h _pylibczi/pb_caster_libCZI_DimensionIndex.h)
 
-pybind11_add_module(_pylibczi ${PYLIBCZI_C_SRC} ${PYLIBCZI_PYBIND11})
-set_target_properties(libCZI PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
-target_link_libraries(_pylibczi PRIVATE libCZI)
+set(TARGET_ONE libczi_c++_extension)
+set(TARGET_TWO _pylibczi)
 
+set_target_properties(libCZI PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+add_library(${TARGET_ONE} STATIC ${PYLIBCZI_C_SRC} ${PYLIBCZI_C_SRC_HEADERS})
+target_link_libraries(${TARGET_ONE} INTERFACE libCZI)
+add_dependencies(${TARGET_ONE} libCZI)
+
+pybind11_add_module(${TARGET_TWO} ${PYLIBCZI_C_SRC} ${PYLIBCZI_PYBIND11})
+target_link_libraries(${TARGET_TWO} PRIVATE libCZI)
+
+#enable_testing()
+add_subdirectory(c_tests)
 #print_all_variables()
 
 

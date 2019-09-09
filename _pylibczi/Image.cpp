@@ -96,12 +96,12 @@ namespace pylibczi {
     }
 
     ImageFactory::ConstrMap ImageFactory::m_pixelToImage{
-        {PT::Gray8, [](V_ST shp, PT pt) { return std::shared_ptr<Image<uint8_t> >(new Image<uint8_t>( std::move(shp), pt)); }},
-        {PT::Bgr24, [](V_ST shp, PT pt) { return std::shared_ptr<Image<uint8_t> >(new Image<uint8_t>( std::move(shp), pt)); }},
-        {PT::Gray16, [](V_ST shp, PT pt) { return std::shared_ptr<Image<uint16_t> >(new Image< uint16_t>( std::move(shp), pt)); }},
-        {PT::Bgr48, [](V_ST shp, PT pt) { return std::shared_ptr<Image<uint16_t> >(new Image< uint16_t>( std::move(shp), pt)); }},
-        {PT::Gray32Float, [](V_ST shp, PT pt) { return std::shared_ptr<Image<float> >(new Image<float>( std::move(shp), pt)); }},
-        {PT::Bgr96Float, [](V_ST shp, PT pt) { return std::shared_ptr<Image<float> >(new Image<float>( std::move(shp), pt)); }}
+        {PT::Gray8, [](V_ST shp, PT pt, LCD *dims, IR ir, int m) { return std::shared_ptr<Image<uint8_t> >(new Image<uint8_t>( std::move(shp), pt, dims, ir, m)); }},
+        {PT::Bgr24, [](V_ST shp, PT pt, LCD *dims, IR ir, int m) { return std::shared_ptr<Image<uint8_t> >(new Image<uint8_t>( std::move(shp), pt, dims, ir, m)); }},
+        {PT::Gray16, [](V_ST shp, PT pt, LCD *dims, IR ir, int m) { return std::shared_ptr<Image<uint16_t> >(new Image< uint16_t>( std::move(shp), pt, dims, ir, m)); }},
+        {PT::Bgr48, [](V_ST shp, PT pt, LCD *dims, IR ir, int m) { return std::shared_ptr<Image<uint16_t> >(new Image< uint16_t>( std::move(shp), pt, dims, ir, m)); }},
+        {PT::Gray32Float, [](V_ST shp, PT pt, LCD *dims, IR ir, int m) { return std::shared_ptr<Image<float> >(new Image<float>( std::move(shp), pt, dims, ir, m)); }},
+        {PT::Bgr96Float, [](V_ST shp, PT pt, LCD *dims, IR ir, int m) { return std::shared_ptr<Image<float> >(new Image<float>( std::move(shp), pt, dims, ir, m)); }}
     };
 
     size_t
@@ -132,7 +132,7 @@ namespace pylibczi {
 
     };
 
-    std::shared_ptr<ImageBC> ImageFactory::construct_image(const std::shared_ptr<libCZI::IBitmapData> &pBitmap) {
+    std::shared_ptr<ImageBC> ImageFactory::construct_image(const std::shared_ptr<libCZI::IBitmapData> &pBitmap, const libCZI::CDimCoordinate *cdims, libCZI::IntRect ir, int m) {
         libCZI::IntSize size = pBitmap->GetSize();
         libCZI::PixelType pt = pBitmap->GetPixelType();
 
@@ -143,7 +143,7 @@ namespace pylibczi {
         shp.emplace_back(size.h);
         shp.emplace_back(size.w);
 
-        std::shared_ptr<ImageBC> img = m_pixelToImage[pt](shp, pt);
+        std::shared_ptr<ImageBC> img = m_pixelToImage[pt](shp, pt, cdims, ir, m);
         img->load_image(pBitmap, channels);
 
         return std::shared_ptr<ImageBC>(img);

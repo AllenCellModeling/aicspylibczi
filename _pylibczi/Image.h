@@ -10,8 +10,10 @@
 #include <cstdio>
 #include <cstdlib>
 #include <functional>
+#include <libCZI/libCZI.h>
 #include <libCZI/libCZI_Pixels.h>
 #include <map>
+#include <numeric>
 #include <utility>
 #include <vector>
 
@@ -29,14 +31,21 @@ namespace pylibczi {
     protected:
         std::vector<size_t> m_matrixSizes;
         libCZI::PixelType m_pixelType;
+        libCZI::CDimCoordinate m_cdims;
+        libCZI::IntRect m_xywh;
+        int m_mIndex;
+
+
         static std::unique_ptr<std::map<libCZI::PixelType, std::string>>
                 m_pixelToTypeName;
 
         size_t calculate_idx(const std::vector<size_t> &idxs);
 
     public:
-        ImageBC(std::vector<size_t> shp, libCZI::PixelType pt)
-                : m_matrixSizes(std::move(shp)), m_pixelType(pt) {}
+        ImageBC(std::vector<size_t> shp, libCZI::PixelType pt, const libCZI::CDimCoordinate *cdim,
+                libCZI::IntRect ir, int mIndex)
+                : m_matrixSizes(std::move(shp)), m_pixelType(pt), m_cdims(*cdim),
+                m_xywh(ir), m_mIndex(mIndex) {}
 
         template<typename T>
         std::shared_ptr<Image<T>> get_derived();
@@ -65,8 +74,9 @@ namespace pylibczi {
         // private constructor
 
     public:
-        Image(std::vector<size_t> shp, libCZI::PixelType pt)
-                : ImageBC(shp, pt), m_array(new T[std::accumulate(shp.begin(), shp.end(), 1 , std::multiplies<>())]) {}
+        Image(std::vector<size_t> shp, libCZI::PixelType pt, const libCZI::CDimCoordinate *cdim,
+              libCZI::IntRect ir, int mIndex)
+                : ImageBC(shp, pt, cdim, ir, mIndex), m_array(new T[std::accumulate(shp.begin(), shp.end(), 1 , std::multiplies<>())]) {}
 
         T &operator[](const std::vector<size_t>& idxsXY);
 
@@ -76,6 +86,8 @@ namespace pylibczi {
 
         void load_image(const std::shared_ptr<libCZI::IBitmapData> &pBitmap,
                         size_t channels) override;
+
+// TODO Implement set_sort_order() and operator()<
     };
 
 
@@ -84,7 +96,11 @@ namespace pylibczi {
         using V_ST = std::vector<size_t>;
         using ConstrMap = std::map<libCZI::PixelType,
                 std::function<std::shared_ptr<ImageBC>(
-                        std::vector<size_t>, libCZI::PixelType pt)>>;
+                        std::vector<size_t>, libCZI::PixelType pt, const libCZI::CDimCoordinate *cdim,
+                libCZI::IntRect ir, int mIndex)> >;
+        using LCD = const libCZI::CDimCoordinate;
+        using IR = libCZI::IntRect;
+
         static ConstrMap m_pixelToImage;
 
     public:
@@ -93,7 +109,7 @@ namespace pylibczi {
         static size_t n_of_channels(PT pt);
 
         std::shared_ptr<ImageBC>
-        construct_image(const std::shared_ptr<libCZI::IBitmapData> &pBitmap);
+        construct_image(const std::shared_ptr<libCZI::IBitmapData> &pBitmap, const libCZI::CDimCoordinate *cdims, libCZI::IntRect ir, int m);
     };
 } // namespace pylibczi
 
