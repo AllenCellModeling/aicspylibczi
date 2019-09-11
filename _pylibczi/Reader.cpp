@@ -36,7 +36,7 @@ namespace pylibczi {
         return xml;
     }
 
-    bool Reader::isMosaicFile(void) {
+    bool Reader::isMosaic(void) {
         return (m_statistics.maxMindex > 0);
     }
 

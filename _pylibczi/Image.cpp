@@ -6,6 +6,7 @@
 #include <numeric>
 #include <typeinfo>
 #include <utility>
+#include <iostream>
 
 #include "Image.h"
 #include "Iterator.h"
@@ -46,62 +47,19 @@ namespace pylibczi {
         return idx;
     }
 
-    template<typename T>
-    bool
-    ImageBC::is_type_match() {
-        return (typeid(T).name() == (*m_pixelToTypeName)[m_pixelType]);
-    }
 
-    template<typename T>
-    std::shared_ptr<Image<T> >
-    ImageBC::get_derived() {
-        if (!is_type_match<T>())
-            throw PixelTypeException(m_pixelType, "Image PixelType doesn't match requested memory type.");
-        return std::shared_ptr<Image<T> >(dynamic_cast< Image<T> *>(this));
-    }
 
-    template<typename T>
-    T &Image<T>::operator[](const std::vector<size_t>& idxs) {
-        if (idxs.size() != m_matrixSizes.size())
-            throw ImageAccessUnderspecifiedException(idxs.size(), m_matrixSizes.size(), "from Image.operator[].");
-        size_t idx = calculate_idx(idxs);
-        return m_array[idx];
-    }
+ 
 
-    template<typename T>
-    T *Image<T>::get_raw_ptr(std::vector<size_t> lst) {
-        std::vector<size_t> zeroPadded(0, m_matrixSizes.size());
-        std::copy(lst.rbegin(), lst.rend(), zeroPadded.rbegin());
-        return this->operator[](calculate_idx(zeroPadded));
-    }
-    template<typename T>
-    void Image<T>::load_image(const std::shared_ptr<libCZI::IBitmapData> &pBitmap, size_t channels) {
-        libCZI::IntSize size = pBitmap->GetSize();
-        {
-            libCZI::ScopedBitmapLockerP lckScoped{pBitmap.get()};
 
-// TODO either put in a case statement or addapt the iterators to take the number of channels
-            auto sEnd = static_cast<uint8_t *>(lckScoped.ptrDataRoi) + size.h*lckScoped.stride;
-            SourceRange<T> sourceRange(channels, static_cast<T *>(lckScoped.ptrDataRoi), (T *)(sEnd),lckScoped.stride, size.w);
-            TargetRange<T> targetRange(channels, size.w, size.h, m_array.get(), m_array.get() + length());
-            for (std::uint32_t h = 0; h < pBitmap->GetHeight(); ++h) {
-               paired_for_each(sourceRange.stride_begin(h), sourceRange.stride_end(h), targetRange.stride_begin(h),
-               [](std::vector<T*> src, std::vector<T*>tgt){
-                   paired_for_each(src.begin(), src.end(), tgt.begin(), [](T* s, T* t){
-                       *t = *s;
-                   });
-               });
-            }
-        }
-    }
 
     ImageFactory::ConstrMap ImageFactory::m_pixelToImage{
-        {PT::Gray8, [](V_ST shp, PT pt, LCD *dims, IR ir, int m) { return std::shared_ptr<Image<uint8_t> >(new Image<uint8_t>( std::move(shp), pt, dims, ir, m)); }},
-        {PT::Bgr24, [](V_ST shp, PT pt, LCD *dims, IR ir, int m) { return std::shared_ptr<Image<uint8_t> >(new Image<uint8_t>( std::move(shp), pt, dims, ir, m)); }},
-        {PT::Gray16, [](V_ST shp, PT pt, LCD *dims, IR ir, int m) { return std::shared_ptr<Image<uint16_t> >(new Image< uint16_t>( std::move(shp), pt, dims, ir, m)); }},
-        {PT::Bgr48, [](V_ST shp, PT pt, LCD *dims, IR ir, int m) { return std::shared_ptr<Image<uint16_t> >(new Image< uint16_t>( std::move(shp), pt, dims, ir, m)); }},
-        {PT::Gray32Float, [](V_ST shp, PT pt, LCD *dims, IR ir, int m) { return std::shared_ptr<Image<float> >(new Image<float>( std::move(shp), pt, dims, ir, m)); }},
-        {PT::Bgr96Float, [](V_ST shp, PT pt, LCD *dims, IR ir, int m) { return std::shared_ptr<Image<float> >(new Image<float>( std::move(shp), pt, dims, ir, m)); }}
+        {PT::Gray8, [](V_ST shp, PT pt, LCD *dims, IR ir, int m) { return std::shared_ptr<Image<uint8_t> >(new Image<uint8_t>(std::move(shp), pt, dims, ir, m)); }},
+        {PT::Bgr24, [](V_ST shp, PT pt, LCD *dims, IR ir, int m) { return std::shared_ptr<Image<uint8_t> >(new Image<uint8_t>(std::move(shp), pt, dims, ir, m)); }},
+        {PT::Gray16, [](V_ST shp, PT pt, LCD *dims, IR ir, int m) { return std::shared_ptr<Image<uint16_t> >(new Image<uint16_t>(std::move(shp), pt, dims, ir, m)); }},
+        {PT::Bgr48, [](V_ST shp, PT pt, LCD *dims, IR ir, int m) { return std::shared_ptr<Image<uint16_t> >(new Image<uint16_t>(std::move(shp), pt, dims, ir, m)); }},
+        {PT::Gray32Float, [](V_ST shp, PT pt, LCD *dims, IR ir, int m) { return std::shared_ptr<Image<float> >(new Image<float>(std::move(shp), pt, dims, ir, m)); }},
+        {PT::Bgr96Float, [](V_ST shp, PT pt, LCD *dims, IR ir, int m) { return std::shared_ptr<Image<float> >(new Image<float>(std::move(shp), pt, dims, ir, m)); }}
     };
 
     size_t
@@ -132,7 +90,10 @@ namespace pylibczi {
 
     };
 
-    std::shared_ptr<ImageBC> ImageFactory::construct_image(const std::shared_ptr<libCZI::IBitmapData> &pBitmap, const libCZI::CDimCoordinate *cdims, libCZI::IntRect ir, int m) {
+    std::shared_ptr<ImageBC> ImageFactory::construct_image(const std::shared_ptr<libCZI::IBitmapData> &pBitmap,
+                                                           const libCZI::CDimCoordinate *cdims,
+                                                           libCZI::IntRect ir,
+                                                           int m) {
         libCZI::IntSize size = pBitmap->GetSize();
         libCZI::PixelType pt = pBitmap->GetPixelType();
 
@@ -144,6 +105,8 @@ namespace pylibczi {
         shp.emplace_back(size.w);
 
         std::shared_ptr<ImageBC> img = m_pixelToImage[pt](shp, pt, cdims, ir, m);
+        if (img.get() == nullptr)
+            throw std::bad_alloc();
         img->load_image(pBitmap, channels);
 
         return std::shared_ptr<ImageBC>(img);

@@ -68,7 +68,7 @@ namespace pylibczi {
        *
        * @return True if the file is a mosaic file, false if it is not.
        */
-      bool isMosaicFile();
+      bool isMosaic();
 
       /*!
        * @brief Get the dimensions (shape) of the file.
@@ -137,6 +137,7 @@ namespace pylibczi {
       std::shared_ptr<ImageBC>
       read_mosaic( const libCZI::CDimCoordinate &planeCoord, libCZI::IntRect imBox = {.w = -1, .h = -1}, float scaleFactor=0.1);
 
+      char dim_to_char(libCZI::DimensionIndex di) { return libCZI::Utils::DimensionToChar(di); }
 
       virtual ~Reader(){
           m_czireader->Close();

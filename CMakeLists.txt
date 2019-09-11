@@ -5,7 +5,7 @@ project(_pylibczi)
 # namely the dependencies on the Eigen library and they have to update
 # their use of std::bind2nd / std::bind1st to std::bind
 #set(CMAKE_CXX_COMPILER /Applications/CLion.app/Contents/bin/clang)
-set(CMAKE_VERBOSE_MAKEFILE ON)
+
 
 set(CMAKE_CXX_STANDARD 14)
 set(PYBIND11_CPP_STANDARD -std=c++14)
@@ -30,6 +30,7 @@ IF(UNIX)
 ENDIF(UNIX)
 
 add_compile_definitions(LINUXENV)
+add_compile_definitions(_STATICLIBBUILD)
 add_subdirectory(libCZI/Src/JxrDecode)
 add_subdirectory(libCZI/Src/libCZI)
 add_subdirectory(pybind11)
@@ -50,11 +51,11 @@ set(TARGET_TWO _pylibczi)
 
 set_target_properties(libCZI PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 add_library(${TARGET_ONE} STATIC ${PYLIBCZI_C_SRC} ${PYLIBCZI_C_SRC_HEADERS})
-target_link_libraries(${TARGET_ONE} INTERFACE libCZI)
-add_dependencies(${TARGET_ONE} libCZI)
+target_link_libraries(${TARGET_ONE} INTERFACE libCZIStatic JxrDecodeStatic)
+add_dependencies(${TARGET_ONE} libCZIStatic JxrDecodeStatic)
 
 pybind11_add_module(${TARGET_TWO} ${PYLIBCZI_C_SRC} ${PYLIBCZI_PYBIND11})
-target_link_libraries(${TARGET_TWO} PRIVATE libCZI)
+target_link_libraries(${TARGET_TWO} PRIVATE libCZIStatic JxrDecodeStatic)
 
 #enable_testing()
 add_subdirectory(c_tests)

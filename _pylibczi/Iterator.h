@@ -78,7 +78,7 @@ namespace pylibczi {
 
         source_channel_iterator stride_end(size_t h) {
             auto tmp = (uint8_t *) m_begin;
-            tmp += h * m_stride + m_pixels_per_stride * m_channels;
+            tmp += h * m_stride + m_pixels_per_stride * m_channels * sizeof(T);
             T *send = (T *) tmp;
             if (send > m_end)
                 throw ImageIteratorException(
