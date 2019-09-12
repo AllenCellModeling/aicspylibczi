@@ -55,3 +55,4 @@ TEST_CASE_METHOD(CziImageCreator, "test_image_nothrow", "[Image_Cast_Nothrow]"){
     std::shared_ptr<ImageBC> img = get();
     REQUIRE_NOTHROW( ImageFactory::get_derived<uint16_t>(img) );
 }
+

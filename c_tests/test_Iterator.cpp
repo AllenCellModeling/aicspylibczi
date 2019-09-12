@@ -7,8 +7,13 @@
 #include "catch.hpp"
 #include "Iterator.h"
 #include "helper_algorithms.h"
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
+#include <iostream>
 
 using namespace pylibczi;
+
+namespace py = pybind11;
 
 TEST_CASE("iterator_source", "[iterator_src]"){
     uint16_t src[60];  // w=5 h=4 c=3 (rgb, bgr or whatever)
@@ -47,3 +52,25 @@ TEST_CASE("iterator_source_to_target", "[iterator_src_tgt]"){
         REQUIRE( tgt[i] == i/20 +1 );
 }
 
+TEST_CASE("nparray_source", "[array_t_src_tgt]"){
+    uint16_t *src = new uint16_t[60];  // w=5 h=4 c=3 (rgb, bgr or whatever)
+    for( int i = 0; i < 60; i++){
+        src[i] = i/20 + 1; // map the values to 1,2,3,1,2,3 ... so that the channel structure is embedded by value.
+    }
+
+
+    std::vector<ptrdiff_t> shp{3, 5,4};
+    py::array_t<uint16_t> arr(shp, src);
+    auto r = arr.unchecked<3>();
+    std::cout << "x = " << r.shape(0) << std::endl;
+    std::cout << "y = " << r.shape(1) << std::endl;
+    std::cout << "z = " << r.shape(2) << std::endl;
+    for(size_t i = 0 ; i < r.shape(0) ; i++)
+        for(size_t j = 0; j < r.shape( 1); j++ )
+            for(size_t k = 0; k < r.shape(2); k++)
+                std::cout << "( " << i << ", " << j << ", " << k << "): " << r(i, j, k) << std::endl;
+
+    REQUIRE(1 == 1);
+
+
+}

@@ -43,7 +43,7 @@ set(PYLIBCZI_C_SRC_HEADERS _pylibczi/Reader.h _pylibczi/helper_algorithms.h
 
 set(PYLIBCZI_C_SRC  _pylibczi/Reader.cpp  _pylibczi/IndexMap.cpp _pylibczi/Image.cpp )
 
-set(PYLIBCZI_PYBIND11 _pylibczi/pb_bindings.cpp
+set(PYLIBCZI_PYBIND11 _pylibczi/pb_bindings.cpp _pylibczi/pb_helpers.h
         _pylibczi/pb_caster_BytesIO.h _pylibczi/pb_caster_libCZI_DimensionIndex.h)
 
 set(TARGET_ONE libczi_c++_extension)
@@ -54,7 +54,9 @@ add_library(${TARGET_ONE} STATIC ${PYLIBCZI_C_SRC} ${PYLIBCZI_C_SRC_HEADERS})
 target_link_libraries(${TARGET_ONE} INTERFACE libCZIStatic JxrDecodeStatic)
 add_dependencies(${TARGET_ONE} libCZIStatic JxrDecodeStatic)
 
-pybind11_add_module(${TARGET_TWO} ${PYLIBCZI_C_SRC} ${PYLIBCZI_PYBIND11})
+#set(Python_ADDITIONAL_VERSIONS 3.7.3)
+#find_package(PythonLibs REQUIRED)
+pybind11_add_module(${TARGET_TWO} STATIC ${PYLIBCZI_C_SRC} ${PYLIBCZI_PYBIND11})
 target_link_libraries(${TARGET_TWO} PRIVATE libCZIStatic JxrDecodeStatic)
 
 #enable_testing()

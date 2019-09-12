@@ -9,16 +9,19 @@
 #include "exceptions.h"
 
 
+
+
 PYBIND11_MODULE(_pylibczi, m) {
 
     namespace py = pybind11;
+
 
     py::register_exception<pylibczi::FilePtrException>(m, "PyBytesIO2FilePtrException");
     py::register_exception<pylibczi::PixelTypeException>(m, "PyPixelTypeException");
 
     py::class_<pylibczi::Reader>(m, "Reader")
         .def(py::init<FILE *>())
-        .def("is_mosaic_file", &pylibczi::Reader::isMosaicFile)
+        .def("is_mosaic_file", &pylibczi::Reader::isMosaic)
         .def("read_dims", &pylibczi::Reader::read_dims)
         .def("read_meta", &pylibczi::Reader::read_meta)
         .def("read_selected", &pylibczi::Reader::read_selected);

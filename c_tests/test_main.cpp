@@ -4,6 +4,11 @@
 
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
+#include <pybind11/embed.h>
+
+namespace py=pybind11;
+
+py::scoped_interpreter guard{};
 
 TEST_CASE( "sanity_check", "Prove that 1 equals 1" ){
 int one = 1;
