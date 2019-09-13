@@ -35,7 +35,7 @@ namespace pylibczi {
             throw ImageAccessUnderspecifiedException(idxs.size(), m_matrixSizes.size(), "Sizes must match");
         size_t running_product = 1;
         std::vector<size_t> weights(1, 1);
-        std::for_each(m_matrixSizes.begin() + 1, m_matrixSizes.end(), [&weights, &running_product](const size_t len) {
+        std::for_each(m_matrixSizes.rbegin(), m_matrixSizes.rend()-1, [&weights, &running_product](const size_t len) {
           running_product *= len;
           weights.emplace_back(running_product);
         });
@@ -49,7 +49,7 @@ namespace pylibczi {
 
 
 
- 
+
 
 
 

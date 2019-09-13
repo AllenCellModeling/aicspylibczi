@@ -72,7 +72,7 @@ namespace pylibczi {
         add_sort_order_index(order_mapping);
 
         // get scene index if specified
-        int scene_index = -1;
+        int scene_index;
         libCZI::IntRect sceneBox = {0, 0, -1, -1};
         if (planeCoord.TryGetPosition(libCZI::DimensionIndex::S, &scene_index)) {
             auto itt = m_statistics.sceneBoundingBoxes.find(scene_index);
@@ -81,7 +81,6 @@ namespace pylibczi {
             else
                 sceneBox.Invalidate();
         } else {
-            std::cout << "You are attempting to extract a scene from a single scene czi." << std::endl;
             scene_index = -1;
         }
 
