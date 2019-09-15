@@ -111,7 +111,7 @@ namespace pylibczi {
        * @param planeCoord A structure containing the Dimension constraints
        * @param mIndex Is only relevant for mosaic files, if you wish to select one frame.
        */
-      std::unique_ptr< Reader::ImageVec > read_selected(libCZI::CDimCoordinate &planeCoord, int mIndex = -1);
+      std::unique_ptr< Reader::ImageVec > read_selected(libCZI::CDimCoordinate &planeCoord, bool flatten = true, int mIndex = -1);
 
       /*!
        * @brief If the czi file is a mosaic tiled image this function can be used to reconstruct it into an image.

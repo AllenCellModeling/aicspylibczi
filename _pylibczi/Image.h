@@ -36,10 +36,10 @@ protected:
 	int m_mIndex;
 
 	static std::unique_ptr<std::map<libCZI::PixelType, std::string>>
-			m_pixelToTypeName;
+			s_pixelToTypeName;
 
 public:
-
+	using ImVec = std::vector< std::shared_ptr< ImageBC > >;
 
 	ImageBC(std::vector<size_t> shp, libCZI::PixelType pt, const libCZI::CDimCoordinate* cdim,
 			libCZI::IntRect ir, int mIndex)
@@ -61,17 +61,17 @@ public:
 
 	libCZI::PixelType pixelType() { return m_pixelType; }
 
-	virtual void load_image(const std::shared_ptr<libCZI::IBitmapData>& pBitmap,
-			size_t channels) = 0;
+	virtual void load_image(const std::shared_ptr<libCZI::IBitmapData>& pBitmap, size_t channels) = 0;
+
+	virtual ImVec split_channels(int startFrom) = 0;
 };
 
 template<typename T>
 inline bool
 ImageBC::is_type_match()
 {
-	auto nm = typeid(T).name();
-	auto pt = (*m_pixelToTypeName)[m_pixelType];
-	return (typeid(T).name()==(*m_pixelToTypeName)[m_pixelType]);
+	auto pt = (*s_pixelToTypeName)[m_pixelType];
+	return (typeid(T).name()==(*s_pixelToTypeName)[m_pixelType]);
 }
 
 template<typename T>
@@ -103,10 +103,25 @@ public:
 			throw PixelTypeException(m_pixelType, "Image asked to create a container for PixelType with inconsitent type.");
 	}
 
+	/*!
+	 * @brief the [] accessor, for accessing or changing a pixel value
+	 * @param idxsXY The X, Y coordinate in the plane (or X, Y, C} order if 3D. can be provided as an initializer list {x, y, c}
+	 * @return a reference to the pixel
+	 */
 	T& operator[](const std::vector<size_t>& idxsXY);
 
+	/*!
+	 * @brief an alternate accessor to the pixel value in CYX order
+	 * @param idxsCYX a vector or initializer list of C,Y,X indices
+	 * @return a reference to the pixel
+	 */
 	T& getCYX(std::vector<size_t> idxsCYX) { return (*this)[std::vector<size_t>(idxsCYX.rbegin(), idxsCYX.rend())]; }
 
+	/*!
+	 * @brief return the raw_pointer to the memory the image class contains, be careful with raw pointer manipulation. here be segfaults
+	 * @param jumpTo an integer offset from the beginning of the array.
+	 * @return a pointer to the internally managed memory. Image maintains ownership!
+	 */
 	T* get_raw_ptr(int jumpTo = 0) { return m_array.get()+jumpTo; }
 
 	/*!
@@ -128,9 +143,35 @@ public:
 		return m_array.release();
 	}
 
+	/*!
+	 * @brief Copy the image from the libCZI bitmap object into this Image object
+	 * @param pBitmap is the image bitmap from libCZI
+	 * @param channels the number of channels 1 for GrayX, 3 for BgrX etc. (ie the number of XY planes required to hold the image)
+	 */
 	void load_image(const std::shared_ptr<libCZI::IBitmapData>& pBitmap,
 			size_t channels) override;
 
+	/*!
+	 * @brief If this container is a 3channel BGR image split it into single channel images so they can be merged into an data matrix
+	 * @param startFrom is an integer offset to start assigning the new channels from.
+	 * @return a vector of smart pointers wrapping Images (2D)
+	 */
+	ImVec split_channels(int startFrom) override{
+		ImVec ivec;
+		if( m_matrixSizes.size() < 3)
+			throw ImageSplitChannelException("Image  only has 2 dimensions. No channels to split.", 0);
+		int cStart = 0;
+		// TODO figure out if C can have a nonzero value for a BGR image
+		if( m_cdims.TryGetPosition(libCZI::DimensionIndex::C, &cStart) && cStart != 0 )
+			throw ImageSplitChannelException("attempting to split channels", cStart);
+		for(int i = 0 ; i < m_matrixSizes[0]; i++){
+			libCZI::CDimCoordinate tmp(m_cdims);
+			tmp.Set(libCZI::DimensionIndex::C, i+startFrom); // assign the channel from the BGR
+			// TODO should I change the pixel type from a BGRx to a Grayx/3
+			ivec.emplace_back( new Image<T>({m_matrixSizes[1], m_matrixSizes[2]}, m_pixelType, &tmp, m_xywh, m_mIndex) );
+		}
+		return ivec;
+	}
 // TODO Implement set_sort_order() and operator()<
 };
 
@@ -181,7 +222,8 @@ class ImageFactory {
 	using LCD = const libCZI::CDimCoordinate;
 	using IR = libCZI::IntRect;
 
-	static ConstrMap m_pixelToImage;
+	static ConstrMap s_pixelToImage;
+
 
 public:
 	static size_t size_of_pixel_type(PT pt);

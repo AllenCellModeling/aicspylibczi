@@ -15,7 +15,8 @@
 
 namespace pylibczi {
 
-    std::unique_ptr<std::map<libCZI::PixelType, std::string> > ImageBC::m_pixelToTypeName(
+    std::unique_ptr<std::map<libCZI::PixelType, std::string> > ImageBC::s_pixelToTypeName(
+    		
         new std::map<libCZI::PixelType, std::string>{
             {libCZI::PixelType::Gray8, typeid(uint8_t).name()},        // 8-bit grayscale
             {libCZI::PixelType::Gray16, typeid(uint16_t).name()},       // 16-bit grayscale
@@ -53,7 +54,7 @@ namespace pylibczi {
 
 
 
-    ImageFactory::ConstrMap ImageFactory::m_pixelToImage{
+    ImageFactory::ConstrMap ImageFactory::s_pixelToImage{
         {PT::Gray8, [](V_ST shp, PT pt, LCD *dims, IR ir, int m) { return std::shared_ptr<Image<uint8_t> >(new Image<uint8_t>(std::move(shp), pt, dims, ir, m)); }},
         {PT::Bgr24, [](V_ST shp, PT pt, LCD *dims, IR ir, int m) { return std::shared_ptr<Image<uint8_t> >(new Image<uint8_t>(std::move(shp), pt, dims, ir, m)); }},
         {PT::Gray16, [](V_ST shp, PT pt, LCD *dims, IR ir, int m) { return std::shared_ptr<Image<uint16_t> >(new Image<uint16_t>(std::move(shp), pt, dims, ir, m)); }},
@@ -104,8 +105,8 @@ namespace pylibczi {
         shp.emplace_back(size.h);
         shp.emplace_back(size.w);
 
-        std::shared_ptr<ImageBC> img = m_pixelToImage[pt](shp, pt, cdims, ir, m);
-        if (img.get() == nullptr)
+        std::shared_ptr<ImageBC> img = s_pixelToImage[pt](shp, pt, cdims, ir, m);
+        if (img == nullptr)
             throw std::bad_alloc();
         img->load_image(pBitmap, channels);
 
