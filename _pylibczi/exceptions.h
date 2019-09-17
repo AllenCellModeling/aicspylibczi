@@ -9,6 +9,7 @@
 #include <string>
 #include <sstream>
 #include <utility>
+#include <iomanip>
 #include "inc_libCZI.h"
 
 namespace pylibczi {
@@ -82,7 +83,7 @@ namespace pylibczi {
 	  int m_given, m_required;
 	  std::string m_msg;
   public:
-	  ImageAccessUnderspecifiedException(int given, int &required, std::string msg)
+	  ImageAccessUnderspecifiedException(int given, int required, std::string msg)
 			  :m_given(given), m_required(required), m_msg(std::move(msg)) { }
 
 	  const char* what() const noexcept override
@@ -113,16 +114,33 @@ namespace pylibczi {
 	  int m_channel;
   public:
 	  ImageSplitChannelException(std::string msg, int channel)
-			  :m_msg("ImageSplitChannelExcetion: "+msg), m_channel(channel)
-	  {}
+			  :m_msg("ImageSplitChannelExcetion: "+msg), m_channel(channel) { }
 
-	  const char* what() const noexcept override {
+	  const char* what() const noexcept override
+	  {
 		  std::stringstream tmp;
 		  tmp << m_msg << " Channel should be zero or unset but has a value of " << m_channel
 		      << " not sure how to procede in assigning channels." << std::endl;
 		  return tmp.str().c_str();
 	  }
 
+  };
+
+  class ImageCopyAllocFailed: public std::bad_alloc {
+	  std::string m_msg;
+	  int m_size;
+  public:
+	  ImageCopyAllocFailed(std::string msg, int _alloc_size)
+			  :m_msg(std::move(msg)), m_size(_alloc_size) { }
+
+	  const char* what() const noexcept override
+	  {
+		  std::stringstream tmp;
+		  float gb_size = m_size;
+		  gb_size /= 1073741824.0; // 1024 * 1024 * 1024
+		  tmp << "ImageCopyAllocFailed [" << std::setprecision(1) << gb_size << " GB requested]: " << m_msg << std::endl;
+		  return tmp.str().c_str();
+	  }
   };
 }
 

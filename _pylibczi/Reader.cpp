@@ -61,7 +61,7 @@ namespace pylibczi {
 	  return tbl;
   }
 
-  std::unique_ptr<Reader::ImageVec>
+  ImageVector
   Reader::read_selected(libCZI::CDimCoordinate& planeCoord, bool flatten, int mIndex)
   {
 	  // count the matching subblocks
@@ -91,8 +91,8 @@ namespace pylibczi {
 		  scene_index = -1;
 	  }
 
-	  std::unique_ptr<ImageVec> images(new ImageVec());
-	  images->reserve(matching_subblock_count);
+	  ImageVector images;
+	  images.reserve(matching_subblock_count);
 
 	  m_czireader->EnumerateSubBlocks([&](int idx, const libCZI::SubBlockInfo& info) {
 
@@ -114,10 +114,10 @@ namespace pylibczi {
 			  if (m_statistics.dimBounds.TryGetInterval(libCZI::DimensionIndex::C, &start, &sze))
 				  std::cerr << "Warning image has C: start(" << start << ") : size(" << sze << ") - how to handle channels?" << std::endl;
 			  auto imgs = img->split_channels(start+sze);
-			  for_each(imgs.begin(), imgs.end(), [&images](ImageBC::ImVec::value_type& iv) { images->push_back(iv); });
+			  for_each(imgs.begin(), imgs.end(), [&images](ImageBC::ImVec::value_type& iv) { images.push_back(iv); });
 		  }
 		  else
-			  images->push_back(img);
+			  images.push_back(img);
 
 		  return true;
 	  });
@@ -175,8 +175,8 @@ namespace pylibczi {
 	  return ans;
   }
 
-  std::shared_ptr<ImageBC>
-  Reader::read_mosaic(const libCZI::CDimCoordinate& planeCoord, libCZI::IntRect imBox, float scaleFactor)
+  ImageVector
+  Reader::read_mosaic(const libCZI::CDimCoordinate& planeCoord, float scaleFactor, libCZI::IntRect imBox)
   {
 	  // handle the case where the function was called with region=None (default to all)
 	  if (imBox.w==-1 && imBox.h==-1) imBox = m_statistics.boundingBox;
@@ -200,7 +200,18 @@ namespace pylibczi {
 	  // TODO how to handle 3 channel BGR image split them as in read_selected or ???
 	  ImageFactory imageFactory;
 	  auto img = imageFactory.construct_image(multiTileComposit, &planeCoord, imBox, -1);
-	  return img;
+	  ImageVector image_vector;
+	  if (ImageFactory::n_of_channels(img->pixelType())>1) {
+		  int start(0), sze(0);
+		  if (m_statistics.dimBounds.TryGetInterval(libCZI::DimensionIndex::C, &start, &sze))
+			  std::cerr << "Warning image has C: start(" << start << ") : size(" << sze << ") - how to handle channels?" << std::endl;
+		  auto imgs = img->split_channels(start+sze);
+		  for_each(imgs.begin(), imgs.end(), [&image_vector](ImageBC::ImVec::value_type& iv) { image_vector.push_back(iv); });
+	  }
+	  else
+		  image_vector.push_back(img);
+
+	  return image_vector;
   }
 
 }

@@ -24,10 +24,10 @@
 template<class InputIt, class OtherIt, class PairFunction>
 PairFunction paired_for_each(InputIt first, InputIt last, OtherIt ofirst, PairFunction f)
 {
-    for (; first != last; ++first, ++ofirst) {
-        f(*first, *ofirst);
-    }
-    return f;
+	for (; first!=last; ++first, ++ofirst) {
+		f(*first, *ofirst);
+	}
+	return f;
 }
 
 #endif //_PYLIBCZI_HELPER_ALGORITHMS_H
