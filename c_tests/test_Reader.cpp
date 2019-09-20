@@ -5,6 +5,7 @@
 #include "catch.hpp"
 #include "../_pylibczi/Reader.h"
 #include <unistd.h>
+#include "pb_helpers.h"
 
 class CziCreator{
   std::unique_ptr<pylibczi::Reader> m_czi;
@@ -13,7 +14,12 @@ public:
   pylibczi::Reader * get() { return m_czi.get(); }
 };
 
-
+class CziCreator2{
+	std::unique_ptr<pylibczi::Reader> m_czi;
+public:
+	CziCreator2(): m_czi(new pylibczi::Reader( std::fopen("resources/s_3_t_1_c_3_z_5.czi", "rb" ))){}
+	pylibczi::Reader * get() { return m_czi.get(); }
+};
 
 TEST_CASE("test_reader_constructor", "[Reader]"){
     FILE *fp = std::fopen("resources/s_1_t_1_c_1_z_1.czi", "rb");      // #include <cstdio>
@@ -48,11 +54,24 @@ TEST_CASE_METHOD(CziCreator, "test_read_selected", "[Reader_read_selected]"){
     auto czi = get();
     auto c_dims = libCZI::CDimCoordinate{ { libCZI::DimensionIndex::B,0 },
                                           { libCZI::DimensionIndex::C,0 } };
-    auto imvec = czi->read_selected(c_dims);
-    REQUIRE(imvec->size() == 1);
-    auto shape = imvec->front()->shape();
+    auto imvec = czi->read_selected(c_dims).first;
+    REQUIRE(imvec.size() == 1);
+    auto shape = imvec.front()->shape();
     REQUIRE(shape[0] == 325); // height
     REQUIRE(shape[1] == 475); // width
+    //pb_helpers::pack_array(imvec);
+}
+
+TEST_CASE_METHOD(CziCreator2, "test_read_selected2", "[Reader_read_selected]"){
+	auto czi = get();
+	auto c_dims = libCZI::CDimCoordinate{ { libCZI::DimensionIndex::B,0 },
+	                                      { libCZI::DimensionIndex::C,0 } };
+	auto imvec = czi->read_selected(c_dims).first;
+	REQUIRE(imvec.size() == 15);
+	auto shape = imvec.front()->shape();
+	REQUIRE(shape[0] == 325); // height
+	REQUIRE(shape[1] == 475); // width
+	pb_helpers::pack_array(imvec);
 }
 
 // TODO I need a small file for testing mosaic functionality

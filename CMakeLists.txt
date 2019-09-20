@@ -25,7 +25,7 @@ endmacro()
 IF(UNIX)
     # linking with 'thread' is necessary if we use std::thread and related under Linux it seems
     #   otherwise - the program simply crashes (no build-error)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++14 -fPIC -D_FILE_OFFSET_BITS=64 -fvisibility=hidden")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++14 -fPIC -O0 -g -D_FILE_OFFSET_BITS=64 -fvisibility=hidden")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__ANSI__ -fPIC -D_FILE_OFFSET_BITS=64")
 ENDIF(UNIX)
 
@@ -39,9 +39,9 @@ include_directories(libCZI/Src)
 find_library(libCZI REQUIRED PATHS ${CMAKE_SOURCE_DIR}/libCZI)
 
 set(PYLIBCZI_C_SRC_HEADERS _pylibczi/Reader.h _pylibczi/helper_algorithms.h
-        _pylibczi/exceptions.h _pylibczi/inc_libCZI.h _pylibczi/IndexMap.h _pylibczi/Image.h )
+        _pylibczi/exceptions.h _pylibczi/inc_libCZI.h _pylibczi/IndexMap.h _pylibczi/Image.h _pylibczi/pylibczi_ostream.h)
 
-set(PYLIBCZI_C_SRC  _pylibczi/Reader.cpp  _pylibczi/IndexMap.cpp _pylibczi/Image.cpp )
+set(PYLIBCZI_C_SRC  _pylibczi/Reader.cpp  _pylibczi/IndexMap.cpp _pylibczi/Image.cpp _pylibczi/pylibczi_ostream.cpp )
 
 set(PYLIBCZI_PYBIND11 _pylibczi/pb_bindings.cpp _pylibczi/pb_helpers.h _pylibczi/pb_caster_ImageVector.h
         _pylibczi/pb_caster_BytesIO.h _pylibczi/pb_caster_libCZI_DimensionIndex.h)
@@ -56,8 +56,11 @@ add_dependencies(${TARGET_ONE} libCZIStatic JxrDecodeStatic)
 
 #set(Python_ADDITIONAL_VERSIONS 3.7.3)
 #find_package(PythonLibs REQUIRED)
-pybind11_add_module(${TARGET_TWO} STATIC ${PYLIBCZI_C_SRC} ${PYLIBCZI_PYBIND11})
+pybind11_add_module(${TARGET_TWO} MODULE ${PYLIBCZI_C_SRC} ${PYLIBCZI_PYBIND11})
 target_link_libraries(${TARGET_TWO} PRIVATE libCZIStatic JxrDecodeStatic)
+add_custom_command(TARGET ${TARGET_TWO} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${TARGET_TWO}> ${PROJECT_SOURCE_DIR}
+        )
 
 #enable_testing()
 add_subdirectory(c_tests)

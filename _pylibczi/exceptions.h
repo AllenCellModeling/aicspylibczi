@@ -11,6 +11,7 @@
 #include <utility>
 #include <iomanip>
 #include "inc_libCZI.h"
+#include "pylibczi_ostream.h"
 
 namespace pylibczi {
 
@@ -142,6 +143,23 @@ namespace pylibczi {
 		  return tmp.str().c_str();
 	  }
   };
+
+  class CdimSelectionZeroImagesExcetpion: public std::exception {
+  	libCZI::CDimCoordinate m_rcdim; // requested
+  	libCZI::CDimBounds m_icdim; // image file
+  	std::string m_msg;
+  public:
+  	CdimSelectionZeroImagesExcetpion(libCZI::CDimCoordinate &requested, libCZI::CDimBounds &img_cdm, std::string msg)
+  	: m_rcdim(requested), m_icdim(img_cdm), m_msg(std::move(msg)) { std::cout << this->what(); }
+
+  	const char* what() const noexcept override {
+  		std::stringstream tmp;
+  		tmp << "Specified Dims resulted in NO image frames: " << m_rcdim << " ∉ " << m_icdim << std::endl;
+  		return tmp.str().c_str();
+  	}
+  };
 }
+
+
 
 #endif //_PYLIBCZI__PYLIBCZI_EXCEPTIONS_H

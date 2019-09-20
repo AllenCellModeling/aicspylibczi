@@ -6,6 +6,7 @@
 #define _PYLIBCZI_PB_CASTER_IMAGEVECTOR_H
 
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 #include "Image.h"
 #include "pb_helpers.h"
 

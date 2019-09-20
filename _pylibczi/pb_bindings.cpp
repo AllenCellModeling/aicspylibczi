@@ -3,15 +3,22 @@
 //
 
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 #include "inc_libCZI.h"
 #include "Reader.h"
 #include "IndexMap.h"
 #include "exceptions.h"
+// the below headers are crucial otherwise the custom casts aren't recognized
+#include "pb_caster_BytesIO.h"
+#include "pb_caster_ImageVector.h"
+#include "pb_caster_libCZI_DimensionIndex.h"
 
 PYBIND11_MODULE(_pylibczi, m)
 {
 
 	namespace py = pybind11;
+
+	m.doc() = "pylibczi C++ extension for reading ZISRAW/CZI files"; // optional module docstring
 
 
 	py::register_exception<pylibczi::FilePtrException>(m, "PylibCZI_BytesIO2FilePtrException");
@@ -21,10 +28,11 @@ PYBIND11_MODULE(_pylibczi, m)
 	py::register_exception<pylibczi::ImageIteratorException>(m, "PylibCZI_ImageIteratorException");
 	py::register_exception<pylibczi::ImageSplitChannelException>(m, "PylibCZI_ImageSplitChannelException");
 	py::register_exception<pylibczi::ImageCopyAllocFailed>(m, "PylibCZI_ImageCopyAllocFailed");
+	py::register_exception<pylibczi::CdimSelectionZeroImagesExcetpion>(m, "PylibCZI_CDimSpecSelectedNoImagesException");
 
 	py::class_<pylibczi::Reader>(m, "Reader")
-			.def(py::init<FILE*>())
-			.def("is_mosaic_file", &pylibczi::Reader::isMosaic)
+			.def(py::init<pylibczi::FileHolder>())
+			.def("is_mosaic", &pylibczi::Reader::isMosaic)
 			.def("read_dims", &pylibczi::Reader::read_dims)
 			.def("read_meta", &pylibczi::Reader::read_meta)
 			.def("read_selected", &pylibczi::Reader::read_selected);

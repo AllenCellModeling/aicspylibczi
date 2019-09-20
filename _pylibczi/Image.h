@@ -68,7 +68,7 @@ namespace pylibczi {
 			  int value;
 			  if (m_cdims.TryGetPosition(di, &value)) ans.emplace_back(libCZI::Utils::DimensionToChar(di), value);
 		  }
-		  ans.emplace_back('M', m_mIndex);
+		  if(m_mIndex != std::numeric_limits<int>::min() && m_mIndex > -1) ans.emplace_back('M', m_mIndex);
 		  return ans;
 	  }
 

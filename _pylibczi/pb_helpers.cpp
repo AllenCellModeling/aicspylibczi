@@ -1,9 +1,8 @@
 //
-// Created by Jamie Sherman on 2019-09-11.
+// Created by Jamie Sherman on 2019-09-19.
 //
 
-#ifndef _PYLIBCZI__PYLIBCZI_PB_HELPERS_H
-#define _PYLIBCZI__PYLIBCZI_PB_HELPERS_H
+#include "pb_helpers.h"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
@@ -15,7 +14,6 @@
 #include "Reader.h"
 #include "exceptions.h"
 
-namespace py=pybind11;
 namespace pb_helpers {
 
   using ImVec = pylibczi::ImageBC::ImVec;
@@ -82,5 +80,3 @@ namespace pb_helpers {
   }
 
 }
-
-#endif //_PYLIBCZI__PYLIBCZI_PB_HELPERS_H

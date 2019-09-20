@@ -19,6 +19,18 @@ using namespace std;
 
 namespace pylibczi {
 
+  class FileHolder {
+	  FILE* m_fp;
+  public:
+	  FileHolder() { m_fp = nullptr; }
+	  FileHolder(FILE* p) { m_fp = p; }
+	  FILE* get() { return m_fp; }
+	  FileHolder& operator=(FILE* p)
+	  {
+		  m_fp = p;
+		  return *this;
+	  }
+  };
 
 /// <summary>	A wrapper that takes a FILE * and creates an libCZI::IStream object out of it
 
@@ -27,8 +39,8 @@ namespace pylibczi {
 	  FILE* fp;
   public:
 	  CSimpleStreamImplFromFP() = delete;
-	  explicit CSimpleStreamImplFromFP(FILE* file_pointer) { fp = file_pointer; }
-	  ~CSimpleStreamImplFromFP() override { fclose(this->fp); };
+	  CSimpleStreamImplFromFP(FILE* file_pointer) { fp = file_pointer; }
+	  ~CSimpleStreamImplFromFP() override { fclose(fp); };
 	  void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
   };
 
@@ -46,7 +58,7 @@ namespace pylibczi {
 	  libCZI::SubBlockStatistics m_statistics;
   public:
 	  typedef std::map<libCZI::DimensionIndex, std::pair<int, int> > mapDiP;
-	  using ImageVec = std::vector<std::shared_ptr<ImageBC> >;
+	  using Shape = std::vector<std::pair<char, int> >;
 	  /*!
 	   * @brief Construct the Reader and load the file statistics (dimensions etc)
 	   *
@@ -58,7 +70,7 @@ namespace pylibczi {
 	   *
 	   * @param f_in A C-style FILE pointer to the CZI file
 	   */
-	  explicit Reader(FILE* f_in);
+	  explicit Reader(FileHolder f_in);
 
 	  /*!
 	   * @brief Check if the file is a mosaic file.
@@ -111,7 +123,7 @@ namespace pylibczi {
 	   * @param flatten if false this won't flatten 3 channel images, from python this should always be true.
 	   * @param mIndex Is only relevant for mosaic files, if you wish to select one frame.
 	   */
-	  ImageVector read_selected(libCZI::CDimCoordinate& planeCoord, bool flatten = true, int mIndex = -1);
+	  std::pair<ImageVector, Shape> read_selected(libCZI::CDimCoordinate& planeCoord, bool flatten = true, int mIndex = -1);
 
 	  /*!
 	   * @brief If the czi file is a mosaic tiled image this function can be used to reconstruct it into an image.
@@ -148,6 +160,8 @@ namespace pylibczi {
 	  {
 		  m_czireader->Close();
 	  }
+
+	  static Shape get_shape(pylibczi::ImageVector& imgs);
 
   private:
 

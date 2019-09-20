@@ -2,8 +2,10 @@
 // Created by Jamie Sherman on 2019-08-18.
 //
 #include <tuple>
+#include <unistd.h>
 #include "Reader.h"
 #include "exceptions.h"
+#include <set>
 
 namespace pylibczi {
 
@@ -17,13 +19,13 @@ namespace pylibczi {
 		  (*ptrBytesRead) = bytesRead;
   }
 
-  Reader::Reader(FILE* f_in)
+  Reader::Reader(FileHolder f_in)
 		  :m_czireader(new CCZIReader)
   {
-	  if (!f_in) {
+	  if (!f_in.get()) {
 		  throw FilePtrException("Reader class received a bad FILE *!");
 	  }
-	  auto istr = std::make_shared<CSimpleStreamImplFromFP>(f_in);
+	  auto istr = std::make_shared<CSimpleStreamImplFromFP>(f_in.get());
 	  m_czireader->Open(istr);
 	  m_statistics = m_czireader->GetStatistics();
   }
@@ -52,7 +54,8 @@ namespace pylibczi {
   Reader::read_dims()
   {
 	  mapDiP tbl;
-
+//	  std::cout << "********* PID: " << getpid() << std::endl;
+//	  sleep(10);
 	  m_statistics.dimBounds.EnumValidDimensions([&tbl](libCZI::DimensionIndex di, int start, int size) -> bool {
 		  tbl.emplace(di, std::make_pair(start, size));
 		  return true;
@@ -61,9 +64,13 @@ namespace pylibczi {
 	  return tbl;
   }
 
-  ImageVector
+  std::pair<ImageVector, Reader::Shape>
   Reader::read_selected(libCZI::CDimCoordinate& planeCoord, bool flatten, int mIndex)
   {
+  	int mcount = 1;
+  	std::cout << "ReadSelected CDim: " << planeCoord << std::endl;
+  	std::cout << "Bounds: " << m_statistics.dimBounds << std::endl;
+	  std::cout << "RS: " << mcount++ << std::endl;
 	  // count the matching subblocks
 	  ssize_t matching_subblock_count = 0;
 	  std::vector<IndexMap> order_mapping;
@@ -75,8 +82,11 @@ namespace pylibczi {
 		  return true;
 	  });
 
+	  std::cout << "matching_subblocks: " << matching_subblock_count << std::endl;
+	  std::cout << "RS: " << mcount++ << std::endl;
 	  add_sort_order_index(order_mapping);
 
+	  std::cout << "RS: " << mcount++ << std::endl;
 	  // get scene index if specified
 	  int scene_index;
 	  libCZI::IntRect sceneBox = {0, 0, -1, -1};
@@ -91,20 +101,34 @@ namespace pylibczi {
 		  scene_index = -1;
 	  }
 
+	  std::cout << "RS: " << mcount++ << std::endl;
 	  ImageVector images;
 	  images.reserve(matching_subblock_count);
 
+	  std::cout << "RS: " << mcount++ << std::endl;
 	  m_czireader->EnumerateSubBlocks([&](int idx, const libCZI::SubBlockInfo& info) {
 
-		  if (!isPyramid0(info))
+		  if (!isPyramid0(info)) {
+		  	  cout << "!pyramid0" << std::endl;
 			  return true;
-		  if (sceneBox.IsValid() && !sceneBox.IntersectsWith(info.logicalRect))
+		  }
+		  if (sceneBox.IsValid() && !sceneBox.IntersectsWith(info.logicalRect)) {
+			  cout << "invalid box" << std::endl;
 			  return true;
-		  if (!dimsMatch(planeCoord, info.coordinate))
+		  }
+		  if (!dimsMatch(planeCoord, info.coordinate)) {
+			  cout << "dims mismatch" << std::endl;
+			  cout << "\t" << planeCoord << std::endl;
+			  cout << "\t" << info.coordinate << std::endl;
 			  return true;
-		  if (mIndex!=-1 && info.mIndex!=std::numeric_limits<int>::max() && mIndex!=info.mIndex)
+		  }
+		  if (isMosaic() && mIndex!=-1 && info.mIndex!=std::numeric_limits<int>::min() && mIndex!=info.mIndex) {
+			  cout << "mIndex skip" << std::endl;
+			  std::cout << "\t mIndex = " << mIndex << std::endl;
+			  std::cout << "\t info.mIndex = " << info.mIndex << std::endl;
 			  return true;
-
+		  }
+		  std::cout << "RS: " << mcount++ << std::endl;
 		  // add the sub-block image
 		  ImageFactory imageFactory;
 		  auto img = imageFactory.construct_image(m_czireader->ReadSubBlock(idx)->CreateBitmap(),
@@ -121,8 +145,12 @@ namespace pylibczi {
 
 		  return true;
 	  });
-
-	  return images;
+	  std::cout << "read selected returning images" << std::endl;
+	  if( images.empty() ){
+	  	throw pylibczi::CdimSelectionZeroImagesExcetpion(planeCoord, m_statistics.dimBounds, "No pyramid0 selectable subblocks.");
+	  }
+	  auto shape = get_shape(images);
+	  return std::make_pair(images, shape);
 	  // return images;
   }
 
@@ -212,6 +240,42 @@ namespace pylibczi {
 		  image_vector.push_back(img);
 
 	  return image_vector;
+  }
+
+  std::vector<std::pair<char, int> >
+  Reader::get_shape(pylibczi::ImageVector& imgs)
+  {
+	  using ImVec = pylibczi::ImageBC::ImVec;
+	  std::cout << "Pack Array:A" << std::endl;
+	  std::sort(imgs.begin(), imgs.end(), [](ImVec::value_type& a, ImVec::value_type& b) {
+		  return *a<*b;
+	  });
+	  std::vector<std::vector<std::pair<char, int> > > valid_indexs;
+	  for (const auto& img : imgs) {
+		  valid_indexs.push_back(img->get_valid_indexs());
+	  }
+
+	  std::cout << "Pack Array:B1" << std::endl;
+	  std::vector<std::pair<char, int> > char_sizes;
+	  std::cout << "Pack Array:B2 " << valid_indexs.size() << std::endl;
+	  std::set<int> condensed;
+	  for (int i = 0; !valid_indexs.empty() && i<valid_indexs.front().size(); i++) {
+		  std::cout << "Pack Array:B3" << std::endl;
+		  char c;
+		  for (const auto& vi : valid_indexs) {
+			  std::cout << "Pack Array:B4" << std::endl;
+			  std::cout << vi[i].first << " => " << vi[i].second << std::endl;
+			  c = vi[i].first;
+			  condensed.insert(vi[i].second);
+		  }
+		  char_sizes.emplace_back(c, condensed.size());
+		  condensed.clear();
+	  }
+	  std::cout << "Pack Array:B3-2 " << imgs.size() << std::endl;
+	  auto h_by_w = imgs.front()->shape(); // assumption: images are the same shape, if not 🙃
+	  char_sizes.emplace_back('Y', h_by_w[0]); // H
+	  char_sizes.emplace_back('X', h_by_w[1]); // W
+	  return char_sizes;
   }
 
 }

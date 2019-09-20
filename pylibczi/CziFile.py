@@ -61,7 +61,7 @@ class CziFile(object):
     # H = 7  # The H-dimension ("phase").
     # V = 8  # The V-dimension ("view").
     ####
-    ZISRAW_DIMS = {'Z', 'C', 'T', 'R', 'S', 'I', 'H', 'V'}
+    ZISRAW_DIMS = {'Z', 'C', 'T', 'R', 'S', 'I', 'H', 'V', 'B'}
 
     def __init__(self, czi_filename: types.FileLike, metafile_out: types.PathLike = '', use_pylibczi:bool = True, verbose:bool = False):
         # Convert to BytesIO (bytestream)
@@ -70,15 +70,9 @@ class CziFile(object):
         self.metafile_out = metafile_out
         self.czifile_verbose = verbose
 
-        # whether to use czifile or pylibczi for reading the czi file.
-        self.use_pylibczi = use_pylibczi
-        if use_pylibczi:
-            import _pylibczi
-            self.czilib = _pylibczi
-        else:
-            # https://www.lfd.uci.edu/~gohlke/code/czifile.py.html
-            import czifile
-            self.czilib = czifile
+        import _pylibczi
+        self.czilib = _pylibczi
+        self.reader = self.czilib.Reader(self._bytes)
 
     def dims(self):
         """
@@ -86,12 +80,15 @@ class CziFile(object):
         :return: A dictionary containing Dimension / depth, a file with 3 scenes, 7 time-points and 4 z slices
          would have {'S': 3, 'T': 7, 'Z':4}
         """
-        if self.use_pylibczi:
-            return self.czilib.cziread_shape_from_istream(self._bytes);
+        return self.reader.read_dims()
+
+    def is_mosaic(self):
+        return self.reader.is_mosaic()
 
     @staticmethod
     def convert_to_buffer(file: types.FileLike) -> io.BufferedIOBase:
         # Check path
+        print(file)
         if isinstance(file, (str, Path)):
             # This will both fully expand and enforce that the filepath exists
             f = Path(file).expanduser().resolve(strict=True)
@@ -130,59 +127,37 @@ class CziFile(object):
             meta_root (etree): xml class containing root of the extracted meta data.
 
         """
-        if self.use_pylibczi:
-            self.meta_root = etree.fromstring(self.czilib.cziread_meta_from_istream(self._bytes))
-        else:
-            # get the root of the metadata xml
-            #root = ET.fromstring(metastr) # to convert to python etree
-            self.meta_root = self.czi.metadata.getroottree()
+        meta_str = self.reader.read_meta()
+        self.meta_root = etree.fromstring(meta_str)
 
         if self.metafile_out:
             metastr = etree.tostring(self.meta_root, pretty_print=True).decode('utf-8')
             with open(self.metafile_out, 'w') as file:
                 file.write(metastr)
 
-    def read_image(self):
+    def read_image(self, m_index=-1, **kwargs):
         """Read image data from all subblocks and create single montaged image.
 
         Returns:
           |  (m,n,nchan ndarray):  Montaged image from all subblocks.
 
         """
-
+        plane_constraints = self.czilib.DimCoord()
+        [plane_constraints.SetDim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
         if self.czifile_verbose:
             print('Loading czi image for all scenes'); t = time.time()
 
-        if self.use_pylibczi:
-            # xxx - this does not work for czifiles for which the subblocks have no dimension label.
-            #   additionally it seems not possible to create an accessor without specifying a dimension label / index.
-            #img = self.czilib.cziread_scene(self.czi_filename, -np.ones((1,), dtype=np.int64))
-            imgs, coords = self.czilib.cziread_allsubblocks_from_istream(self._bytes)
-            if len(imgs) > 1:
-                # xxx - was not clear what to do in the cases of many subblocks of different sizes.
-                #   could not find any other subblock attribute to indicate what the difference is between them.
-                #   only plotting the images that are the majority size gave the result closest to loading in Zen.
-                img, _ = CziFile._montage(imgs, coords, mode_size_only=True)
-            else:
-                img = imgs[0]
-        else:
-            # (?, scenes, ?, xdim, ydim, colors?)
-            img = np.squeeze(self.czilib.CziFile(self.czi_filename).asarray())
-            assert( img.ndim <= 3 ) # xxx - other dims?
+        img, shp = self.reader.read_selected(plane_constraints, m_index, True)
 
-        if self.czifile_verbose:
-            print('\tdone in %.4f s' % (time.time() - t, ))
-            print('\tAll scenes size is %d x %d' % (img.shape[0], img.shape[1]))
-
-        return img
+        return (img, shp)
 
     def read_mosaic_size(self):
         """
         Get the size of the entire mosaic image
         :return: (x, y, w, h)
         """
-        shape = self.czilib.cziread_mosaic_shape(str(self.czi_filename))
-        return shape
+        # shape = self.czilib.cziread_mosaic_shape(str(self.czi_filename))
+        return (0, 0)#shape
 
     def read_mosaic(self, region: Tuple = None, scale_factor: float = 1.0, **kwargs):
         """
@@ -209,19 +184,12 @@ class CziFile(object):
             H = 7   # The H-dimension ("phase").
             V = 8   # The V-dimension ("view").
         """
-        plane_constraints = {k: v for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS}
+        plane_constraints = self.czilib.DimCoord()
+        [plane_constraints.SetDim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
 
-        img = self.czilib.cziread_mosaic(str(self.czi_filename), plane_constraints, region, scale_factor)
+        img = self.reader.read_mosaic(plane_constraints, region, scale_factor)
 
         return img
-
-    def read_selection(self, m_index: [int, None] = None, **kwargs):
-        plane_constraints = {k: v for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS}
-
-        img = self.czilib.cziread_selected(self._bytes, plane_constraints, m_index)
-        print(f"length: {len(img[0])}")
-        x = 10
-        return img[0]
 
     @staticmethod
     def plot_image(image, figno=1, doplots_ds=1, reduce=np.mean, interp_string='nearest', show=True):

@@ -40,8 +40,8 @@ public:
 	{
 		auto c_dims = libCZI::CDimCoordinate{{libCZI::DimensionIndex::B, 0},
 		                                     {libCZI::DimensionIndex::C, 0}};
-		auto imvec = m_czi->read_selected(c_dims);
-		return imvec->front();
+		auto imvec = m_czi->read_selected(c_dims).first;
+		return imvec.front();
 	}
 };
 
