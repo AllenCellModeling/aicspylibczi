@@ -15,6 +15,57 @@
 #include "IndexMap.h"
 #include "Image.h"
 
+/*! \mainpage libCZI_c++_extension
+ *
+ * \section intro_sec Introduction
+ *
+ * This C++ extension wraps Zeiss's libCZI providing a minimal interface for working with CZI files.
+ * There main class is Reader. Reader is constructed with a FileHolder class which is simply a class
+ * that contains a FILE *.
+ *
+ * This is the introduction.
+ *
+ * \section install_sec Installation
+ *
+ * To install as a C++ package follow these steps
+ * \subsection step1 Step 1:  git clone --recurse-submodules <github repo URL>
+ * \subsection step2 Step 2:  cd cmake-build-debug
+ * \subsection step3 Step 3:  cmake ../
+ * \subsection step4 Step 4:  make
+ * \subsection step5 Step 5:  include the headers and link against the library
+ *
+ * \code{.cpp}
+ * #include <cstdio>
+ * #include "Reader.h"
+ *
+ * using namespace pylibczi;
+ *
+ * int main(){
+ *     std::string filename("yourczifile.czi");
+ *     FILE *fp = fopen(filename.c_str(), "rb");
+ *     FileHolder fholder(fp);
+ *     auto czi = Reader(fholder);
+ *     auto dims = czi.read_dims();
+ *     // select some subset of dims
+ *     auto c_dims = libCZI::CDimCoordinate{ { libCZI::DimensionIndex::B,0 },
+ *                                           { libCZI::DimensionIndex::C,0 } };
+ *     std::string xml = czi.read_meta(); // grab all the metadata as a string.
+ *     if( !czi.isMosaic() )
+ *
+ *         auto ans = czi.read_selected(c_dims);
+ *         auto imgs = ans.first;
+ *         auto shape = ans.second;
+ *         // imgs is a vector of ImageBC* which reference Image<T> objects;
+ *     } else {
+ *         auto img = czi.read_mosaic(c_dims);
+ *         // img is a vector containing one ImageBC* pointing to an Image<T> which contains the whole mosaic image
+ *     }
+ * }
+ *
+ * \endcode
+ */
+
+
 using namespace std;
 
 namespace pylibczi {
