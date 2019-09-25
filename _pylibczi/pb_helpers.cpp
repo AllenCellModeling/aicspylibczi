@@ -21,9 +21,7 @@ namespace pb_helpers {
   template<typename T>
   py::array* make_array(int new_size, std::vector<ssize_t>& shp, ImVec& imgs)
   {
-	  std::cout << "Pack Array:D1" << std::endl;
 	  if (new_size==0) return new py::array_t<T>({1}, new T);
-	  std::cout << "Pack Array:D2" << std::endl;
 	  T* ptr;
 	  try {
 		  ptr = new T[new_size];
@@ -49,19 +47,15 @@ namespace pb_helpers {
 	  return new py::array_t<T>(shp, ptr, free_when_done);
   }
 
-
-
   py::array pack_array(pylibczi::ImageVector& imgs)
   {
 	  // assumptions: The array contains images of the same size and the array is contiguous.
-	  auto char_sizes = pylibczi::Reader::get_shape(imgs);
-	  std::cout << "Pack Array:C " << imgs.size() << std::endl;
+	  auto char_sizes = pylibczi::Reader::get_shape(imgs, imgs.is_mosaic());
 	  int new_size = imgs.front()->length()*imgs.size();
 	  std::vector<ssize_t> shp(char_sizes.size(), 0);
 	  std::transform(char_sizes.begin(), char_sizes.end(), shp.begin(), [](const std::pair<char, int>& a) {
 		  return a.second;
 	  });
-	  std::cout << "Pack Array:D" << std::endl;
 	  py::array* arr_p = nullptr;
 	  switch (imgs.front()->pixelType()) {
 	  case libCZI::PixelType::Gray8:
@@ -75,7 +69,6 @@ namespace pb_helpers {
 		  break;
 	  default: throw pylibczi::PixelTypeException(imgs.front()->pixelType(), "Unsupported pixel type");
 	  }
-	  std::cout << "Pack Array:E" << std::endl;
 	  return *arr_p;
   }
 

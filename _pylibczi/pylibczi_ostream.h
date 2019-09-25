@@ -12,7 +12,7 @@
 
 using namespace std;
 
-ostream &operator<<(ostream &out, const libCZI::CDimCoordinate &cdim);
-ostream & operator<<(ostream &out, const libCZI::CDimBounds &bounds);
+ostream& operator<<(ostream& out, const libCZI::CDimCoordinate& cdim);
+ostream& operator<<(ostream& out, const libCZI::CDimBounds& bounds);
 
 #endif //_PYLIBCZI_PYLIBCZI_OSTREAM_H

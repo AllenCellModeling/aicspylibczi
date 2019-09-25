@@ -43,7 +43,7 @@ set(PYLIBCZI_C_SRC_HEADERS _pylibczi/Reader.h _pylibczi/helper_algorithms.h
 
 set(PYLIBCZI_C_SRC  _pylibczi/Reader.cpp  _pylibczi/IndexMap.cpp _pylibczi/Image.cpp _pylibczi/pylibczi_ostream.cpp )
 
-set(PYLIBCZI_PYBIND11 _pylibczi/pb_bindings.cpp _pylibczi/pb_helpers.h _pylibczi/pb_caster_ImageVector.h
+set(PYLIBCZI_PYBIND11 _pylibczi/pb_bindings.cpp _pylibczi/pb_helpers.h _pylibczi/pb_helpers.cpp _pylibczi/pb_caster_ImageVector.h
         _pylibczi/pb_caster_BytesIO.h _pylibczi/pb_caster_libCZI_DimensionIndex.h)
 
 set(TARGET_ONE libczi_c++_extension)

@@ -159,7 +159,7 @@ class CziFile(object):
         # shape = self.czilib.cziread_mosaic_shape(str(self.czi_filename))
         return (0, 0)#shape
 
-    def read_mosaic(self, region: Tuple = None, scale_factor: float = 1.0, **kwargs):
+    def read_mosaic(self, region: Tuple = None, scale_factor: float = 0.1, **kwargs):
         """
         reads a mosaic file and returns an image corresponding to the specified dimensions. If the file is more than
         a 2D sheet of pixels, meaning only one channel, z-slice, time-index, etc then the kwargs must specify the
@@ -187,7 +187,19 @@ class CziFile(object):
         plane_constraints = self.czilib.DimCoord()
         [plane_constraints.SetDim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
 
-        img = self.reader.read_mosaic(plane_constraints, region, scale_factor)
+        if region is None:
+            region = self.czilib.IntRect()
+            region.w = -1
+            region.h = -1
+        else:
+            assert(len(region) == 4)
+            tmp = self.czilib.IntRect()
+            tmp.x = region[0]
+            tmp.y = region[1]
+            tmp.w = region[2]
+            tmp.h = region[3]
+            region = tmp
+        img = self.reader.read_mosaic(plane_constraints, scale_factor, region)
 
         return img
 

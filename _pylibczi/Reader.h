@@ -105,7 +105,7 @@ namespace pylibczi {
    * https://github.com/elhuhdron/pylibczi
    */
   class Reader {
-	  CCZIReader* m_czireader;
+	  std::shared_ptr<CCZIReader> m_czireader; // required for cast in libCZI
 	  libCZI::SubBlockStatistics m_statistics;
   public:
 	  typedef std::map<libCZI::DimensionIndex, std::pair<int, int> > mapDiP;
@@ -198,7 +198,7 @@ namespace pylibczi {
 	   * @endcode
 	   */
 	  ImageVector
-	  read_mosaic(const libCZI::CDimCoordinate& planeCoord, float scaleFactor = 0.1, libCZI::IntRect imBox = {.w = -1, .h = -1});
+	  read_mosaic(const libCZI::CDimCoordinate planeCoord, float scaleFactor = 0.1, libCZI::IntRect imBox = {.w = -1, .h = -1});
 
 	  /*!
 	   * Convert the libCZI::DimensionIndex to a character
@@ -212,7 +212,7 @@ namespace pylibczi {
 		  m_czireader->Close();
 	  }
 
-	  static Shape get_shape(pylibczi::ImageVector& imgs);
+	  static Shape get_shape(pylibczi::ImageVector& imgs, bool is_mosaic);
 
   private:
 

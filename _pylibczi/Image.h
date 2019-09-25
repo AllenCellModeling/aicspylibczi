@@ -55,11 +55,11 @@ namespace pylibczi {
 
 	  size_t length()
 	  {
-		  return std::accumulate(m_matrixSizes.begin(), m_matrixSizes.end(), 1,
+		  return std::accumulate(m_matrixSizes.begin(), m_matrixSizes.end(), (size_t)1,
 				  std::multiplies<>());
 	  }
 
-	  std::vector<std::pair<char, int> > get_valid_indexs()
+	  std::vector<std::pair<char, int> > get_valid_indexs(bool isMosaic=false)
 	  {
 		  using CZI_DI = libCZI::DimensionIndex;
 		  std::vector<CZI_DI> sort_order{CZI_DI::S, CZI_DI::T, CZI_DI::C, CZI_DI::Z};
@@ -68,7 +68,7 @@ namespace pylibczi {
 			  int value;
 			  if (m_cdims.TryGetPosition(di, &value)) ans.emplace_back(libCZI::Utils::DimensionToChar(di), value);
 		  }
-		  if(m_mIndex != std::numeric_limits<int>::min() && m_mIndex > -1) ans.emplace_back('M', m_mIndex);
+		  if(isMosaic) ans.emplace_back('M', m_mIndex);
 		  return ans;
 	  }
 
@@ -122,7 +122,7 @@ namespace pylibczi {
 	   * @param mIndex The mosaic index for the image, this is only relevant if the file is a mosaic file.
 	   */
 	  Image(std::vector<size_t> shp, libCZI::PixelType pt, const libCZI::CDimCoordinate* cdim, libCZI::IntRect ir, int mIndex)
-			  :ImageBC(shp, pt, cdim, ir, mIndex), m_array(new T[std::accumulate(shp.begin(), shp.end(), 1, std::multiplies<>())])
+			  :ImageBC(shp, pt, cdim, ir, mIndex), m_array(new T[std::accumulate(shp.begin(), shp.end(), (size_t)1, std::multiplies<>())])
 	  {
 		  if (!is_type_match<T>())
 			  throw PixelTypeException(m_pixelType, "Image asked to create a container for PixelType with inconsitent type.");
@@ -223,14 +223,20 @@ namespace pylibczi {
 	  libCZI::IntSize size = pBitmap->GetSize();
 	  {
 		  libCZI::ScopedBitmapLockerP lckScoped{pBitmap.get()};
-
-		  auto sEnd = static_cast<uint8_t*>(lckScoped.ptrDataRoi)+size.h*lckScoped.stride;
+		  // WARNING do not compute the end of the array by multiplying stride by height, they are both uint32_t and you'll get an overflow for larger images
+		  uint8_t *sEnd = static_cast<uint8_t*>(lckScoped.ptrDataRoi)+lckScoped.size;
 		  SourceRange<T> sourceRange(channels, static_cast<T*>(lckScoped.ptrDataRoi), (T*) (sEnd), lckScoped.stride, size.w);
 		  TargetRange<T> targetRange(channels, size.w, size.h, m_array.get(), m_array.get()+length());
 		  for (std::uint32_t h = 0; h<pBitmap->GetHeight(); ++h) {
+//		  	  std::cout << "h: " << h << std::endl;
+//		  	  bool first_go = true;
 			  paired_for_each(sourceRange.stride_begin(h), sourceRange.stride_end(h), targetRange.stride_begin(h),
-					  [](std::vector<T*> src, std::vector<T*> tgt) {
-						  paired_for_each(src.begin(), src.end(), tgt.begin(), [](T* s, T* t) {
+					  [&](std::vector<T*> src, std::vector<T*> tgt) {
+						  paired_for_each(src.begin(), src.end(), tgt.begin(), [&](T* s, T* t) {
+//						  	  if(first_go){
+//						  	  	std::cout << ((T*)sEnd) - s << std::endl;
+//						  	  	first_go=false;
+//						  	  }
 							  *t = *s;
 						  });
 					  });
@@ -273,6 +279,11 @@ namespace pylibczi {
    * to convert the structure into a numpy.ndarray. From the C++ side it serves no purpose.
    */
   class ImageVector: public std::vector<std::shared_ptr<ImageBC> > {
+	bool m_is_mosaic = false;
+
+  public:
+  	bool is_mosaic(){ return m_is_mosaic; }
+  	void set_mosaic(bool val){ m_is_mosaic = val; }
 
   };
 

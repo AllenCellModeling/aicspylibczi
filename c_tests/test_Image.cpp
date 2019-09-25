@@ -99,7 +99,7 @@ TEST_CASE("test_image_accessors", "[Image_operator[]]")
 	for (size_t k = 0; k<3; k++)
 		for (size_t j = 0; j<4; j++)
 			for (size_t i = 0; i<5; i++)
-				REQUIRE( img[{i, j, k}] == *img.get_raw_ptr(cnt++) );
+				REQUIRE(img[{i, j, k}]==*img.get_raw_ptr(cnt++));
 }
 
 TEST_CASE("test_image_accessors_2d", "[Image_operator[2d]]")
@@ -134,6 +134,6 @@ TEST_CASE("test_image_accessors_2d", "[Image_operator[2d]]")
 	cnt = 0;
 	for (size_t j = 0; j<4; j++)
 		for (size_t i = 0; i<5; i++)
-			REQUIRE( img[{i, j}] ==  *img.get_raw_ptr(cnt++) );
+			REQUIRE(img[{i, j}]==*img.get_raw_ptr(cnt++));
 }
 
