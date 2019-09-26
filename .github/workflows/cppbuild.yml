@@ -1,0 +1,23 @@
+on: push
+name: C++ Build & Test
+jobs:
+  cmake-build:
+    name: CMake Build & Test Ubuntu
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: checkout submodules
+        run: git submodule sync --recursive && git submodule update --init --recursive
+      - name: build with cmake
+        run: |
+          which clang
+          export CC=clang
+          export CXX=clang++
+          mkdir ./cmake-build-debug
+          cd cmake-build-debug
+          cmake ../
+          make
+      - name: run C++ tests
+        run: |
+          cd ./cmake-build-debug/c_tests/
+          ./test_libczi_c++_extension

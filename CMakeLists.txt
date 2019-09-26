@@ -62,7 +62,7 @@ add_custom_command(TARGET ${TARGET_TWO} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${TARGET_TWO}> ${PROJECT_SOURCE_DIR}
         )
 
-#enable_testing()
+#enable_testing() // didn't do anything when enabled
 add_subdirectory(c_tests)
 #print_all_variables()
 

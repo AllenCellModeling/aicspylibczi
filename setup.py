@@ -25,6 +25,64 @@ from setuptools.command.build_ext import build_ext
 from distutils.version import LooseVersion
 
 
+requirements = [
+    "numpy>=1.14.1",
+    "scipy",
+    "lxml",
+    "scikit-image",
+    "matplotlib>=2.0.0",
+    "tifffile",
+]
+
+test_requirements = [
+    "codecov",
+    "flake8",
+    "pytest",
+    "pytest-cov",
+    "pytest-raises",
+]
+
+dev_requirements = [
+    "bumpversion>=0.5.3",
+    "coverage>=5.0a4",
+    "flake8>=3.7.7",
+    "ipython>=7.5.0",
+    "pytest>=4.3.0",
+    "pytest-cov==2.6.1",
+    "pytest-raises>=0.10",
+    "pytest-runner>=4.4",
+    "Sphinx>=2.0.0b1",
+    "tox>=3.5.2",
+    "twine>=1.13.0",
+    "wheel>=0.33.1",
+]
+
+setup_requirements = [
+    "pytest-runner",
+]
+
+interactive_requirements = [
+    "altair",
+    "jupyterlab",
+    "matplotlib",
+    "pillow",
+]
+
+extra_requirements = {
+    "test": test_requirements,
+    "dev": dev_requirements,
+    "setup": setup_requirements,
+    "interactive": interactive_requirements,
+    "all": [
+        *requirements,
+        *test_requirements,
+        *setup_requirements,
+        *dev_requirements,
+        *interactive_requirements
+    ]
+}
+
+
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
         Extension.__init__(self, name, sources=[])
@@ -65,6 +123,8 @@ class CMakeBuild(build_ext):
             build_args += ['--', '-j2']
 
         env = os.environ.copy()
+        env['CC'] = 'clang'
+        env['CXX'] = 'clang++'
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
                                                               self.distribution.get_version())
         if not os.path.exists(self.build_temp):
@@ -78,9 +138,15 @@ setup(
     author='Paul Watkins, Jamie Sherman',
     author_email='pwatkins@gmail.com, jamies@alleninstitute.org',
     description='A python module and a python extension for Zeiss (CZI/ZISRAW) microscopy files. test project using pybind11 and CMake',
-    long_description='This module contains a C++ library that wraps libCZI from Zeiss. This C++ library has pybind11 bindings enabling it to be compiled to a python extension (_pylibczi) which is then exposed indirectly by pylibczi.',
+    long_description='This module contains a C++ library that wraps libCZI from Zeiss. This C++ library has pybind11 bindings enabling it '
+                     'to be compiled to a python extension (_pylibczi) which is then exposed indirectly by pylibczi.',
     ext_modules=[CMakeExtension('_pylibczi')],
     cmdclass=dict(build_ext=CMakeBuild),
+    install_requires=requirements,
+    setup_requires=setup_requirements,
+    test_suite="pylibczi/tests",
+    tests_require=test_requirements,
+    extras_require=extra_requirements,
     zip_safe=False,
 )
 
