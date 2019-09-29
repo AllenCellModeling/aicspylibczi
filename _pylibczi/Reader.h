@@ -212,6 +212,12 @@ namespace pylibczi {
 		  m_czireader->Close();
 	  }
 
+	  /*!
+	   * Get the full size of the mosaic image without scaling. If you're selecting a subregion it must be within the box returned.
+	   * @return an IntRect {x, y, w, h}
+	   */
+	  libCZI::IntRect mosaic_shape() { return m_statistics.boundingBoxLayer0Only; }
+
 	  static Shape get_shape(pylibczi::ImageVector& imgs, bool is_mosaic);
 
   private:

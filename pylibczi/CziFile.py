@@ -135,29 +135,44 @@ class CziFile(object):
             with open(self.metafile_out, 'w') as file:
                 file.write(metastr)
 
-    def read_image(self, m_index=-1, **kwargs):
-        """Read image data from all subblocks and create single montaged image.
+    def read_image(self, m_index: int = -1, **kwargs):
+        """
+        Read the subblocks in the CZI file and for any subblocks that match all the constraints in kwargs return that data.
+        This allows you to select channels/scenes/timepoints/Z-slices etc.
 
-        Returns:
-          |  (m,n,nchan ndarray):  Montaged image from all subblocks.
-
+        :param m_index: If it's a mosaic file and you wish to select specific M-indexs then use this otherwise ignore it.
+        :param kwargs: The keywords below allow you to specify the dimensions that you wish to match. If you underspecify the constraints
+        you can easily end up with a massive image stack.
+            Z = 1   # The Z-dimension.
+            C = 2   # The C-dimension ("channel").
+            T = 3   # The T-dimension ("time").
+            R = 4   # The R-dimension ("rotation").
+            S = 5   # The S-dimension ("scene").
+            I = 6   # The I-dimension ("illumination").
+            H = 7   # The H-dimension ("phase").
+            V = 8   # The V-dimension ("view").
+        :return: a tuple of (numpy.ndarray, a list of (Dimension, size)) the second element of the tuple is to make sure the numpy.ndarray
+        is interpretable. An example of the list is [('S', 1), ('T', 1), ('C', 2), ('Z', 25), ('Y', 1024), ('X', 1024)] so if you probed the
+        numpy.ndarray with .shape you would get (1, 1, 2, 25, 1024, 1024).
         """
         plane_constraints = self.czilib.DimCoord()
         [plane_constraints.SetDim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
-        if self.czifile_verbose:
-            print('Loading czi image for all scenes'); t = time.time()
-
         img, shp = self.reader.read_selected(plane_constraints, m_index, True)
-
         return (img, shp)
 
     def read_mosaic_size(self):
         """
-        Get the size of the entire mosaic image
+        Get the size of the entire mosaic image, if it's not a mosaic image return (0, 0, -1, -1)
         :return: (x, y, w, h)
         """
-        # shape = self.czilib.cziread_mosaic_shape(str(self.czi_filename))
-        return (0, 0)#shape
+        if not self.reader.is_mosaic():
+            ans = self.czilib.IntRect()
+            ans.x = ans.y = 0
+            ans.w = ans.h = -1
+            return ans
+
+        return self.reader.mosaic_shape()
+
 
     def read_mosaic(self, region: Tuple = None, scale_factor: float = 0.1, **kwargs):
         """
@@ -183,6 +198,7 @@ class CziFile(object):
             I = 6   # The I-dimension ("illumination").
             H = 7   # The H-dimension ("phase").
             V = 8   # The V-dimension ("view").
+        :returns numpy.ndarray (1, height, width)
         """
         plane_constraints = self.czilib.DimCoord()
         [plane_constraints.SetDim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
@@ -203,79 +219,82 @@ class CziFile(object):
 
         return img
 
-    @staticmethod
-    def plot_image(image, figno=1, doplots_ds=1, reduce=np.mean, interp_string='nearest', show=True):
-        """Generic image plot using matplotlib.
-
-        Kwargs:
-          |  figno (int): Figure number to use.
-          |  doplots_ds (int): Downsampling reduce factor before plotting.
-          |  reduce (func): Function to use for block-reduce downsampling.
-          |  interp_string (str): Interpolation string for matplotlib imshow.
-          |  show (bool): Whether to show images or return immediately.
-
-        """
-        from matplotlib import pylab as pl
-        import skimage.measure as measure
-
-        if image.ndim == 3 and issubclass(image.dtype.type, np.integer):
-            #image = image / np.iinfo(image.dtype).max
-            image = image / image.max()
-            # all the zeiss color formats are bgr, not rgb
-            image = image[:,:,[2,1,0]]
-            assert(doplots_ds==1) # block reduce on color images not implemented here
-
-        img_ds = measure.block_reduce(image, block_size=tuple([doplots_ds for x in range(image.ndim)]),
-                                      func=reduce).astype(image.dtype) if doplots_ds > 1 else image
-
-        pl.figure(figno)
-        ax = pl.subplot(1,1,1)
-        ax.imshow(img_ds,interpolation=interp_string, cmap='gray')
-        pl.axis('off')
-
-        if show: pl.show()
-
-    # https://stackoverflow.com/questions/43554819/find-most-frequent-row-or-mode-of-a-matrix-of-vectors-python-numpy
-    @staticmethod
-    def _mode_rows(a):
-        a = np.ascontiguousarray(a)
-        void_dt = np.dtype((np.void, a.dtype.itemsize * np.prod(a.shape[1:])))
-        _,ids, count = np.unique(a.view(void_dt).ravel(), \
-                                    return_index=1,return_counts=1)
-        largest_count_id = ids[count.argmax()]
-        most_frequent_row = a[largest_count_id]
-        return most_frequent_row
-
-    @staticmethod
-    def _montage(images, coords, bg=0, mode_size_only=False):
-        nimages = len(images)
-
-        # images should be the same datatype, get the datatype.
-        sel = np.array([x is None for x in images])
-        fnz = np.nonzero(np.logical_not(sel))[0][0]
-        img_dtype = images[fnz].dtype
-
-        # get the sizes of all the images.
-        img_shapes = np.vstack(np.array([x.shape if x is not None else (0,0) for x in images]))
-
-        if mode_size_only:
-            r = CziFile._mode_rows(img_shapes)
-            sel = (r != img_shapes).any(1)
-            img_shapes[sel,:] = -1
-
-        # calculate size and allocate output image.
-        corners = coords.astype(np.double, copy=True)
-        corners -= np.nanmin(corners, axis=0)
-        sz_out = np.ceil(np.nanmax(corners + img_shapes[:,::-1], axis=0)).astype(np.int64)[::-1]
-        image = np.empty(sz_out, dtype=img_dtype); image.fill(bg)
-
-        # convert the image corners to subscripts.
-        corners = np.round(corners).astype(np.int64)
-        c = corners[:,::-1]
-
-        for i in range(nimages):
-            if images[i] is None or not (img_shapes[i,:] > 0).all(): continue
-            s = img_shapes[i,:]
-            image[c[i, 0]:c[i, 0] + s[0], c[i, 1]:c[i, 1] + s[1]] = images[i]
-
-        return image, corners
+    # The code below is from the previous incarnation. It may be needed for others work so I have left it here
+    # to be resolved when merged back into the master repo.
+    #
+    # @staticmethod
+    # def plot_image(image, figno=1, doplots_ds=1, reduce=np.mean, interp_string='nearest', show=True):
+    #     """Generic image plot using matplotlib.
+    #
+    #     Kwargs:
+    #       |  figno (int): Figure number to use.
+    #       |  doplots_ds (int): Downsampling reduce factor before plotting.
+    #       |  reduce (func): Function to use for block-reduce downsampling.
+    #       |  interp_string (str): Interpolation string for matplotlib imshow.
+    #       |  show (bool): Whether to show images or return immediately.
+    #
+    #     """
+    #     from matplotlib import pylab as pl
+    #     import skimage.measure as measure
+    #
+    #     if image.ndim == 3 and issubclass(image.dtype.type, np.integer):
+    #         #image = image / np.iinfo(image.dtype).max
+    #         image = image / image.max()
+    #         # all the zeiss color formats are bgr, not rgb
+    #         image = image[:,:,[2,1,0]]
+    #         assert(doplots_ds==1) # block reduce on color images not implemented here
+    #
+    #     img_ds = measure.block_reduce(image, block_size=tuple([doplots_ds for x in range(image.ndim)]),
+    #                                   func=reduce).astype(image.dtype) if doplots_ds > 1 else image
+    #
+    #     pl.figure(figno)
+    #     ax = pl.subplot(1,1,1)
+    #     ax.imshow(img_ds,interpolation=interp_string, cmap='gray')
+    #     pl.axis('off')
+    #
+    #     if show: pl.show()
+    #
+    # # https://stackoverflow.com/questions/43554819/find-most-frequent-row-or-mode-of-a-matrix-of-vectors-python-numpy
+    # @staticmethod
+    # def _mode_rows(a):
+    #     a = np.ascontiguousarray(a)
+    #     void_dt = np.dtype((np.void, a.dtype.itemsize * np.prod(a.shape[1:])))
+    #     _,ids, count = np.unique(a.view(void_dt).ravel(), \
+    #                                 return_index=1,return_counts=1)
+    #     largest_count_id = ids[count.argmax()]
+    #     most_frequent_row = a[largest_count_id]
+    #     return most_frequent_row
+    #
+    # @staticmethod
+    # def _montage(images, coords, bg=0, mode_size_only=False):
+    #     nimages = len(images)
+    #
+    #     # images should be the same datatype, get the datatype.
+    #     sel = np.array([x is None for x in images])
+    #     fnz = np.nonzero(np.logical_not(sel))[0][0]
+    #     img_dtype = images[fnz].dtype
+    #
+    #     # get the sizes of all the images.
+    #     img_shapes = np.vstack(np.array([x.shape if x is not None else (0,0) for x in images]))
+    #
+    #     if mode_size_only:
+    #         r = CziFile._mode_rows(img_shapes)
+    #         sel = (r != img_shapes).any(1)
+    #         img_shapes[sel,:] = -1
+    #
+    #     # calculate size and allocate output image.
+    #     corners = coords.astype(np.double, copy=True)
+    #     corners -= np.nanmin(corners, axis=0)
+    #     sz_out = np.ceil(np.nanmax(corners + img_shapes[:,::-1], axis=0)).astype(np.int64)[::-1]
+    #     image = np.empty(sz_out, dtype=img_dtype); image.fill(bg)
+    #
+    #     # convert the image corners to subscripts.
+    #     corners = np.round(corners).astype(np.int64)
+    #     c = corners[:,::-1]
+    #
+    #     for i in range(nimages):
+    #         if images[i] is None or not (img_shapes[i,:] > 0).all(): continue
+    #         s = img_shapes[i,:]
+    #         image[c[i, 0]:c[i, 0] + s[0], c[i, 1]:c[i, 1] + s[1]] = images[i]
+    #
+    #     return image, corners

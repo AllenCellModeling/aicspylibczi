@@ -6,8 +6,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: checkout submodules
-        run: git submodule sync --recursive && git submodule update --init --recursive
+        with:
+          submodules: true
       - name: setup python
         uses: actions/setup-python@v1
         with:
@@ -19,13 +19,14 @@ jobs:
       - name: Test with pytest
         run: |
           pytest --cov-report xml --cov=pylibczi pylibczi/tests
+          codecov -t ${{ secrets.CodeCovKey }}
   lint:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@master
-      - name: checkout submodules
-        run: git submodule sync --recursive && git submodule update --init --recursive
+        with:
+          submodules: true
       - name: Set up Python 3.7
         uses: actions/setup-python@v1
         with:

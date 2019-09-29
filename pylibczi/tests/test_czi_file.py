@@ -3,6 +3,13 @@ from pylibczi import CziFile
 from pathlib import Path
 
 
+@pytest.mark.parametrize("fname", [
+    pytest.param('', marks=pytest.mark.raises(exception=IsADirectoryError))
+])
+def test_is_a_directory(data_dir, fname):
+    czi = CziFile(str(data_dir))
+
+
 @pytest.mark.parametrize("fname, xp_query, expected", [
     pytest.param('s_1_t_1_c_1_z_1.czi', ".//SizeS", 1, marks=pytest.mark.raises(exception=AttributeError)),
     pytest.param('s_1_t_1_c_1_z_1.czi', ".//SizeZ", 1, marks=pytest.mark.raises(exception=AttributeError)),
@@ -23,6 +30,8 @@ def test_metadata(data_dir, fname, xp_query, expected):
     assert int(vs.text) == expected
 
 
+
+
 @pytest.mark.parametrize("fname, expected", [
     ('s_1_t_1_c_1_z_1.czi', (False)),
     ('s_3_t_1_c_3_z_5.czi', (False)),
@@ -30,6 +39,19 @@ def test_metadata(data_dir, fname, xp_query, expected):
 def test_is_mosaic(data_dir, fname, expected):
     czi = CziFile(str(data_dir / fname))
     assert czi.is_mosaic() == expected
+
+
+@pytest.mark.parametrize("fname, expected", [
+    ('s_1_t_1_c_1_z_1.czi', [0, 0, -1, -1]),
+    ('s_3_t_1_c_3_z_5.czi', [0, 0, -1, -1]),
+])
+def test_mosaic_size(data_dir, fname, expected):
+    czi = CziFile(str(data_dir / fname))
+    ans = czi.read_mosaic_size()
+    assert ans.x == expected[0]
+    assert ans.y == expected[1]
+    assert ans.w == expected[2]
+    assert ans.h == expected[3]
 
 
 @pytest.mark.parametrize("fname, expected", [
@@ -71,5 +93,8 @@ def test_image_shape(data_dir, fname, expects):
 # def test_mosaic_image():
 #     pTwo = Path('~/Data/20190618_CL001_HB01_Rescan_002.czi').expanduser()
 #     czi = CziFile(str(pTwo))
-#     img = czi.read_mosaic(C=1)
+#     sze = czi.read_mosaic_size()
+#     assert sze.w == 69986
+#     assert sze.h == 62649
+#     img = czi.read_mosaic(scale_factor=0.1, C=1)
 #     assert img.shape[0] == 1

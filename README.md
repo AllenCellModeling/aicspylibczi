@@ -1,4 +1,9 @@
 # pylibczi
+[![C++ Build & Test](https://github.com/AllenCellModeling/pylibczi/workflows/C%2B%2B+Build+%26+Test/badge.svg)](https://github.com/AllenCellModeling/pylibczi/actions)
+[![Python Build & Test](https://github.com/AllenCellModeling/pylibczi/workflows/Python+Build%2C+Test%2C+%26+Lint/badge.svg)](https://github.com/AllenCellModeling/pylibczi/actions)
+[![codecov](https://codecov.io/gh/AllenCellModeling/pylibczi/branch/feature/pybind11/graph/badge.svg)](https://codecov.io/gh/AllenCellModeling/pylibczi)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
 
 Python module to expose [libCZI](https://github.com/zeiss-microscopy/libCZI) functionality for reading (subset of) Zeiss CZI files and meta-data.
 
@@ -12,10 +17,9 @@ pip install pylibczi
 
 ## Usage
 
-For example usage, see [`sample.py`](sample.py).
-In the first example, replace `test.czi` with your own CZI file containing scenes.
-In the second example, replace `test2.czi` with your own CZI file containing grayscale or BGR48 image data.
-The latter is a more generic reader for reading and assembling all subblocks.
+For example usage, see the [`Example_Usage.ipynb`](Example_Usage.ipynb).
+To try out the notebook you need to launch `jupyter notebook` and then open the `Example_usage.ipynb`
+This shows how to work with a standard CZI file and a Mosaic CZI file.
 
 ## Documentation
 
@@ -27,16 +31,17 @@ Use these steps to build and install pylibczi locally:
 
 * Clone the repository including submodules (`--recurse-submodules`).
 * Requirements:
-  * libCZI requires a c++11 compatible compiler.
+  * libCZI requires a c++11 compatible compiler. Built & Tested with clang.
   * Development requirements are those required for libCZI: **libpng**, **zlib**
-  * Install the python requirements:
+  * Install the package:
     ```
-    pip install -r requirements.txt
-    pip install -r dev-requirements.txt
+    pip install .
+    pip install -e .[dev] # for development (-e means editable so changes take effect when made)
+    pip install .[all] # for everything including jupyter notebook to work with the Example_Usage above
     ```
-* Build and install:
-  ```
-  python setup.py install
-  ```
   * libCZI is automatically built as a submodule and linked statically to pylibczi.
 
+## License
+
+The GPLv3 license is a consequence of libCZI which imposes GPLv3. If you wish to use libCZI or this derivative in
+a commercial product you'll need to talk to Zeiss.

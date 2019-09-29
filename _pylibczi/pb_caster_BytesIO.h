@@ -32,7 +32,6 @@ namespace pybind11 {
 			/* Extract PyObject from handle */
 			PyObject* source = src.ptr();
 			/* Try converting into a Python integer value */
-			std::cout << "in load funtion of file caster!" << std::endl;
 			int f_desc = PyObject_AsFileDescriptor(source);
 			if (f_desc==-1) return false;
 			value = fdopen(f_desc, "r");

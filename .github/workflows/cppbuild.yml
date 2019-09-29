@@ -6,8 +6,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: checkout submodules
-        run: git submodule sync --recursive && git submodule update --init --recursive
+        with:
+          submodules: true
       - name: build with cmake
         run: |
           which clang

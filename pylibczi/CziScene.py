@@ -26,7 +26,10 @@ import scipy.spatial.distance as scidist
 from .exceptions import CziFileNotMultiSceneError
 from .CziFile import CziFile
 
-
+#
+# This code is here for a rework with Paul Watkins to figure out what he needs functionality wise
+# For the feature/pybind11 commits please ignore this file.
+#
 class CziScene(CziFile):
     """Zeiss CZI scene image and metadata.
 
