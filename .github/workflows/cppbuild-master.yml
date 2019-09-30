@@ -1,5 +1,11 @@
-on: [push, pull_request]
-name: Any Push C++ Build & Test
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: 0 10 * * 1
+
+name: C++ Build & Test
 jobs:
   cmake-build:
     name: CMake Build & Test Ubuntu

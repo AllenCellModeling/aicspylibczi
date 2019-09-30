@@ -1,5 +1,11 @@
-on: [push, pull_request]
-name: Any Push Python Build, Test, & Lint
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: 0 10 * * 1
+
+name: Python Build, Test, & Lint
 jobs:
   python-test:
     name: Python Build & Test Ubuntu

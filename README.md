@@ -1,6 +1,6 @@
 # pylibczi
-[![C++ Build & Test](https://github.com/AllenCellModeling/pylibczi/workflows/C%2B%2B+Build+%26+Test/badge.svg)](https://github.com/AllenCellModeling/pylibczi/actions)
-[![Python Build & Test](https://github.com/AllenCellModeling/pylibczi/workflows/Python+Build%2C+Test%2C+%26+Lint/badge.svg)](https://github.com/AllenCellModeling/pylibczi/actions)
+[![C++ Build & Test](https://github.com/AllenCellModeling/pylibczi/workflows/C%2B%2B%20Build%20%26%20Test/badge.svg)](https://github.com/AllenCellModeling/pylibczi/actions)
+[![Python Build & Test](https://github.com/AllenCellModeling/pylibczi/workflows/Python%20Build%2C%20Test%2C%20%26%20Lint/badge.svg)](https://github.com/AllenCellModeling/pylibczi/actions)
 [![codecov](https://codecov.io/gh/AllenCellModeling/pylibczi/branch/feature/pybind11/graph/badge.svg)](https://codecov.io/gh/AllenCellModeling/pylibczi)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
