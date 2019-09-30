@@ -7,6 +7,12 @@
 
 Python module to expose [libCZI](https://github.com/zeiss-microscopy/libCZI) functionality for reading (subset of) Zeiss CZI files and meta-data.
 
+## Usage
+
+For example usage, see the [`Example_Usage.ipynb`](Example_Usage.ipynb).
+To try out the notebook you need to launch `jupyter notebook` and then open the `Example_usage.ipynb`
+This shows how to work with a standard CZI file and a Mosaic CZI file.
+
 ## Installation
 
 The preferred installation method is with `pip install`.
@@ -14,12 +20,6 @@ This will intall the pylibczi python module and extension binaries ([hosted on P
 ```
 pip install pylibczi
 ```
-
-## Usage
-
-For example usage, see the [`Example_Usage.ipynb`](Example_Usage.ipynb).
-To try out the notebook you need to launch `jupyter notebook` and then open the `Example_usage.ipynb`
-This shows how to work with a standard CZI file and a Mosaic CZI file.
 
 ## Documentation
 

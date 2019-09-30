@@ -47,4 +47,4 @@ $ bumpversion patch # possible: major / minor / patch
 $ git push
 $ git push --tags
 
-Travis will then deploy to PyPI if tests pass.
+Make and merge a PR to `stable` and GitHub will then deploy to PyPI once merged.

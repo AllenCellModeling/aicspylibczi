@@ -1,8 +1,0 @@
-numpy>=1.14.1
-scipy
-lxml
-scikit-image
-matplotlib>=2.0.0
-tifffile
-pytest
-pytest-raises

@@ -1,4 +1,0 @@
-numpy>=1.14.1
-scipy
-lxml
-cmake
