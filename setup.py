@@ -98,19 +98,30 @@ class CMakeBuild(build_ext):
         # Default cmake to whichever one is first in the path.
         self.cmake_exe = 'cmake.exe' if platform.system() == "Windows" else 'cmake'
         # Use the python distrubution (anaconda) cmake, if we can find it.
-        cmakes = []
+        found_cmake = ''
+        found_cmake_depth = -1 # if multiple cmakes, use one with shallowest path depth.
         for site_package_dir in site.getsitepackages():
             cmakes = list(Path(site_package_dir).glob('**/{}'.format(self.cmake_exe)))
-            if len(cmakes) > 0:
-                self.cmake_exe = cmakes[0].as_posix()
-                self.announce("Using cmake: '{}'".format(self.cmake_exe), log.INFO)
-                break
-
-        try:
-            out = subprocess.check_output([self.cmake_exe, '--version'])
-        except OSError:
-            raise RuntimeError("CMake must be installed to build the following extensions: " +
-                               ", ".join(e.name for e in self.extensions))
+            for cmake in cmakes:
+                cmake_exe = cmake.as_posix()
+                cmake_depth = len(cmake.parts)
+                try:
+                    out = subprocess.check_output([cmake_exe, '--version'])
+                    valid_cmake = True
+                except:
+                    valid_cmake = False
+                if valid_cmake and (not found_cmake or cmake_depth < found_cmake_depth):
+                    found_cmake = cmake_exe
+                    found_cmake_depth = cmake_depth
+        if found_cmake:
+            self.cmake_exe = found_cmake
+            self.announce("Using cmake: '{}'".format(self.cmake_exe), log.INFO)
+        else:
+            try:
+                out = subprocess.check_output([self.cmake_exe, '--version'])
+            except OSError:
+                raise RuntimeError("CMake must be installed to build the following extensions: " +
+                                   ", ".join(e.name for e in self.extensions))
 
         if platform.system() == "Windows":
             cmake_version = LooseVersion(re.search(r'version\s*([\d.]+)', out.decode()).group(1))
