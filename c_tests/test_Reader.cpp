@@ -5,7 +5,6 @@
 #include "catch.hpp"
 #include "../_pylibczi/Reader.h"
 #include <cstdio>
-#include <unistd.h>
 #include "pb_helpers.h"
 
 class CziCreator {
