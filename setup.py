@@ -122,14 +122,23 @@ class CMakeBuild(build_ext):
             build_args += ['--', '-j2']
 
         env = os.environ.copy()
-        env['CC'] = 'clang'
-        env['CXX'] = 'clang++'
+        if 'CC' not in env:
+            env['CC'] = 'clang'
+        if 'CXX' not in env:
+            env['CXX'] = 'clang++'
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
                                                               self.distribution.get_version())
+        # Use the python (anaconda) cmake, if available, otherwise whatever cmake is in the path.
+        cmake_exe = os.path.join(os.path.dirname(sys.executable), 'cmake')
+        if not os.path.isfile(cmake_exe): cmake_exe = 'cmake'
+        # Use distutils debug flag to also force verbosity on the make commands.
+        if 'DISTUTILS_DEBUG' in env:
+            cmake_args += ['-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON']
+
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
-        subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
-        subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
+        subprocess.check_call([cmake_exe, ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
+        subprocess.check_call([cmake_exe, '--build', '.'] + build_args, cwd=self.build_temp)
 
 
 setup(
@@ -142,6 +151,7 @@ setup(
         'This module contains a C++ library that wraps libCZI from Zeiss. This C++ library has pybind11 bindings '
         'enabling it to be compiled to a python extension (_pylibczi) which is then exposed indirectly by pylibczi.'),
     ext_modules=[CMakeExtension('_pylibczi')],
+    packages = ['pylibczi'],
     cmdclass=dict(build_ext=CMakeBuild),
     install_requires=requirements,
     setup_requires=setup_requirements,
