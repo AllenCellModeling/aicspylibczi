@@ -19,11 +19,13 @@ import platform
 import re
 import subprocess
 import sys
+from pathlib import Path
+import site
 from distutils.version import LooseVersion
+from distutils import log
 
 from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
-from distutils import log
 
 
 requirements = [
@@ -93,10 +95,16 @@ class CMakeExtension(Extension):
 
 class CMakeBuild(build_ext):
     def run(self):
-        # Use the python (anaconda) cmake, if available, otherwise whatever cmake is in the path.
-        self.cmake_exe = os.path.join(os.path.dirname(sys.executable), 'cmake')
-        if not os.path.isfile(self.cmake_exe): self.cmake_exe = 'cmake'
-        self.announce("Using cmake: '{}'".format(self.cmake_exe), log.INFO)
+        # Default cmake to whichever one is first in the path.
+        self.cmake_exe = 'cmake.exe' if platform.system() == "Windows" else 'cmake'
+        # Use the python distrubution (anaconda) cmake, if we can find it.
+        cmakes = []
+        for site_package_dir in site.getsitepackages():
+            cmakes = list(Path(site_package_dir).glob('**/{}'.format(self.cmake_exe)))
+            if len(cmakes) > 0:
+                self.cmake_exe = cmakes[0].as_posix()
+                self.announce("Using cmake: '{}'".format(self.cmake_exe), log.INFO)
+                break
 
         try:
             out = subprocess.check_output([self.cmake_exe, '--version'])
