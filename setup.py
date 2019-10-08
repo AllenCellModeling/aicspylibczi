@@ -19,7 +19,9 @@ import platform
 import re
 import subprocess
 import sys
+from pathlib import Path
 from distutils.version import LooseVersion
+from distutils import log
 
 from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
@@ -91,11 +93,42 @@ class CMakeExtension(Extension):
 
 class CMakeBuild(build_ext):
     def run(self):
+        # Default cmake to whichever one is first in the path.
+        self.cmake_exe = 'cmake.exe' if platform.system() == "Windows" else 'cmake'
+        # Try to find the python distrubution (pip installed) cmake.
+        found_cmake = ''
         try:
-            out = subprocess.check_output(['cmake', '--version'])
-        except OSError:
-            raise RuntimeError("CMake must be installed to build the following extensions: " +
-                               ", ".join(e.name for e in self.extensions))
+            import cmake as cmake_module
+            imported_cmake_module = True
+        except:
+            imported_cmake_module = False
+        if imported_cmake_module:
+            # Although it probably should not happen, robustly deal with multiple cmakes installed
+            #   into the cmake packages' path by taking the cmake with the shallowest path depth.
+            found_cmake_depth = -1
+            for cmake_path in cmake_module.__path__:
+                for cmake in Path(cmake_path).glob('**/{}'.format(self.cmake_exe)):
+                    cmake_exe = cmake.as_posix()
+                    cmake_depth = len(cmake.parts)
+                    try:
+                        out = subprocess.check_output([cmake_exe, '--version'])
+                        valid_cmake = True
+                    except:
+                        valid_cmake = False
+                    if valid_cmake and (not found_cmake or cmake_depth < found_cmake_depth):
+                        found_cmake = cmake_exe
+                        found_cmake_depth = cmake_depth
+
+        # Use the python distribution cmake (pip installed) if it was found.
+        if found_cmake:
+            self.cmake_exe = found_cmake
+            self.announce("Using cmake: '{}'".format(self.cmake_exe), log.INFO)
+        else:
+            try:
+                out = subprocess.check_output([self.cmake_exe, '--version'])
+            except OSError:
+                raise RuntimeError("CMake must be installed to build the following extensions: " +
+                                   ", ".join(e.name for e in self.extensions))
 
         if platform.system() == "Windows":
             cmake_version = LooseVersion(re.search(r'version\s*([\d.]+)', out.decode()).group(1))
@@ -125,10 +158,14 @@ class CMakeBuild(build_ext):
         env = os.environ.copy()
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
                                                               self.distribution.get_version())
+        # Use distutils debug flag to also force verbosity on the make commands.
+        if 'DISTUTILS_DEBUG' in env:
+            cmake_args += ['-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON']
+
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
-        subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
-        subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
+        subprocess.check_call([self.cmake_exe, ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
+        subprocess.check_call([self.cmake_exe, '--build', '.'] + build_args, cwd=self.build_temp)
 
 
 setup(
