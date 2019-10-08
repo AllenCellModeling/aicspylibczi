@@ -23,6 +23,8 @@ from distutils.version import LooseVersion
 
 from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
+from distutils import log
+
 
 requirements = [
     "numpy>=1.14.1",
@@ -54,6 +56,7 @@ dev_requirements = [
     "tox>=3.5.2",
     "twine>=1.13.0",
     "wheel>=0.33.1",
+    "cmake",
 ]
 
 setup_requirements = [
@@ -90,8 +93,13 @@ class CMakeExtension(Extension):
 
 class CMakeBuild(build_ext):
     def run(self):
+        # Use the python (anaconda) cmake, if available, otherwise whatever cmake is in the path.
+        self.cmake_exe = os.path.join(os.path.dirname(sys.executable), 'cmake')
+        if not os.path.isfile(self.cmake_exe): self.cmake_exe = 'cmake'
+        self.announce("Using cmake: '{}'".format(self.cmake_exe), log.INFO)
+
         try:
-            out = subprocess.check_output(['cmake', '--version'])
+            out = subprocess.check_output([self.cmake_exe, '--version'])
         except OSError:
             raise RuntimeError("CMake must be installed to build the following extensions: " +
                                ", ".join(e.name for e in self.extensions))
@@ -128,17 +136,14 @@ class CMakeBuild(build_ext):
             env['CXX'] = 'clang++'
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
                                                               self.distribution.get_version())
-        # Use the python (anaconda) cmake, if available, otherwise whatever cmake is in the path.
-        cmake_exe = os.path.join(os.path.dirname(sys.executable), 'cmake')
-        if not os.path.isfile(cmake_exe): cmake_exe = 'cmake'
         # Use distutils debug flag to also force verbosity on the make commands.
         if 'DISTUTILS_DEBUG' in env:
             cmake_args += ['-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON']
 
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
-        subprocess.check_call([cmake_exe, ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
-        subprocess.check_call([cmake_exe, '--build', '.'] + build_args, cwd=self.build_temp)
+        subprocess.check_call([self.cmake_exe, ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
+        subprocess.check_call([self.cmake_exe, '--build', '.'] + build_args, cwd=self.build_temp)
 
 
 setup(
