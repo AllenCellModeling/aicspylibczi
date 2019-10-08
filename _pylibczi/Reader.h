@@ -198,7 +198,9 @@ namespace pylibczi {
 	   * @endcode
 	   */
 	  ImageVector
-	  read_mosaic(const libCZI::CDimCoordinate planeCoord, float scaleFactor = 0.1, libCZI::IntRect imBox = {.x = 0, .y = 0, .w = -1, .h = -1});
+    // for gcc and MSVC the imBox struct initializer must be done with the fields in order and without field names.
+    // for reference: imBox = {.x = 0, .y = 0, .w = -1, .h = -1}
+    read_mosaic(const libCZI::CDimCoordinate planeCoord, float scaleFactor = 0.1, libCZI::IntRect imBox = {0, 0, -1, -1});
 
 	  /*!
 	   * Convert the libCZI::DimensionIndex to a character

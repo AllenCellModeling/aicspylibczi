@@ -2,17 +2,29 @@
 // Created by Jamie Sherman on 2019-08-18.
 //
 #include <tuple>
-#include <unistd.h>
 #include "Reader.h"
 #include "exceptions.h"
 #include <set>
+
+// unistd.h does not exist in windows
+#if defined(_WIN32) || defined(_WIN64)
+#include <stdio.h>
+#include <BaseTsd.h>
+typedef SSIZE_T ssize_t;
+#else
+#include <unistd.h>
+#endif
 
 namespace pylibczi {
 
   void
   CSimpleStreamImplFromFP::Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead)
   {
-	  fseeko(this->fp, offset, SEEK_SET);
+#if defined(_WIN32) || defined(_WIN64)
+	  _fseeki64(this->fp, offset, SEEK_SET);
+#else
+	  fseeko(this->fp, (__int64) offset, SEEK_SET);
+#endif
 
 	  std::uint64_t bytesRead = fread(pv, 1, (size_t) size, this->fp);
 	  if (ptrBytesRead!=nullptr)
