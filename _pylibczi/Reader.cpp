@@ -21,9 +21,9 @@ namespace pylibczi {
   CSimpleStreamImplFromFP::Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead)
   {
 #if defined(_WIN32) || defined(_WIN64)
-	  _fseeki64(this->fp, offset, SEEK_SET);
+	  _fseeki64(this->fp, (__int64) offset, SEEK_SET);
 #else
-	  fseeko(this->fp, (__int64) offset, SEEK_SET);
+	  fseeko(this->fp, offset, SEEK_SET);
 #endif
 
 	  std::uint64_t bytesRead = fread(pv, 1, (size_t) size, this->fp);
