@@ -1,8 +1,7 @@
 on: [push, pull_request]
-name: Any Push C++ Build & Test
+name: C++ Build
 jobs:
   cmake-build:
-    name: CMake Build & Test Ubuntu
     runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 6

@@ -5,10 +5,9 @@ on:
   schedule:
     - cron: 0 10 * * 1
 
-name: Python Build, Test, & Lint
+name: Python Master Build
 jobs:
   python-test:
-    name: Python Build & Test Ubuntu
     runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 6

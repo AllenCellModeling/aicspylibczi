@@ -5,10 +5,9 @@ on:
   schedule:
     - cron: 0 10 * * 1
 
-name: C++ Build & Test
+name: C++ Master Build
 jobs:
   cmake-build:
-    name: CMake Build & Test Ubuntu
     runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 6

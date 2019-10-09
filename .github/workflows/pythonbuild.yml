@@ -1,8 +1,7 @@
 on: [push, pull_request]
-name: Any Push Python Build, Test, & Lint
+name: Python Build
 jobs:
   python-test:
-    name: Python Build & Test Ubuntu
     runs-on: ${{ matrix.os }}
     strategy:
       max-parallel: 6
