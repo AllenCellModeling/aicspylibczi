@@ -10,18 +10,6 @@ project(_pylibczi)
 set(CMAKE_CXX_STANDARD 14)
 set(PYBIND11_CPP_STANDARD -std=c++14)
 
-macro(print_all_variables)
-    message(STATUS "print_all_variables------------------------------------------{")
-    get_cmake_property(_variableNames VARIABLES)
-    foreach (_variableName ${_variableNames})
-        #string(FIND "${_varableName}" "PYTHON" pos1)
-        #if(${pos1} GREATER -1)
-        message(STATUS "${_variableName}=${${_variableName}}")
-        #endif()
-    endforeach()
-    message(STATUS "print_all_variables------------------------------------------}")
-endmacro()
-
 IF(UNIX)
     # linking with 'thread' is necessary if we use std::thread and related under Linux it seems
     #   otherwise - the program simply crashes (no build-error)
@@ -54,16 +42,12 @@ add_library(${TARGET_ONE} STATIC ${PYLIBCZI_C_SRC} ${PYLIBCZI_C_SRC_HEADERS})
 target_link_libraries(${TARGET_ONE} INTERFACE libCZIStatic JxrDecodeStatic)
 add_dependencies(${TARGET_ONE} libCZIStatic JxrDecodeStatic)
 
-#set(Python_ADDITIONAL_VERSIONS 3.7.3)
-#find_package(PythonLibs REQUIRED)
 pybind11_add_module(${TARGET_TWO} MODULE ${PYLIBCZI_C_SRC} ${PYLIBCZI_PYBIND11})
 target_link_libraries(${TARGET_TWO} PRIVATE libCZIStatic JxrDecodeStatic)
 add_custom_command(TARGET ${TARGET_TWO} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${TARGET_TWO}> ${PROJECT_SOURCE_DIR}
         )
 
-#enable_testing() // didn't do anything when enabled
 add_subdirectory(c_tests)
-#print_all_variables()
 
 
