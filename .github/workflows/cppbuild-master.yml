@@ -9,7 +9,12 @@ name: C++ Build & Test
 jobs:
   cmake-build:
     name: CMake Build & Test Ubuntu
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      max-parallel: 6
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+
     steps:
       - uses: actions/checkout@master
         with:
