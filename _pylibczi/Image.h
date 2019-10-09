@@ -27,6 +27,12 @@ namespace pylibczi {
 
   class ImageFactory;
 
+  /*!
+   * @brief ImageBC is an abstract base class. The main reason for it's existence is to be able to polymorphically work with
+   * Image<T> of different T through the virtual functions from a ImageBC *. Each ImageBC * is meant to point to the contents of
+   * one subblock which may be either 2D or 3D, in the case of 3D the data is then later split into multiple 2D Image<T> so that
+   * the concept of a Channel isn't destroyed.
+   */
   class ImageBC {
   protected:
 	  std::vector<size_t> m_matrixSizes; // C Y X order or Y X  ( H, W )
@@ -35,7 +41,7 @@ namespace pylibczi {
 	  libCZI::IntRect m_xywh;
 	  int m_mIndex;
 
-	  static std::unique_ptr<std::map<libCZI::PixelType, std::string>>
+	  static std::map<libCZI::PixelType, std::string>
 			  s_pixelToTypeName;
 
   public:
@@ -55,34 +61,12 @@ namespace pylibczi {
 
 	  size_t length()
 	  {
-		  return std::accumulate(m_matrixSizes.begin(), m_matrixSizes.end(), (size_t)1,
-				  std::multiplies<>());
+		  return std::accumulate(m_matrixSizes.begin(), m_matrixSizes.end(), (size_t)1, std::multiplies<>());
 	  }
 
-	  std::vector<std::pair<char, int> > get_valid_indexs(bool isMosaic=false)
-	  {
-		  using CZI_DI = libCZI::DimensionIndex;
-		  std::vector<CZI_DI> sort_order{CZI_DI::S, CZI_DI::T, CZI_DI::C, CZI_DI::Z};
-		  std::vector<std::pair<char, int> > ans;
-		  for (auto di : sort_order) {
-			  int value;
-			  if (m_cdims.TryGetPosition(di, &value)) ans.emplace_back(libCZI::Utils::DimensionToChar(di), value);
-		  }
-		  if(isMosaic) ans.emplace_back('M', m_mIndex);
-		  return ans;
-	  }
+	  std::vector<std::pair<char, int> > get_valid_indexs(bool isMosaic=false);
 
-	  bool operator<(ImageBC& other)
-	  {
-		  using CZI_DI = libCZI::DimensionIndex;
-		  std::vector<CZI_DI> sort_order{CZI_DI::S, CZI_DI::T, CZI_DI::C, CZI_DI::Z};
-		  for (auto di : sort_order) {
-			  int di_value, other_value;
-			  if (m_cdims.TryGetPosition(di, &di_value) && other.m_cdims.TryGetPosition(di, &other_value) && di_value!=other_value)
-				  return (di_value<other_value);
-		  }
-		  return m_mIndex<other.m_mIndex;
-	  }
+	  bool operator<(ImageBC& other);
 
 	  libCZI::PixelType pixelType() { return m_pixelType; }
 
@@ -95,8 +79,8 @@ namespace pylibczi {
   inline bool
   ImageBC::is_type_match()
   {
-	  auto pt = (*s_pixelToTypeName)[m_pixelType];
-	  return (typeid(T).name()==(*s_pixelToTypeName)[m_pixelType]);
+	  auto pt = s_pixelToTypeName[m_pixelType];
+	  return (typeid(T).name()==s_pixelToTypeName[m_pixelType]);
   }
 
   template<typename T>
@@ -181,62 +165,11 @@ namespace pylibczi {
 	   * @param startFrom is an integer offset to start assigning the new channels from.
 	   * @return a vector of smart pointers wrapping Images (2D)
 	   */
-	  ImVec split_channels(int startFrom) override
-	  {
-		  ImVec ivec;
-		  if (m_matrixSizes.size()<3)
-			  throw ImageSplitChannelException("Image  only has 2 dimensions. No channels to split.", 0);
-		  int cStart = 0;
-		  // TODO figure out if C can have a nonzero value for a BGR image
-		  if (m_cdims.TryGetPosition(libCZI::DimensionIndex::C, &cStart) && cStart!=0)
-			  throw ImageSplitChannelException("attempting to split channels", cStart);
-		  for (int i = 0; i<m_matrixSizes[0]; i++) {
-			  libCZI::CDimCoordinate tmp(m_cdims);
-			  tmp.Set(libCZI::DimensionIndex::C, i+startFrom); // assign the channel from the BGR
-			  // TODO should I change the pixel type from a BGRx to a Grayx/3
-			  ivec.emplace_back(new Image<T>({m_matrixSizes[1], m_matrixSizes[2]}, m_pixelType, &tmp, m_xywh, m_mIndex));
-		  }
-		  return ivec;
-	  }
+	  ImVec split_channels(int startFrom) override;
 // TODO Implement set_sort_order() and operator()<
   };
 
-  template<typename T>
-  inline T& Image<T>::operator[](const std::vector<size_t>& idxs)
-  {
-	  if (idxs.size()!=m_matrixSizes.size())
-		  throw ImageAccessUnderspecifiedException(idxs.size(), m_matrixSizes.size(), "from Image.operator[].");
-	  size_t idx = calculate_idx(idxs);
-	  return m_array[idx];
-  }
 
-  template<typename T>
-  inline T* Image<T>::get_raw_ptr(std::vector<size_t> lst)
-  {
-	  std::vector<size_t> zeroPadded(0, m_matrixSizes.size());
-	  std::copy(lst.rbegin(), lst.rend(), zeroPadded.rbegin());
-	  return this->operator[](calculate_idx(zeroPadded));
-  }
-  template<typename T>
-  inline void Image<T>::load_image(const std::shared_ptr<libCZI::IBitmapData>& pBitmap, size_t channels)
-  {
-	  libCZI::IntSize size = pBitmap->GetSize();
-	  {
-		  libCZI::ScopedBitmapLockerP lckScoped{pBitmap.get()};
-		  // WARNING do not compute the end of the array by multiplying stride by height, they are both uint32_t and you'll get an overflow for larger images
-		  uint8_t *sEnd = static_cast<uint8_t*>(lckScoped.ptrDataRoi)+lckScoped.size;
-		  SourceRange<T> sourceRange(channels, static_cast<T*>(lckScoped.ptrDataRoi), (T*) (sEnd), lckScoped.stride, size.w);
-		  TargetRange<T> targetRange(channels, size.w, size.h, m_array.get(), m_array.get()+length());
-		  for (std::uint32_t h = 0; h<pBitmap->GetHeight(); ++h) {
-			  paired_for_each(sourceRange.stride_begin(h), sourceRange.stride_end(h), targetRange.stride_begin(h),
-					  [&](std::vector<T*> src, std::vector<T*> tgt) {
-						  paired_for_each(src.begin(), src.end(), tgt.begin(), [&](T* s, T* t) {
-							  *t = *s;
-						  });
-					  });
-		  }
-	  }
-  }
 
   class ImageFactory {
 	  using PT = libCZI::PixelType;
@@ -257,12 +190,7 @@ namespace pylibczi {
 	  static size_t n_of_channels(PT pt);
 
 	  template<typename T>
-	  static std::shared_ptr<Image<T> > get_derived(std::shared_ptr<ImageBC> ptr)
-	  {
-		  if (!ptr->is_type_match<T>())
-			  throw PixelTypeException(ptr->pixelType(), "Image PixelType doesn't match requested memory type.");
-		  return std::dynamic_pointer_cast<Image<T> >(ptr);
-	  }
+	  static std::shared_ptr<Image<T> > get_derived(std::shared_ptr<ImageBC> ptr);
 
 	  std::shared_ptr<ImageBC>
 	  construct_image(const std::shared_ptr<libCZI::IBitmapData>& pBitmap, const libCZI::CDimCoordinate* cdims, libCZI::IntRect ir, int m);
@@ -282,5 +210,7 @@ namespace pylibczi {
   };
 
 } // namespace pylibczi
+
+#include "Image.inl"
 
 #endif //_PYLIBCZI__PYLIBCZI_IMAGE_H

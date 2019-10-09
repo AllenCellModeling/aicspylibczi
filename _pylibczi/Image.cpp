@@ -7,6 +7,7 @@
 #include <typeinfo>
 #include <utility>
 #include <iostream>
+#include <cstdint>
 
 #include "Image.h"
 #include "Iterator.h"
@@ -15,9 +16,7 @@
 
 namespace pylibczi {
 
-  std::unique_ptr<std::map<libCZI::PixelType, std::string> > ImageBC::s_pixelToTypeName(
-
-		  new std::map<libCZI::PixelType, std::string>{
+  std::map<libCZI::PixelType, std::string>  ImageBC::s_pixelToTypeName{
 				  {libCZI::PixelType::Gray8, typeid(uint8_t).name()},        // 8-bit grayscale
 				  {libCZI::PixelType::Gray16, typeid(uint16_t).name()},       // 16-bit grayscale
 				  {libCZI::PixelType::Gray32Float, typeid(float).name()},          // 4-byte float
@@ -29,7 +28,32 @@ namespace pylibczi {
 				  {libCZI::PixelType::Bgr192ComplexFloat, typeid(nullptr).name()},    // unsupported by libCZI
 				  {libCZI::PixelType::Gray32, typeid(nullptr).name()},    // unsupported by libCZI
 				  {libCZI::PixelType::Gray64Float, typeid(nullptr).name()}     // unsupported by libCZI
-		  });
+		  };
+
+  std::vector<std::pair<char, int> > ImageBC::get_valid_indexs(bool isMosaic)
+  {
+      using CZI_DI = libCZI::DimensionIndex;
+      std::vector<CZI_DI> sort_order{CZI_DI::S, CZI_DI::T, CZI_DI::C, CZI_DI::Z};
+      std::vector<std::pair<char, int> > ans;
+      for (auto di : sort_order) {
+          int value;
+          if (m_cdims.TryGetPosition(di, &value)) ans.emplace_back(libCZI::Utils::DimensionToChar(di), value);
+      }
+      if(isMosaic) ans.emplace_back('M', m_mIndex);
+      return ans;
+  }
+
+  bool ImageBC::operator<(ImageBC& other)
+{
+  using CZI_DI = libCZI::DimensionIndex;
+  std::vector<CZI_DI> sort_order{CZI_DI::S, CZI_DI::T, CZI_DI::C, CZI_DI::Z};
+  for (auto di : sort_order) {
+  int di_value, other_value;
+  if (m_cdims.TryGetPosition(di, &di_value) && other.m_cdims.TryGetPosition(di, &other_value) && di_value!=other_value)
+  return (di_value<other_value);
+}
+return m_mIndex<other.m_mIndex;
+}
 
   size_t ImageBC::calculate_idx(const std::vector<size_t>& idxs)
   {
