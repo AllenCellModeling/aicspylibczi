@@ -10,7 +10,7 @@ project(_pylibczi)
 set(CMAKE_CXX_STANDARD 14)
 set(PYBIND11_CPP_STANDARD -std=c++14)
 
-IF (UNIX)
+IF (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     # linking with 'thread' is necessary if we use std::thread and related under Linux it seems
     #   otherwise - the program simply crashes (no build-error)
     set(CMAKE_C_COMPILER /usr/bin/clang)
@@ -18,7 +18,7 @@ IF (UNIX)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++14 -fPIC -O0 -g -D_FILE_OFFSET_BITS=64 -fvisibility=hidden")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__ANSI__ -fPIC -D_FILE_OFFSET_BITS=64")
     add_compile_definitions(LINUXENV)
-ENDIF (UNIX)
+ENDIF (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 IF (WIN32)
 
