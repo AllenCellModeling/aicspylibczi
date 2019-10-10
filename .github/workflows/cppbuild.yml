@@ -12,15 +12,10 @@ jobs:
       - uses: actions/checkout@master
         with:
           submodules: true
-      - name: build with cmake
+      - name: build and test
         run: |
           mkdir ./cmake-build-debug
           cd cmake-build-debug
           cmake ../
           cmake --build .
-        shell: bash
-      - name: run C++ tests
-        run: |
-          cd ./cmake-build-debug/c_tests/
-          ./test_libczi_c++_extension
         shell: bash
