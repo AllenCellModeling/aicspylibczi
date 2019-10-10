@@ -2,9 +2,9 @@
 // Created by Jamie Sherman on 2019-08-18.
 //
 #include <tuple>
-#include <unistd.h>
 #include "Reader.h"
 #include "exceptions.h"
+#include "pylibczi_unistd.h"
 #include <set>
 
 namespace pylibczi {
@@ -122,7 +122,7 @@ namespace pylibczi {
           return true;
       });
       if (images.empty()) {
-          throw pylibczi::CdimSelectionZeroImagesExcetpion(planeCoord, m_statistics.dimBounds, "No pyramid0 selectable subblocks.");
+          throw pylibczi::CdimSelectionZeroImagesException(planeCoord, m_statistics.dimBounds, "No pyramid0 selectable subblocks.");
       }
       auto shape = get_shape(images, isMosaic());
       images.set_mosaic(isMosaic());

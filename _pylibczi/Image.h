@@ -158,7 +158,7 @@ namespace pylibczi {
        */
       T* release_memory()
       {
-          if (!is_type_match())
+          if (!is_type_match<T>())
               throw PixelTypeException(pixelType(), "Image PixelType is inconsistent with requested memory type.");
           return m_array.release();
       }

@@ -198,7 +198,8 @@ namespace pylibczi {
        * @endcode
        */
       ImageVector
-      read_mosaic(const libCZI::CDimCoordinate planeCoord, float scaleFactor = 0.1, libCZI::IntRect imBox = {.w = -1, .h = -1});
+      read_mosaic(const libCZI::CDimCoordinate planeCoord, float scaleFactor = 0.1, libCZI::IntRect imBox = {0, 0, -1, -1});
+        // changed from {.w=-1, .h=-1} to above to support MSVC and GCC - lagging on C++14 std
 
       /*!
        * Convert the libCZI::DimensionIndex to a character

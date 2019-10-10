@@ -6,7 +6,7 @@
 
 namespace pylibczi {
 
-  std::map<libCZI::PixelType, const std::string> PixelTypeException::m_byName{
+  const std::map<libCZI::PixelType, const std::string> PixelTypeException::m_byName{
           {libCZI::PixelType::Invalid, "Invalid"},
           {libCZI::PixelType::Gray8, "Gray8"},
           {libCZI::PixelType::Gray16, "Gray16"},
