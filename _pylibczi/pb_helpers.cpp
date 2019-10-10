@@ -30,10 +30,9 @@ namespace pb_helpers {
           throw pylibczi::ImageCopyAllocFailed("try using a more constraints (S=1, T=5, etc on the DimensionIndex).", new_size);
       }
 
-      pylibczi::ImageFactory image_factory;
       T* pos = ptr;
       for (auto img : imgs) {
-          auto typed_img = image_factory.get_derived<T>(img);
+          auto typed_img = pylibczi::ImageFactory::get_derived<T>(img);
           int len = typed_img->length();
           std::copy(typed_img->get_raw_ptr(), typed_img->get_raw_ptr()+len, pos);
           pos += len;

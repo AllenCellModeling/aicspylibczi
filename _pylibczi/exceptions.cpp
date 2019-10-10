@@ -2,7 +2,7 @@
 // Created by Jamie Sherman on 2019-10-09.
 //
 
-#import "exceptions.h"
+#include "exceptions.h"
 
 namespace pylibczi {
 

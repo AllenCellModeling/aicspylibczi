@@ -17,7 +17,7 @@ jobs:
           mkdir ./cmake-build-debug
           cd cmake-build-debug
           cmake ../
-          make
+          cmakea -build .
         shell: bash
       - name: run C++ tests
         run: |

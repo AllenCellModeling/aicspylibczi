@@ -106,8 +106,7 @@ namespace pylibczi {
               return true;
           }
           // add the sub-block image
-          ImageFactory imageFactory;
-          auto img = imageFactory.construct_image(m_czireader->ReadSubBlock(idx)->CreateBitmap(),
+          auto img = ImageFactory::construct_image(m_czireader->ReadSubBlock(idx)->CreateBitmap(),
                   &info.coordinate, info.logicalRect, info.mIndex);
           if (flatten && ImageFactory::n_of_channels(img->pixelType())>1) {
               int start(0), sze(0);
@@ -202,8 +201,7 @@ namespace pylibczi {
               nullptr);   // use default options
 
       // TODO how to handle 3 channel BGR image split them as in read_selected or ???
-      ImageFactory imageFactory;
-      auto img = imageFactory.construct_image(multiTileComposit, &planeCoord, imBox, -1);
+      auto img = ImageFactory::construct_image(multiTileComposit, &planeCoord, imBox, -1);
       ImageVector image_vector;
       image_vector.reserve(1);
       if (ImageFactory::n_of_channels(img->pixelType())>1) {

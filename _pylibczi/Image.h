@@ -199,9 +199,13 @@ namespace pylibczi {
       static size_t n_of_channels(PT pixel_type);
 
       template<typename T>
-      static std::shared_ptr<Image<T> > get_derived(std::shared_ptr<ImageBC> ptr);
+      static std::shared_ptr<Image<T> > get_derived(std::shared_ptr<ImageBC> ptr){
+          if (!ptr->is_type_match<T>())
+              throw PixelTypeException(ptr->pixelType(), "Image PixelType doesn't match requested memory type.");
+          return std::dynamic_pointer_cast<Image<T> >(ptr);
+      }
 
-      std::shared_ptr<ImageBC>
+      static std::shared_ptr<ImageBC>
       construct_image(const std::shared_ptr<libCZI::IBitmapData>& pBitmap, const libCZI::CDimCoordinate* cdims, libCZI::IntRect box,
               int mIndex);
   };
@@ -218,15 +222,6 @@ namespace pylibczi {
       void set_mosaic(bool val) { m_is_mosaic = val; }
 
   };
-
-  template<typename T>
-  inline std::shared_ptr<Image<T> >
-  get_derived(std::shared_ptr<ImageBC> ptr)
-  {
-      if (!ptr->is_type_match<T>())
-          throw PixelTypeException(ptr->pixelType(), "Image PixelType doesn't match requested memory type.");
-      return std::dynamic_pointer_cast<Image<T> >(ptr);
-  }
 
   template<typename T>
   inline ImageBC::ImVec Image<T>::split_channels(int startFrom)
