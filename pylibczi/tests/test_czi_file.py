@@ -3,11 +3,15 @@ from pylibczi import CziFile
 from pathlib import Path
 
 
-@pytest.mark.parametrize("fname", [
-    pytest.param('', marks=pytest.mark.raises(exception=IsADirectoryError))
+@pytest.mark.parametrize("as_string", [
+    pytest.param(True, marks=pytest.mark.raises(exception=IsADirectoryError)),
+    pytest.param(False, marks=pytest.mark.raises(exception=IsADirectoryError))
 ])
-def test_is_a_directory(data_dir, fname):
-    czi = CziFile(str(data_dir))
+def test_is_a_directory(data_dir, as_string):
+    input = data_dir
+    if as_string:
+        input = str(data_dir)
+    czi = CziFile(input)
 
 
 @pytest.mark.parametrize("fname, xp_query, expected", [
@@ -28,8 +32,6 @@ def test_metadata(data_dir, fname, xp_query, expected):
     meta = czi.meta_root
     vs = meta.find(xp_query)
     assert int(vs.text) == expected
-
-
 
 
 @pytest.mark.parametrize("fname, expected", [
@@ -71,7 +73,7 @@ def test_read_image(data_dir, fname, expected):
     ('s_3_t_1_c_3_z_5.czi', (3, 3, 5, 325, 475)),
 ])
 def test_read_image_from_istream(data_dir, fname, expected):
-    with open(data_dir/fname, 'rb') as fp:
+    with open(data_dir / fname, 'rb') as fp:
         czi = CziFile(czi_filename=fp)
         img, shp = czi.read_image()
     assert img.shape == expected
@@ -80,16 +82,15 @@ def test_read_image_from_istream(data_dir, fname, expected):
 @pytest.mark.parametrize("fname, expects", [
     ('s_1_t_1_c_1_z_1.czi', {'B': (0, 1), 'C': (0, 1)}),  # single dims except for C are dropped (S/T dropped) B is always used
     ('s_3_t_1_c_3_z_5.czi', {'B': (0, 1), 'S': (0, 3), 'C': (0, 3), 'Z': (0, 5)}),
-#    ('20190425_S08_001-04-Scene-3-P4-B03.czi', {'B': (0, 1), 'S': (0, 1), 'T': (0, 61), 'C': (0, 2), 'Z': (0, 70)})
 ])
 def test_image_shape(data_dir, fname, expects):
-    with open(data_dir/fname, 'rb') as fp:
+    with open(data_dir / fname, 'rb') as fp:
         czi = CziFile(czi_filename=fp)
         shape = czi.dims()
     for key in expects.keys():
         assert shape[key] == expects[key]
 
-
+# I'm waiting for a small mosaic file then I can add an equivalent test back in
 # def test_mosaic_image():
 #     pTwo = Path('~/Data/20190618_CL001_HB01_Rescan_002.czi').expanduser()
 #     czi = CziFile(str(pTwo))

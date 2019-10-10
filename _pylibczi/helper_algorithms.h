@@ -6,14 +6,14 @@
 #define _PYLIBCZI_HELPER_ALGORITHMS_H
 
 //! @brief paired_for_each walks through 2 containers in sync. It is similar to the second definition of transform
-//! \tparam InputIt An arbitrary iterator type usually associated with a container
-//! \tparam OtherIt An arbitrary iterator type usually associated with a container
-//! \tparam PairFunction The type of the function f
-//! \param first The starting iterator of type InputIt
-//! \param last The ending iterator of type InputIt
-//! \param ofirst The starting iterator of type OtherIt
-//! \param f A function that takes the values of the de-referenced iterators in order
-//! \return the function f
+//! @tparam InputIt An arbitrary iterator type usually associated with a container
+//! @tparam OtherIt An arbitrary iterator type usually associated with a container
+//! @tparam PairFunction The type of the function f
+//! @param first The starting iterator of type InputIt
+//! @param last The ending iterator of type InputIt
+//! @param ofirst The starting iterator of type OtherIt
+//! @param f A function that takes the values of the de-referenced iterators in order
+//! @return the function f
 //!
 //! @example assign a to b
 //! @code
@@ -24,10 +24,10 @@
 template<class InputIt, class OtherIt, class PairFunction>
 PairFunction paired_for_each(InputIt first, InputIt last, OtherIt ofirst, PairFunction f)
 {
-	for (; first!=last; ++first, ++ofirst) {
-		f(*first, *ofirst);
-	}
-	return f;
+    for (; first!=last; ++first, ++ofirst) {
+        f(*first, *ofirst);
+    }
+    return f;
 }
 
 #endif //_PYLIBCZI_HELPER_ALGORITHMS_H
