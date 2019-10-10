@@ -13,11 +13,17 @@ set(PYBIND11_CPP_STANDARD -std=c++14)
 IF (UNIX)
     # linking with 'thread' is necessary if we use std::thread and related under Linux it seems
     #   otherwise - the program simply crashes (no build-error)
+    set(CMAKE_C_COMPILER clang)
+    set(CMAKE_CXX_COMPILER clang++)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++14 -fPIC -O0 -g -D_FILE_OFFSET_BITS=64 -fvisibility=hidden")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__ANSI__ -fPIC -D_FILE_OFFSET_BITS=64")
+    add_compile_definitions(LINUXENV)
 ENDIF (UNIX)
 
-add_compile_definitions(LINUXENV)
+IF (WIN32)
+
+ENDIF (WIN32)
+
 add_compile_definitions(_STATICLIBBUILD)
 add_subdirectory(libCZI/Src/JxrDecode)
 add_subdirectory(libCZI/Src/libCZI)

@@ -54,6 +54,7 @@ dev_requirements = [
     "tox>=3.5.2",
     "twine>=1.13.0",
     "wheel>=0.33.1",
+    "cmake",
 ]
 
 setup_requirements = [
@@ -122,8 +123,6 @@ class CMakeBuild(build_ext):
             build_args += ['--', '-j2']
 
         env = os.environ.copy()
-        env['CC'] = 'clang'
-        env['CXX'] = 'clang++'
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
                                                               self.distribution.get_version())
         if not os.path.exists(self.build_temp):
@@ -142,6 +141,7 @@ setup(
         'This module contains a C++ library that wraps libCZI from Zeiss. This C++ library has pybind11 bindings '
         'enabling it to be compiled to a python extension (_pylibczi) which is then exposed indirectly by pylibczi.'),
     ext_modules=[CMakeExtension('_pylibczi')],
+    packages=['pylibczi'],
     cmdclass=dict(build_ext=CMakeBuild),
     install_requires=requirements,
     setup_requires=setup_requirements,
