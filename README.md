@@ -9,11 +9,9 @@ Python module to expose [libCZI](https://github.com/zeiss-microscopy/libCZI) fun
 
 ## Usage
 
-For example usage, see the [`Example_Usage.ipynb`](Example_Usage.ipynb).
-To try out the notebook you need to launch `jupyter notebook` and then open the `Example_usage.ipynb`
-This shows how to work with a standard CZI file and a Mosaic CZI file.
+The first example show how to work with a standard CZI file (Single or Multe-Scene). The second example shows how to work with a Mosaic CZI file.
 
-#### Read in a czi and select a portion of the image to display
+#### Example 1:  Read in a czi and select a portion of the image to display
 ```python
 import pylibczi
 import pathlib
@@ -41,7 +39,7 @@ img_disp = Image.fromarray(i2[0,0,0,0,200:1100,500:1000].astype(np.uint8))
 ```
 ![Colony Image](colony.png)
 
-#### Read in a mosaic file 
+#### Example 2:  Read in a mosaic file 
 ```python
 import pylibczi
 import pathlib
