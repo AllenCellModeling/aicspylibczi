@@ -12,16 +12,13 @@ jobs:
       - uses: actions/checkout@master
         with:
           submodules: true
-          run: |
-            export CC=clang
-            export CXX=clang++
       - name: build and test
         run: |
           mkdir ./cmake-build-debug
           cd cmake-build-debug
           cmake ../
           cmake --build .
-        if: !startWith(${{ matrix.os }}, 'windows')
+        if: !startWith( ${{ matrix.os }} , 'windows')
           env:
             CC: clang
             CXX: clang++
