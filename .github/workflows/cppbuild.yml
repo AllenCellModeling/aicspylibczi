@@ -13,13 +13,12 @@ jobs:
         with:
           submodules: true
       - name: build and test
+        env:
+          CC: clang
+          CXX: clang++
         run: |
           mkdir ./cmake-build-debug
           cd cmake-build-debug
           cmake ../
           cmake --build .
-        if: !startWith( ${{ matrix.os }} , 'windows')
-          env:
-            CC: clang
-            CXX: clang++
         shell: bash
