@@ -90,7 +90,9 @@ Use these steps to build and install pylibczi locally:
     pip install -e .[dev] # for development (-e means editable so changes take effect when made)
     pip install .[all] # for everything including jupyter notebook to work with the Example_Usage above
     ```
-  * libCZI is automatically built as a submodule and linked statically to pylibczi.
+  * libCZI is automatically built as a submodule and linked statically into pylibczi.
+* Note: If you get the message `EXEC : Fatal Python error : initfsencoding: unable to load the file system codec ... ModuleNotFoundError: No module named 'encodings'` on windows you need to set PYTHONHOME to be the folder the python.exe you are compiling against lives in.
+
 
 ## License
 
