@@ -22,10 +22,10 @@
 namespace pylibczi {
 
 // forward declare for use in casting in ImageBC
-  template<typename T>
-  class Image;
+//  template<typename T>
+//  class Image;
 
-  class ImageFactory;
+  //class ImageFactory;
 
   /*!
    * @brief ImageBC is an abstract base class. The main reason for it's existence is to be able to polymorphically work with
@@ -43,9 +43,9 @@ namespace pylibczi {
        * 3D images can be split up into 2D planes. This functionality is present for consistency with the Channel Dimension.
        */
 
-      std::vector<size_t> m_matrixSizes; // C Y X order or Y X  ( H, W )  The shape of the data being stored
+      std::vector<size_t> m_shape; // C Y X order or Y X  ( H, W )  The shape of the data being stored
       libCZI::PixelType m_pixelType;
-      libCZI::CDimCoordinate m_cdims;
+      libCZI::CDimCoordinate m_planeCoordinates;
       libCZI::IntRect m_xywh;  // (x0, y0, w, h) for image bounding box
       int m_mIndex;  // mIndex is a concept from libCZI and is used for mosaic files
 
@@ -59,7 +59,7 @@ namespace pylibczi {
 
       ImageBC(std::vector<size_t> shp, libCZI::PixelType pt, const libCZI::CDimCoordinate* cdim,
               libCZI::IntRect ir, int mIndex)
-              :m_matrixSizes(std::move(shp)), m_pixelType(pt), m_cdims(*cdim),
+              :m_shape(std::move(shp)), m_pixelType(pt), m_planeCoordinates(*cdim),
                m_xywh(ir), m_mIndex(mIndex) { }
 
       size_t calculate_idx(const std::vector<size_t>& idxs);
@@ -67,11 +67,11 @@ namespace pylibczi {
       template<typename T>
       bool is_type_match();
 
-      std::vector<size_t> shape() { return m_matrixSizes; }
+      std::vector<size_t> shape() { return m_shape; }
 
       size_t length()
       {
-          return std::accumulate(m_matrixSizes.begin(), m_matrixSizes.end(), (size_t) 1, std::multiplies<>());
+          return std::accumulate(m_shape.begin(), m_shape.end(), (size_t) 1, std::multiplies<>());
       }
 
       std::vector<std::pair<char, int> > get_valid_indexs(bool isMosaic = false);
@@ -97,15 +97,7 @@ namespace pylibczi {
   class Image: public ImageBC {
       std::unique_ptr<T[]> m_array;
 
-      // allow ImageFactory access -> 2 statements below mean ImageFactory is the
-      // only way to make an image this prevents people from mucking up the order
-      // indexing of image to memory copying
-      friend ImageFactory;
-
-      // private constructor
-
   public:
-      // TODO ? make the constructor private ?
       /*!
        * @brief The Image constructor creates the container and memory for storing an image from a ZeissRaw/CZI file. This class
        * is really intended to be created by ImageFactory.
@@ -180,35 +172,7 @@ namespace pylibczi {
 // TODO Implement set_sort_order() and operator()<
   };
 
-  class ImageFactory {
-      using PT = libCZI::PixelType;
-      using V_ST = std::vector<size_t>;
-      using ConstrMap = std::map<libCZI::PixelType,
-                                 std::function<std::shared_ptr<ImageBC>(
-                                         std::vector<size_t>, libCZI::PixelType pt, const libCZI::CDimCoordinate* cdim,
-                                         libCZI::IntRect ir, int mIndex)> >;
 
-      using LCD = const libCZI::CDimCoordinate;
-      using IR = libCZI::IntRect;
-
-      static ConstrMap s_pixelToImage;
-
-  public:
-      static size_t size_of_pixel_type(PT pixel_type);
-
-      static size_t n_of_channels(PT pixel_type);
-
-      template<typename T>
-      static std::shared_ptr<Image<T> > get_derived(std::shared_ptr<ImageBC> ptr){
-          if (!ptr->is_type_match<T>())
-              throw PixelTypeException(ptr->pixelType(), "Image PixelType doesn't match requested memory type.");
-          return std::dynamic_pointer_cast<Image<T> >(ptr);
-      }
-
-      static std::shared_ptr<ImageBC>
-      construct_image(const std::shared_ptr<libCZI::IBitmapData>& pBitmap, const libCZI::CDimCoordinate* cdims, libCZI::IntRect box,
-              int mIndex);
-  };
 
   /*!
    * @brief This class is a std::vector< std::shared_ptr<ImageBC> >, it's sole reason for existing is to enable a custom binding
@@ -227,17 +191,17 @@ namespace pylibczi {
   inline ImageBC::ImVec Image<T>::split_channels(int startFrom)
   {
       ImVec ivec;
-      if (m_matrixSizes.size()<3)
+      if (m_shape.size()<3)
           throw ImageSplitChannelException("Image  only has 2 dimensions. No channels to split.", 0);
       int cStart = 0;
       // TODO figure out if C can have a nonzero value for a BGR image
-      if (m_cdims.TryGetPosition(libCZI::DimensionIndex::C, &cStart) && cStart!=0)
+      if (m_planeCoordinates.TryGetPosition(libCZI::DimensionIndex::C, &cStart) && cStart!=0)
           throw ImageSplitChannelException("attempting to split channels", cStart);
-      for (int i = 0; i<m_matrixSizes[0]; i++) {
-          libCZI::CDimCoordinate tmp(m_cdims);
+      for (int i = 0; i<m_shape[0]; i++) {
+          libCZI::CDimCoordinate tmp(m_planeCoordinates);
           tmp.Set(libCZI::DimensionIndex::C, i+startFrom); // assign the channel from the BGR
           // TODO should I change the pixel type from a BGRx to a Grayx/3
-          ivec.emplace_back(new Image<T>({m_matrixSizes[1], m_matrixSizes[2]}, m_pixelType, &tmp, m_xywh, m_mIndex));
+          ivec.emplace_back(new Image<T>({m_shape[1], m_shape[2]}, m_pixelType, &tmp, m_xywh, m_mIndex));
       }
       return ivec;
   }
@@ -245,8 +209,8 @@ namespace pylibczi {
   template<typename T>
   inline T& Image<T>::operator[](const std::vector<size_t>& idxs)
   {
-      if (idxs.size()!=m_matrixSizes.size())
-          throw ImageAccessUnderspecifiedException(idxs.size(), m_matrixSizes.size(), "from Image.operator[].");
+      if (idxs.size()!=m_shape.size())
+          throw ImageAccessUnderspecifiedException(idxs.size(), m_shape.size(), "from Image.operator[].");
       size_t idx = calculate_idx(idxs);
       return m_array[idx];
   }
@@ -254,7 +218,7 @@ namespace pylibczi {
   template<typename T>
   inline T* Image<T>::get_raw_ptr(std::vector<size_t> lst)
   {
-      std::vector<size_t> zeroPadded(0, m_matrixSizes.size());
+      std::vector<size_t> zeroPadded(0, m_shape.size());
       std::copy(lst.rbegin(), lst.rend(), zeroPadded.rbegin());
       return this->operator[](calculate_idx(zeroPadded));
   }

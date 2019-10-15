@@ -30,7 +30,7 @@ public:
 	CziMCreator(): m_czi(new pylibczi::Reader( std::fopen("/Users/jamies/Data/20190618_CL001_HB01_Rescan_002.czi", "rb" ))){}
 	pylibczi::Reader * get() { return m_czi.get(); }
 };
-/**/
+*/
 
 TEST_CASE("test_reader_constructor", "[Reader]")
 {
@@ -91,6 +91,8 @@ TEST_CASE_METHOD(CziCreator2, "test_read_selected2", "[Reader_read_selected]")
     //pb_helpers::pack_array(imvec);
 }
 
+// TODO I need a small file for testing mosaic functionality
+
 /* The file is 30GB can't use it for server test
 TEST_CASE_METHOD(CziMCreator, "test_read_mosaic", "[Reader_read_mosaic]"){
 	auto czi = get();
@@ -102,5 +104,4 @@ TEST_CASE_METHOD(CziMCreator, "test_read_mosaic", "[Reader_read_mosaic]"){
 	//REQUIRE(shape[1] == 475); // width
 	//pb_helpers::pack_array(imvec);
 }
-/**/
-// TODO I need a small file for testing mosaic functionality
+*/

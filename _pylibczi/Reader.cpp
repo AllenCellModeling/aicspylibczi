@@ -1,11 +1,10 @@
-//
-// Created by Jamie Sherman on 2019-08-18.
-//
 #include <tuple>
+#include <set>
+
 #include "Reader.h"
+#include "ImageFactory.h"
 #include "exceptions.h"
 #include "pylibczi_unistd.h"
-#include <set>
 
 namespace pylibczi {
 

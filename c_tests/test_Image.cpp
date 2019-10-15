@@ -4,6 +4,7 @@
 
 #include "catch.hpp"
 #include "Image.h"
+#include "ImageFactory.h"
 #include "Reader.h"
 #include "exceptions.h"
 #include "Iterator.h"
