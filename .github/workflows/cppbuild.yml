@@ -13,13 +13,17 @@ jobs:
       - uses: actions/checkout@master
         with:
           submodules: true
-      - name: build and test
+      - name: set llvm env vars
+        if: matrix.compiler == 'llvm'
         env:
           CC: clang
           CXX: clang++
+      - name: set gnu env vars
         if: matrix.compiler == 'gnu'
+        env:
           CC: gcc
           CXX: g++
+      - name: build and test
         run: |
           mkdir ./cmake-build-debug
           cd cmake-build-debug
