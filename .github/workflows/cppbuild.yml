@@ -14,15 +14,13 @@ jobs:
         with:
           submodules: true
       - name: build and test
-        if: !startsWith(matrix.os, 'windows')
-          if: matrix.compiler == 'llvm'
-            env:
-              CC: clang
-              CXX: clang++
-          if: matrix.compiler == 'gnu'
-            env:
-              CC: gcc
-              CXX: g++
+        env:
+          CC: clang
+          CXX: clang++
+        if: matrix.compiler == 'gnu'
+        env:
+          CC: gcc
+          CXX: g++
         run: |
           mkdir ./cmake-build-debug
           cd cmake-build-debug
