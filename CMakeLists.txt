@@ -33,7 +33,7 @@ include_directories(libCZI/Src)
 find_library(libCZI REQUIRED PATHS ${CMAKE_SOURCE_DIR}/libCZI)
 
 set(PYLIBCZI_C_SRC_HEADERS _pylibczi/Reader.h _pylibczi/helper_algorithms.h _pylibczi/exceptions.h _pylibczi/inc_libCZI.h
-        _pylibczi/IndexMap.h _pylibczi/Image.h _pylibczi/ImageFactory.h _pylibczi/pylibczi_ostream.h)
+        _pylibczi/IndexMap.h _pylibczi/Image.h _pylibczi/TypedImage.h _pylibczi/ImageFactory.h _pylibczi/pylibczi_ostream.h)
 
 set(PYLIBCZI_C_SRC _pylibczi/Reader.cpp _pylibczi/IndexMap.cpp _pylibczi/Image.cpp _pylibczi/ImageFactory.cpp
         _pylibczi/pylibczi_ostream.cpp _pylibczi/exceptions.cpp)

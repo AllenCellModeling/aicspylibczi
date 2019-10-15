@@ -5,6 +5,10 @@
 #include "exceptions.h"
 
 namespace pylibczi {
+
+  template<typename T>
+  class Image;
+
   class ImageFactory {
       using PT = libCZI::PixelType;
       using V_ST = std::vector<size_t>;

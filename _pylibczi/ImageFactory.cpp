@@ -1,4 +1,5 @@
 #include "ImageFactory.h"
+#include "TypedImage.h"
 
 namespace pylibczi {
   ImageFactory::ConstrMap ImageFactory::s_pixelToImage{

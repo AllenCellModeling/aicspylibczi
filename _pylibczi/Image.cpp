@@ -4,15 +4,11 @@
 
 #include <algorithm>
 #include <numeric>
-#include <typeinfo>
 #include <utility>
-#include <iostream>
 #include <cstdint>
 
 #include "Image.h"
-#include "Iterator.h"
 #include "exceptions.h"
-#include "helper_algorithms.h"
 
 namespace pylibczi {
 
