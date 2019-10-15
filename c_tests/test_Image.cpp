@@ -37,7 +37,7 @@ class CziImageCreator {
 public:
     CziImageCreator()
             :m_czi(new Reader(std::fopen("resources/s_1_t_1_c_1_z_1.czi", "rb"))) { }
-    std::shared_ptr<ImageBC> get()
+    std::shared_ptr<Image> get()
     {
         auto c_dims = libCZI::CDimCoordinate{{libCZI::DimensionIndex::B, 0},
                                              {libCZI::DimensionIndex::C, 0}};
@@ -48,7 +48,7 @@ public:
 
 TEST_CASE_METHOD(CziImageCreator, "test_image_cast", "[Image_Cast]")
 {
-    std::shared_ptr<ImageBC> img = get();
+    std::shared_ptr<Image> img = get();
     REQUIRE(img.get()->is_type_match<uint16_t>());
     REQUIRE(!(img->is_type_match<uint8_t>()));
     REQUIRE(!(img->is_type_match<float>()));
@@ -56,13 +56,13 @@ TEST_CASE_METHOD(CziImageCreator, "test_image_cast", "[Image_Cast]")
 
 TEST_CASE_METHOD(CziImageCreator, "test_image_throw", "[Image_Cast_Throw]")
 {
-    std::shared_ptr<ImageBC> img = get();
+    std::shared_ptr<Image> img = get();
     REQUIRE_THROWS_AS(ImageFactory::get_derived<uint8_t>(img), PixelTypeException);
 }
 
 TEST_CASE_METHOD(CziImageCreator, "test_image_nothrow", "[Image_Cast_Nothrow]")
 {
-    std::shared_ptr<ImageBC> img = get();
+    std::shared_ptr<Image> img = get();
     REQUIRE_NOTHROW(ImageFactory::get_derived<uint16_t>(img));
 }
 

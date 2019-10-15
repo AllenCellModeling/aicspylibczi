@@ -53,7 +53,7 @@ namespace pylibczi {
 
   };
 
-  std::shared_ptr<ImageBC> ImageFactory::construct_image(const std::shared_ptr<libCZI::IBitmapData>& pBitmap,
+  std::shared_ptr<Image> ImageFactory::construct_image(const std::shared_ptr<libCZI::IBitmapData>& pBitmap,
           const libCZI::CDimCoordinate* cdims,
           libCZI::IntRect box,
           int mIndex)
@@ -68,11 +68,11 @@ namespace pylibczi {
       shp.emplace_back(size.h);
       shp.emplace_back(size.w);
 
-      std::shared_ptr<ImageBC> img = s_pixelToImage[pt](shp, pt, cdims, box, mIndex);
+      std::shared_ptr<Image> img = s_pixelToImage[pt](shp, pt, cdims, box, mIndex);
       if (img==nullptr)
           throw std::bad_alloc();
       img->load_image(pBitmap, channels);
 
-      return std::shared_ptr<ImageBC>(img);
+      return std::shared_ptr<Image>(img);
   }
 }

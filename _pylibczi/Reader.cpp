@@ -112,7 +112,7 @@ namespace pylibczi {
               if (m_statistics.dimBounds.TryGetInterval(libCZI::DimensionIndex::C, &start, &sze))
                   std::cerr << "Warning image has C: start(" << start << ") : size(" << sze << ") - how to handle channels?" << std::endl;
               auto imgs = img->split_channels(start+sze);
-              for_each(imgs.begin(), imgs.end(), [&images](ImageBC::ImVec::value_type& iv) { images.push_back(iv); });
+              for_each(imgs.begin(), imgs.end(), [&images](Image::ImVec::value_type& iv) { images.push_back(iv); });
           }
           else
               images.push_back(img);
@@ -208,7 +208,7 @@ namespace pylibczi {
           if (m_statistics.dimBounds.TryGetInterval(libCZI::DimensionIndex::C, &start, &sze))
               std::cerr << "Warning image has C: start(" << start << ") : size(" << sze << ") - how to handle channels?" << std::endl;
           auto imgs = img->split_channels(start+sze);
-          for_each(imgs.begin(), imgs.end(), [&image_vector](ImageBC::ImVec::value_type& iv) { image_vector.push_back(iv); });
+          for_each(imgs.begin(), imgs.end(), [&image_vector](Image::ImVec::value_type& iv) { image_vector.push_back(iv); });
       }
       else
           image_vector.push_back(img);
@@ -220,7 +220,7 @@ namespace pylibczi {
   std::vector<std::pair<char, int> >
   Reader::get_shape(pylibczi::ImageVector& imgs, bool is_mosaic)
   {
-      using ImVec = pylibczi::ImageBC::ImVec;
+      using ImVec = pylibczi::Image::ImVec;
       std::sort(imgs.begin(), imgs.end(), [](ImVec::value_type& a, ImVec::value_type& b) {
           return *a<*b;
       });

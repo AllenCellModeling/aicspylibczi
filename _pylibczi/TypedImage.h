@@ -6,7 +6,7 @@
 namespace pylibczi {
 
   template<typename T>
-  class TypedImage: public ImageBC {
+  class TypedImage: public Image {
       std::unique_ptr<T[]> m_array;
 
   public:
@@ -20,7 +20,7 @@ namespace pylibczi {
        * @param mIndex The mosaic index for the image, this is only relevant if the file is a mosaic file.
        */
       TypedImage(std::vector<size_t> shape, libCZI::PixelType pixel_type, const libCZI::CDimCoordinate* cdim, libCZI::IntRect box, int mIndex)
-              :ImageBC(shape, pixel_type, cdim, box, mIndex),
+              :Image(shape, pixel_type, cdim, box, mIndex),
                m_array(new T[std::accumulate(shape.begin(), shape.end(), (size_t) 1, std::multiplies<>())])
       {
           if (!is_type_match<T>())
@@ -122,7 +122,7 @@ namespace pylibczi {
   }
 
   template<typename T>
-  inline ImageBC::ImVec TypedImage<T>::split_channels(int startFrom)
+  inline Image::ImVec TypedImage<T>::split_channels(int startFrom)
   {
       ImVec ivec;
       if (m_shape.size()<3)

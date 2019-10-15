@@ -12,7 +12,7 @@
 
 namespace pylibczi {
 
-  std::map<libCZI::PixelType, std::string>  ImageBC::s_pixelToTypeName{
+  std::map<libCZI::PixelType, std::string>  Image::s_pixelToTypeName{
           {libCZI::PixelType::Gray8, typeid(uint8_t).name()},        // 8-bit grayscale
           {libCZI::PixelType::Gray16, typeid(uint16_t).name()},       // 16-bit grayscale
           {libCZI::PixelType::Gray32Float, typeid(float).name()},          // 4-byte float
@@ -26,7 +26,7 @@ namespace pylibczi {
           {libCZI::PixelType::Gray64Float, typeid(nullptr).name()}     // unsupported by libCZI
   };
 
-  std::vector<std::pair<char, int> > ImageBC::get_valid_indexs(bool isMosaic)
+  std::vector<std::pair<char, int> > Image::get_valid_indexs(bool isMosaic)
   {
       using CZI_DI = libCZI::DimensionIndex;
       std::vector<CZI_DI> sort_order{CZI_DI::S, CZI_DI::T, CZI_DI::C, CZI_DI::Z};
@@ -39,7 +39,7 @@ namespace pylibczi {
       return ans;
   }
 
-  bool ImageBC::operator<(ImageBC& other)
+  bool Image::operator<(Image& other)
   {
       using CZI_DI = libCZI::DimensionIndex;
       std::vector<CZI_DI> sort_order{CZI_DI::S, CZI_DI::T, CZI_DI::C, CZI_DI::Z};
@@ -51,7 +51,7 @@ namespace pylibczi {
       return m_mIndex<other.m_mIndex;
   }
 
-  size_t ImageBC::calculate_idx(const std::vector<size_t>& idxs)
+  size_t Image::calculate_idx(const std::vector<size_t>& idxs)
   {
       if (idxs.size()!=m_shape.size())
           throw ImageAccessUnderspecifiedException(idxs.size(), m_shape.size(), "Sizes must match");

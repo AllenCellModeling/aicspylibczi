@@ -18,7 +18,7 @@
 
 namespace pb_helpers {
 
-  using ImVec = pylibczi::ImageBC::ImVec;
+  using ImVec = pylibczi::Image::ImVec;
 
   template<typename T>
   py::array* make_array(int new_size, std::vector<ssize_t>& shp, ImVec& imgs)

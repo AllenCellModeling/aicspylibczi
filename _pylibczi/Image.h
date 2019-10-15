@@ -27,7 +27,7 @@ namespace pylibczi {
    * one subblock which may be either 2D or 3D, in the case of 3D the data is then later split into multiple 2D Image<T> so that
    * the concept of a Channel isn't destroyed.
    */
-  class ImageBC {
+  class Image {
   protected:
       /*!
        * ImageBC holds the data describing the image (Image<T> inherits it). The m_matrixSizes can be 2D or 3D depending on
@@ -49,9 +49,9 @@ namespace pylibczi {
               s_pixelToTypeName;
 
   public:
-      using ImVec = std::vector<std::shared_ptr<ImageBC> >;
+      using ImVec = std::vector<std::shared_ptr<Image> >;
 
-      ImageBC(std::vector<size_t> shp, libCZI::PixelType pt, const libCZI::CDimCoordinate* cdim,
+      Image(std::vector<size_t> shp, libCZI::PixelType pt, const libCZI::CDimCoordinate* cdim,
               libCZI::IntRect ir, int mIndex)
               :m_shape(std::move(shp)), m_pixelType(pt), m_planeCoordinates(*cdim),
                m_xywh(ir), m_mIndex(mIndex) { }
@@ -70,7 +70,7 @@ namespace pylibczi {
 
       std::vector<std::pair<char, int> > get_valid_indexs(bool isMosaic = false);
 
-      bool operator<(ImageBC& other);
+      bool operator<(Image& other);
 
       libCZI::PixelType pixelType() { return m_pixelType; }
 
@@ -81,7 +81,7 @@ namespace pylibczi {
 
   template<typename T>
   inline bool
-  ImageBC::is_type_match()
+  Image::is_type_match()
   {
       auto pt = s_pixelToTypeName[m_pixelType];
       return (typeid(T).name()==s_pixelToTypeName[m_pixelType]);
@@ -94,7 +94,7 @@ namespace pylibczi {
    * @brief This class is a std::vector< std::shared_ptr<ImageBC> >, it's sole reason for existing is to enable a custom binding
    * to convert the structure into a numpy.ndarray. From the C++ side it serves no purpose.
    */
-  class ImageVector: public std::vector<std::shared_ptr<ImageBC> > {
+  class ImageVector: public std::vector<std::shared_ptr<Image> > {
       bool m_is_mosaic = false;
 
   public:

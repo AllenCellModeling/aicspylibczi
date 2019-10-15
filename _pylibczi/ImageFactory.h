@@ -13,7 +13,7 @@ namespace pylibczi {
       using PT = libCZI::PixelType;
       using V_ST = std::vector<size_t>;
       using ConstrMap = std::map<libCZI::PixelType,
-                                 std::function<std::shared_ptr<ImageBC>(
+                                 std::function<std::shared_ptr<Image>(
                                          std::vector<size_t>, libCZI::PixelType pt, const libCZI::CDimCoordinate* cdim,
                                          libCZI::IntRect ir, int mIndex)
                                  > >;
@@ -30,7 +30,7 @@ namespace pylibczi {
 
       template<typename T>
       static std::shared_ptr<TypedImage<T> >
-      get_derived(std::shared_ptr<ImageBC>
+      get_derived(std::shared_ptr<Image>
       ptr)
       {
           if (!ptr->is_type_match<T>())
@@ -38,7 +38,7 @@ namespace pylibczi {
           return std::dynamic_pointer_cast<TypedImage<T>>(ptr);
       }
 
-      static std::shared_ptr<ImageBC>
+      static std::shared_ptr<Image>
       construct_image(const std::shared_ptr<libCZI::IBitmapData>& pBitmap, const libCZI::CDimCoordinate* cdims, libCZI::IntRect box,
               int mIndex);
   };
