@@ -6,7 +6,7 @@
 namespace pylibczi {
 
   template<typename T>
-  class Image: public ImageBC {
+  class TypedImage: public ImageBC {
       std::unique_ptr<T[]> m_array;
 
   public:
@@ -19,12 +19,12 @@ namespace pylibczi {
        * @param box The (x0, y0, w, h) structure containing the logical position of the image.
        * @param mIndex The mosaic index for the image, this is only relevant if the file is a mosaic file.
        */
-      Image(std::vector<size_t> shape, libCZI::PixelType pixel_type, const libCZI::CDimCoordinate* cdim, libCZI::IntRect box, int mIndex)
+      TypedImage(std::vector<size_t> shape, libCZI::PixelType pixel_type, const libCZI::CDimCoordinate* cdim, libCZI::IntRect box, int mIndex)
               :ImageBC(shape, pixel_type, cdim, box, mIndex),
                m_array(new T[std::accumulate(shape.begin(), shape.end(), (size_t) 1, std::multiplies<>())])
       {
           if (!is_type_match<T>())
-              throw PixelTypeException(m_pixelType, "Image asked to create a container for PixelType with inconsitent type.");
+              throw PixelTypeException(m_pixelType, "TypedImage asked to create a container for PixelType with inconsitent type.");
       }
 
       /*!
@@ -63,7 +63,7 @@ namespace pylibczi {
       T* release_memory()
       {
           if (!is_type_match<T>())
-              throw PixelTypeException(pixelType(), "Image PixelType is inconsistent with requested memory type.");
+              throw PixelTypeException(pixelType(), "TypedImage PixelType is inconsistent with requested memory type.");
           return m_array.release();
       }
 
@@ -85,23 +85,23 @@ namespace pylibczi {
   };
 
   template<typename T>
-  inline T& Image<T>::operator[](const std::vector<size_t>& idxs)
+  inline T& TypedImage<T>::operator[](const std::vector<size_t>& idxs)
   {
       if (idxs.size()!=m_shape.size())
-          throw ImageAccessUnderspecifiedException(idxs.size(), m_shape.size(), "from Image.operator[].");
+          throw ImageAccessUnderspecifiedException(idxs.size(), m_shape.size(), "from TypedImage.operator[].");
       size_t idx = calculate_idx(idxs);
       return m_array[idx];
   }
 
   template<typename T>
-  inline T* Image<T>::get_raw_ptr(std::vector<size_t> lst)
+  inline T* TypedImage<T>::get_raw_ptr(std::vector<size_t> lst)
   {
       std::vector<size_t> zeroPadded(0, m_shape.size());
       std::copy(lst.rbegin(), lst.rend(), zeroPadded.rbegin());
       return this->operator[](calculate_idx(zeroPadded));
   }
   template<typename T>
-  inline void Image<T>::load_image(const std::shared_ptr<libCZI::IBitmapData>& pBitmap, size_t channels)
+  inline void TypedImage<T>::load_image(const std::shared_ptr<libCZI::IBitmapData>& pBitmap, size_t channels)
   {
       libCZI::IntSize size = pBitmap->GetSize();
       {
@@ -122,11 +122,11 @@ namespace pylibczi {
   }
 
   template<typename T>
-  inline ImageBC::ImVec Image<T>::split_channels(int startFrom)
+  inline ImageBC::ImVec TypedImage<T>::split_channels(int startFrom)
   {
       ImVec ivec;
       if (m_shape.size()<3)
-          throw ImageSplitChannelException("Image  only has 2 dimensions. No channels to split.", 0);
+          throw ImageSplitChannelException("TypedImage  only has 2 dimensions. No channels to split.", 0);
       int cStart = 0;
       // TODO figure out if C can have a nonzero value for a BGR image
       if (m_planeCoordinates.TryGetPosition(libCZI::DimensionIndex::C, &cStart) && cStart!=0)
@@ -135,7 +135,7 @@ namespace pylibczi {
           libCZI::CDimCoordinate tmp(m_planeCoordinates);
           tmp.Set(libCZI::DimensionIndex::C, i+startFrom); // assign the channel from the BGR
           // TODO should I change the pixel type from a BGRx to a Grayx/3
-          ivec.emplace_back(new Image<T>({m_shape[1], m_shape[2]}, m_pixelType, &tmp, m_xywh, m_mIndex));
+          ivec.emplace_back(new TypedImage<T>({m_shape[1], m_shape[2]}, m_pixelType, &tmp, m_xywh, m_mIndex));
       }
       return ivec;
   }

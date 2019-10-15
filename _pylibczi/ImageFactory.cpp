@@ -4,22 +4,22 @@
 namespace pylibczi {
   ImageFactory::ConstrMap ImageFactory::s_pixelToImage{
           {PT::Gray8, [](V_ST shp, PT pt, LCD* dims, IR ir, int m) {
-              return std::shared_ptr<Image<uint8_t>>(new Image<uint8_t>(std::move(shp), pt, dims, ir, m));
+              return std::shared_ptr<TypedImage<uint8_t>>(new TypedImage<uint8_t>(std::move(shp), pt, dims, ir, m));
           }},
           {PT::Bgr24, [](V_ST shp, PT pt, LCD* dims, IR ir, int m) {
-              return std::shared_ptr<Image<uint8_t>>(new Image<uint8_t>(std::move(shp), pt, dims, ir, m));
+              return std::shared_ptr<TypedImage<uint8_t>>(new TypedImage<uint8_t>(std::move(shp), pt, dims, ir, m));
           }},
           {PT::Gray16, [](V_ST shp, PT pt, LCD* dims, IR ir, int m) {
-              return std::shared_ptr<Image<uint16_t>>(new Image<uint16_t>(std::move(shp), pt, dims, ir, m));
+              return std::shared_ptr<TypedImage<uint16_t>>(new TypedImage<uint16_t>(std::move(shp), pt, dims, ir, m));
           }},
           {PT::Bgr48, [](V_ST shp, PT pt, LCD* dims, IR ir, int m) {
-              return std::shared_ptr<Image<uint16_t>>(new Image<uint16_t>(std::move(shp), pt, dims, ir, m));
+              return std::shared_ptr<TypedImage<uint16_t>>(new TypedImage<uint16_t>(std::move(shp), pt, dims, ir, m));
           }},
           {PT::Gray32Float, [](V_ST shp, PT pt, LCD* dims, IR ir, int m) {
-              return std::shared_ptr<Image<float>>(new Image<float>(std::move(shp), pt, dims, ir, m));
+              return std::shared_ptr<TypedImage<float>>(new TypedImage<float>(std::move(shp), pt, dims, ir, m));
           }},
           {PT::Bgr96Float, [](V_ST shp, PT pt, LCD* dims, IR ir, int m) {
-              return std::shared_ptr<Image<float>>(new Image<float>(std::move(shp), pt, dims, ir, m));
+              return std::shared_ptr<TypedImage<float>>(new TypedImage<float>(std::move(shp), pt, dims, ir, m));
           }}
   };
 

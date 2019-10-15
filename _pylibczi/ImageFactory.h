@@ -7,7 +7,7 @@
 namespace pylibczi {
 
   template<typename T>
-  class Image;
+  class TypedImage;
 
   class ImageFactory {
       using PT = libCZI::PixelType;
@@ -29,13 +29,13 @@ namespace pylibczi {
       static size_t n_of_channels(PT pixel_type);
 
       template<typename T>
-      static std::shared_ptr<Image<T> >
+      static std::shared_ptr<TypedImage<T> >
       get_derived(std::shared_ptr<ImageBC>
       ptr)
       {
           if (!ptr->is_type_match<T>())
-              throw PixelTypeException(ptr->pixelType(), "Image PixelType doesn't match requested memory type.");
-          return std::dynamic_pointer_cast<Image<T>>(ptr);
+              throw PixelTypeException(ptr->pixelType(), "TypedImage PixelType doesn't match requested memory type.");
+          return std::dynamic_pointer_cast<TypedImage<T>>(ptr);
       }
 
       static std::shared_ptr<ImageBC>

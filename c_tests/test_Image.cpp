@@ -69,7 +69,7 @@ TEST_CASE_METHOD(CziImageCreator, "test_image_nothrow", "[Image_Cast_Nothrow]")
 TEST_CASE("test_image_accessors", "[Image_operator[]]")
 {
     libCZI::CDimCoordinate cdim{{libCZI::DimensionIndex::S, 1}, {libCZI::DimensionIndex::C, 1}};
-    Image<uint16_t> img({3, 4, 5}, libCZI::PixelType::Gray16, &cdim, {0, 0, 5, 4}, -1);
+    TypedImage<uint16_t> img({3, 4, 5}, libCZI::PixelType::Gray16, &cdim, {0, 0, 5, 4}, -1);
     uint16_t ip[60];
     for (int i = 0; i<3*4*5; i++) ip[i] = i/3+1;
 
@@ -106,7 +106,7 @@ TEST_CASE("test_image_accessors", "[Image_operator[]]")
 TEST_CASE("test_image_accessors_2d", "[Image_operator[2d]]")
 {
     libCZI::CDimCoordinate cdim{{libCZI::DimensionIndex::S, 1}, {libCZI::DimensionIndex::C, 1}};
-    Image<uint16_t> img({4, 5}, libCZI::PixelType::Gray16, &cdim, {0, 0, 5, 4}, -1);
+    TypedImage<uint16_t> img({4, 5}, libCZI::PixelType::Gray16, &cdim, {0, 0, 5, 4}, -1);
     uint16_t ip[20];
     for (int i = 0; i<4*5; i++) ip[i] = i+1;
 
