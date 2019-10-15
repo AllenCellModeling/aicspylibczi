@@ -18,7 +18,6 @@ jobs:
           CC: clang
           CXX: clang++
         if: matrix.compiler == 'gnu'
-        env:
           CC: gcc
           CXX: g++
         run: |
