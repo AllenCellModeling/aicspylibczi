@@ -18,11 +18,13 @@ jobs:
         env:
           CC: clang
           CXX: clang++
+        shell: bash
       - name: set gnu env vars
         if: matrix.compiler == 'gnu'
         env:
           CC: gcc
           CXX: g++
+        shell: bash
       - name: build and test
         run: |
           mkdir ./cmake-build-debug
