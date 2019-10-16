@@ -156,9 +156,9 @@ class CziFile(object):
         numpy.ndarray with .shape you would get (1, 1, 2, 25, 1024, 1024).
         """
         plane_constraints = self.czilib.DimCoord()
-        [plane_constraints.SetDim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
-        img, shp = self.reader.read_selected(plane_constraints, m_index, True)
-        return (img, shp)
+        [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
+        image, shape = self.reader.read_selected(plane_constraints, m_index, True)
+        return image, shape
 
     def read_mosaic_size(self):
         """
@@ -201,7 +201,7 @@ class CziFile(object):
         :returns numpy.ndarray (1, height, width)
         """
         plane_constraints = self.czilib.DimCoord()
-        [plane_constraints.SetDim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
+        [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
 
         if region is None:
             region = self.czilib.IntRect()

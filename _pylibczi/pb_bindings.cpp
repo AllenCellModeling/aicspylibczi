@@ -31,11 +31,11 @@ PYBIND11_MODULE(_pylibczi, m)
     py::class_<pylibczi::Reader>(m, "Reader")
         .def(py::init<pylibczi::FileHolder>())
         .def("is_mosaic", &pylibczi::Reader::isMosaic)
-        .def("readDims", &pylibczi::Reader::readDims)
-        .def("readMeta", &pylibczi::Reader::readMeta)
-        .def("readSelected", &pylibczi::Reader::readSelected)
-        .def("mosaicShape", &pylibczi::Reader::mosaicShape)
-        .def("readMosaic", &pylibczi::Reader::readMosaic);
+        .def("read_dims", &pylibczi::Reader::readDims)
+        .def("read_meta", &pylibczi::Reader::readMeta)
+        .def("read_selected", &pylibczi::Reader::readSelected)
+        .def("mosaic_shape", &pylibczi::Reader::mosaicShape)
+        .def("read_mosaic", &pylibczi::Reader::readMosaic);
 
     py::class_<pylibczi::IndexMap>(m, "IndexMap")
         .def(py::init<>())
@@ -45,7 +45,7 @@ PYBIND11_MODULE(_pylibczi, m)
 
     py::class_<libCZI::CDimCoordinate>(m, "DimCoord")
         .def(py::init<>())
-        .def("SetDim", &libCZI::CDimCoordinate::Set);
+        .def("set_dim", &libCZI::CDimCoordinate::Set);
 
     py::class_<libCZI::IntRect>(m, "IntRect")
         .def(py::init<>())
