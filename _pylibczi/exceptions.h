@@ -1,7 +1,3 @@
-//
-// Created by Jamie Sherman on 2019-08-20.
-//
-
 #ifndef _PYLIBCZI__PYLIBCZI_EXCEPTIONS_H
 #define _PYLIBCZI__PYLIBCZI_EXCEPTIONS_H
 
@@ -10,39 +6,40 @@
 #include <sstream>
 #include <utility>
 #include <iomanip>
+
 #include "inc_libCZI.h"
 #include "pylibczi_ostream.h"
 
 namespace pylibczi {
 
   class FilePtrException: public std::exception {
-      std::string m_msg;
+      std::string m_message;
   public:
-      explicit FilePtrException(std::string str)
-              :exception(), m_msg(std::move(str)) { }
+      explicit FilePtrException(std::string message_)
+          :exception(), m_message(std::move(message_)) { }
       const char* what() const noexcept override
       {
           std::string tmp("File Pointer Exception: ");
-          tmp += m_msg;
+          tmp += m_message;
           return tmp.c_str();
       }
   };
 
   class PixelTypeException: public std::exception {
-      libCZI::PixelType m_ptype;
-      std::string m_msg;
+      libCZI::PixelType m_pixelType;
+      std::string m_message;
 
-      static const std::map<libCZI::PixelType, const std::string> m_byName;
+      static const std::map<libCZI::PixelType, const std::string> s_byName;
 
   public:
-      PixelTypeException(libCZI::PixelType pt, std::string msg)
-              :exception(), m_ptype(pt), m_msg(std::move(msg)) { }
+      PixelTypeException(libCZI::PixelType pixel_type_, std::string message_)
+          :exception(), m_pixelType(pixel_type_), m_message(std::move(message_)) { }
 
       const char* what() const noexcept override
       {
-          auto tname = m_byName.find(m_ptype);
-          std::string name((tname==m_byName.end()) ? "Unknown type" : tname->second);
-          std::string tmp("PixelType( "+name+" ): "+m_msg);
+          auto tname = s_byName.find(m_pixelType);
+          std::string name((tname==s_byName.end()) ? "Unknown type" : tname->second);
+          std::string tmp("PixelType( "+name+" ): "+m_message);
           return tmp.c_str();
       }
 
@@ -51,17 +48,17 @@ namespace pylibczi {
   class RegionSelectionException: public std::exception {
       libCZI::IntRect m_requested;
       libCZI::IntRect m_image;
-      std::string m_msg;
+      std::string m_message;
 
   public:
-      RegionSelectionException(const libCZI::IntRect& req, const libCZI::IntRect& im, std::string msg)
-              :m_requested(req), m_image(im), m_msg(std::move(msg)) { }
+      RegionSelectionException(const libCZI::IntRect& requested_box_, const libCZI::IntRect& image_box_, std::string message_)
+          :m_requested(requested_box_), m_image(image_box_), m_message(std::move(message_)) { }
 
       const char* what() const noexcept override
       {
           std::stringstream front;
           front << "Requirement violated requested region is not a subset of the defined image! \n\t "
-                << m_requested << " ⊄ " << m_image << "\n\t" << m_msg << std::endl;
+                << m_requested << " ⊄ " << m_image << "\n\t" << m_message << std::endl;
           return front.str().c_str();
       }
 
@@ -69,43 +66,43 @@ namespace pylibczi {
 
   class ImageAccessUnderspecifiedException: public std::exception {
       int m_given, m_required;
-      std::string m_msg;
+      std::string m_message;
   public:
-      ImageAccessUnderspecifiedException(int given, int required, std::string msg)
-              :m_given(given), m_required(required), m_msg(std::move(msg)) { }
+      ImageAccessUnderspecifiedException(int given_, int required_, std::string message_)
+          :m_given(given_), m_required(required_), m_message(std::move(message_)) { }
 
       const char* what() const noexcept override
       {
           std::stringstream tmp;
           tmp << "Dimensions underspecified, given " << m_given << " dimensions but " << m_required << " needed! \n\t"
-              << m_msg << std::endl;
+              << m_message << std::endl;
           return tmp.str().c_str();
       }
   };
 
   class ImageIteratorException: public std::exception {
-      std::string m_msg;
+      std::string m_message;
   public:
-      explicit ImageIteratorException(std::string msg)
-              :m_msg("ImageIteratorException: "+msg) { }
+      explicit ImageIteratorException(std::string message_)
+          :m_message("ImageIteratorException: "+message_) { }
 
       const char* what() const noexcept override
       {
-          return m_msg.c_str();
+          return m_message.c_str();
       }
   };
 
   class ImageSplitChannelException: public std::exception {
-      std::string m_msg;
+      std::string m_message;
       int m_channel;
   public:
-      ImageSplitChannelException(std::string msg, int channel)
-              :m_msg("ImageSplitChannelExcetion: "+msg), m_channel(channel) { }
+      ImageSplitChannelException(std::string message_, int channel_)
+          :m_message("ImageSplitChannelExcetion: "+message_), m_channel(channel_) { }
 
       const char* what() const noexcept override
       {
           std::stringstream tmp;
-          tmp << m_msg << " Channel should be zero or unset but has a value of " << m_channel
+          tmp << m_message << " Channel should be zero or unset but has a value of " << m_channel
               << " not sure how to procede in assigning channels." << std::endl;
           return tmp.str().c_str();
       }
@@ -113,34 +110,37 @@ namespace pylibczi {
   };
 
   class ImageCopyAllocFailed: public std::bad_alloc {
-      std::string m_msg;
-      int m_size;
+      std::string m_message;
+      unsigned long m_size;
   public:
-      ImageCopyAllocFailed(std::string msg, int _alloc_size)
-              :m_msg(std::move(msg)), m_size(_alloc_size) { }
+      ImageCopyAllocFailed(std::string message_, unsigned long alloc_size_)
+          :m_message(std::move(message_)), m_size(alloc_size_) { }
 
       const char* what() const noexcept override
       {
           std::stringstream tmp;
-          float gb_size = m_size;
-          gb_size /= 1073741824.0; // 1024 * 1024 * 1024
-          tmp << "ImageCopyAllocFailed [" << std::setprecision(1) << gb_size << " GB requested]: " << m_msg << std::endl;
+          float gbSize = m_size;
+          gbSize /= 1073741824.0; // 1024 * 1024 * 1024
+          tmp << "ImageCopyAllocFailed [" << std::setprecision(1) << gbSize << " GB requested]: " << m_message << std::endl;
           return tmp.str().c_str();
       }
   };
 
   class CdimSelectionZeroImagesException: public std::exception {
-      libCZI::CDimCoordinate m_rcdim; // requested
-      libCZI::CDimBounds m_icdim; // image file
-      std::string m_msg;
+      libCZI::CDimCoordinate m_requestedPlaneCoordinate; // requested
+      libCZI::CDimBounds m_planeCoordinateBounds; // image file
+      std::string m_message;
   public:
-      CdimSelectionZeroImagesException(libCZI::CDimCoordinate& requested, libCZI::CDimBounds& img_cdm, std::string msg)
-              :m_rcdim(requested), m_icdim(img_cdm), m_msg(std::move(msg)) { std::cout << this->what(); }
+      CdimSelectionZeroImagesException(libCZI::CDimCoordinate& requested_plane_coordinate_, libCZI::CDimBounds& plane_coordinate_bounds_,
+          std::string message_)
+          :m_requestedPlaneCoordinate(requested_plane_coordinate_), m_planeCoordinateBounds(plane_coordinate_bounds_),
+           m_message(std::move(message_)) { std::cout << this->what(); }
 
       const char* what() const noexcept override
       {
           std::stringstream tmp;
-          tmp << "Specified Dims resulted in NO image frames: " << m_rcdim << " ∉ " << m_icdim << std::endl;
+          tmp << "Specified Dims resulted in NO image frames: " << m_requestedPlaneCoordinate << " ∉ " << m_planeCoordinateBounds
+              << std::endl;
           return tmp.str().c_str();
       }
   };

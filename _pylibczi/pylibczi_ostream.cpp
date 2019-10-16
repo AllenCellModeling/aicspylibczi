@@ -1,31 +1,28 @@
-//
-// Created by Jamie Sherman on 2019-09-19.
-//
 #include "pylibczi_ostream.h"
 
-ostream& operator<<(ostream& out, const libCZI::CDimCoordinate& cdim)
+ostream& operator<<(ostream& out_, const libCZI::CDimCoordinate& plane_coordante_)
 {
     stringstream tmp;
-    cdim.EnumValidDimensions([&tmp](libCZI::DimensionIndex di, int val) {
+    plane_coordante_.EnumValidDimensions([&tmp](libCZI::DimensionIndex di_, int val_) {
         tmp << (tmp.str().empty() ? "CDimCoordinate: {" : ", ");
-        tmp << libCZI::Utils::DimensionToChar(di) << ": " << val;
+        tmp << libCZI::Utils::DimensionToChar(di_) << ": " << val_;
         return true;
     });
     tmp << "}";
-    out << tmp.str();
-    return out;
+    out_ << tmp.str();
+    return out_;
 }
 
-ostream& operator<<(ostream& out, const libCZI::CDimBounds& bounds)
+ostream& operator<<(ostream& out_, const libCZI::CDimBounds& plane_coordinate_bounds_)
 {
     stringstream tmp;
-    bounds.EnumValidDimensions([&tmp](libCZI::DimensionIndex di, int st, int len) {
+    plane_coordinate_bounds_.EnumValidDimensions([&tmp](libCZI::DimensionIndex di_, int start_, int length_) {
         tmp << (tmp.str().empty() ? "CDimBounds: {" : ", ");
-        tmp << libCZI::Utils::DimensionToChar(di) << ": (" << st << "," << len << ")";
+        tmp << libCZI::Utils::DimensionToChar(di_) << ": (" << start_ << "," << length_ << ")";
         return true;
     });
     tmp << "}";
-    out << tmp.str();
+    out_ << tmp.str();
 
-    return out;
+    return out_;
 }

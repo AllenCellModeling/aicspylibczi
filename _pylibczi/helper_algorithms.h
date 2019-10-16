@@ -1,7 +1,3 @@
-//
-// Created by James Sherman on 9/4/19.
-//
-
 #ifndef _PYLIBCZI_HELPER_ALGORITHMS_H
 #define _PYLIBCZI_HELPER_ALGORITHMS_H
 
@@ -9,9 +5,9 @@
 //! @tparam InputIt An arbitrary iterator type usually associated with a container
 //! @tparam OtherIt An arbitrary iterator type usually associated with a container
 //! @tparam PairFunction The type of the function f
-//! @param first The starting iterator of type InputIt
-//! @param last The ending iterator of type InputIt
-//! @param ofirst The starting iterator of type OtherIt
+//! @param first_ The starting iterator of type InputIt
+//! @param last_ The ending iterator of type InputIt
+//! @param other_first_ The starting iterator of type OtherIt
 //! @param f A function that takes the values of the de-referenced iterators in order
 //! @return the function f
 //!
@@ -22,10 +18,10 @@
 //! paired_for_each(a.begin(), a.end(), b.begin(), [](int a, int& b){ b = a; });
 //! @endcode
 template<class InputIt, class OtherIt, class PairFunction>
-PairFunction paired_for_each(InputIt first, InputIt last, OtherIt ofirst, PairFunction f)
+PairFunction paired_for_each(InputIt first_, InputIt last_, OtherIt other_first_, PairFunction f)
 {
-    for (; first!=last; ++first, ++ofirst) {
-        f(*first, *ofirst);
+    for (; first_!=last_; ++first_, ++other_first_) {
+        f(*first_, *other_first_);
     }
     return f;
 }

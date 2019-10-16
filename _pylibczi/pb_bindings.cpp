@@ -1,13 +1,11 @@
-//
-// Created by Jamie Sherman on 2019-08-20.
-//
-
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+
 #include "inc_libCZI.h"
 #include "Reader.h"
 #include "IndexMap.h"
 #include "exceptions.h"
+
 // the below headers are crucial otherwise the custom casts aren't recognized
 #include "pb_caster_BytesIO.h"
 #include "pb_caster_ImageVector.h"
@@ -31,29 +29,29 @@ PYBIND11_MODULE(_pylibczi, m)
     py::register_exception<pylibczi::CdimSelectionZeroImagesException>(m, "PylibCZI_CDimSpecSelectedNoImagesException");
 
     py::class_<pylibczi::Reader>(m, "Reader")
-            .def(py::init<pylibczi::FileHolder>())
-            .def("is_mosaic", &pylibczi::Reader::isMosaic)
-            .def("read_dims", &pylibczi::Reader::read_dims)
-            .def("read_meta", &pylibczi::Reader::read_meta)
-            .def("read_selected", &pylibczi::Reader::read_selected)
-            .def("mosaic_shape", &pylibczi::Reader::mosaic_shape)
-            .def("read_mosaic", &pylibczi::Reader::read_mosaic);
+        .def(py::init<pylibczi::FileHolder>())
+        .def("is_mosaic", &pylibczi::Reader::isMosaic)
+        .def("readDims", &pylibczi::Reader::readDims)
+        .def("readMeta", &pylibczi::Reader::readMeta)
+        .def("readSelected", &pylibczi::Reader::readSelected)
+        .def("mosaicShape", &pylibczi::Reader::mosaicShape)
+        .def("readMosaic", &pylibczi::Reader::readMosaic);
 
     py::class_<pylibczi::IndexMap>(m, "IndexMap")
-            .def(py::init<>())
-            .def("is_m_index_valid", &pylibczi::IndexMap::IsMIndexValid)
-            .def("dim_index", &pylibczi::IndexMap::dimIndex)
-            .def("m_index", &pylibczi::IndexMap::mIndex);
+        .def(py::init<>())
+        .def("is_m_index_valid", &pylibczi::IndexMap::isMIndexValid)
+        .def("dim_index", &pylibczi::IndexMap::dimIndex)
+        .def("m_index", &pylibczi::IndexMap::mIndex);
 
     py::class_<libCZI::CDimCoordinate>(m, "DimCoord")
-            .def(py::init<>())
-            .def("SetDim", &libCZI::CDimCoordinate::Set);
+        .def(py::init<>())
+        .def("SetDim", &libCZI::CDimCoordinate::Set);
 
     py::class_<libCZI::IntRect>(m, "IntRect")
-            .def(py::init<>())
-            .def_readwrite("x", &libCZI::IntRect::x)
-            .def_readwrite("y", &libCZI::IntRect::y)
-            .def_readwrite("w", &libCZI::IntRect::w)
-            .def_readwrite("h", &libCZI::IntRect::h);
+        .def(py::init<>())
+        .def_readwrite("x", &libCZI::IntRect::x)
+        .def_readwrite("y", &libCZI::IntRect::y)
+        .def_readwrite("w", &libCZI::IntRect::w)
+        .def_readwrite("h", &libCZI::IntRect::h);
 
 }

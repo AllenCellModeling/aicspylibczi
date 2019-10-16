@@ -9,28 +9,28 @@
 namespace pylibczi {
 
   void
-  CSimpleStreamImplFromFP::Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead)
+  CSimpleStreamImplFromFp::Read(std::uint64_t offset_, void* data_ptr_, std::uint64_t size_, std::uint64_t* bytes_read_ptr_)
   {
-      fseeko(this->fp, offset, SEEK_SET);
+      fseeko(this->m_fp, offset_, SEEK_SET);
 
-      std::uint64_t bytesRead = fread(pv, 1, (size_t) size, this->fp);
-      if (ptrBytesRead!=nullptr)
-          (*ptrBytesRead) = bytesRead;
+      std::uint64_t bytesRead = fread(data_ptr_, 1, (size_t) size_, this->m_fp);
+      if (bytes_read_ptr_!=nullptr)
+          (*bytes_read_ptr_) = bytesRead;
   }
 
-  Reader::Reader(FileHolder f_in)
-          :m_czireader(new CCZIReader)
+  Reader::Reader(FileHolder f_in_)
+      :m_czireader(new CCZIReader)
   {
-      if (!f_in.get()) {
+      if (!f_in_.get()) {
           throw FilePtrException("Reader class received a bad FILE *!");
       }
-      auto istr = std::make_shared<CSimpleStreamImplFromFP>(f_in.get());
+      auto istr = std::make_shared<CSimpleStreamImplFromFp>(f_in_.get());
       m_czireader->Open(istr);
       m_statistics = m_czireader->GetStatistics();
   }
 
   std::string
-  Reader::read_meta()
+  Reader::readMeta()
   {
       auto mds = m_czireader->ReadMetadataSegment();
       auto md = mds->CreateMetaFromMetadataSegment();
@@ -46,12 +46,12 @@ namespace pylibczi {
   /// @brief get_shape_from_fp returns the Dimensions of a ZISRAW/CZI when provided a ICZIReader object
   /// @param czi: a shared_ptr to an initialized CziReader object
   /// @return A Python Dictionary as a PyObject*
-  Reader::mapDiP
-  Reader::read_dims()
+  Reader::MapDiP
+  Reader::readDims()
   {
-      mapDiP tbl;
-      m_statistics.dimBounds.EnumValidDimensions([&tbl](libCZI::DimensionIndex di, int start, int size) -> bool {
-          tbl.emplace(di, std::make_pair(start, size));
+      MapDiP tbl;
+      m_statistics.dimBounds.EnumValidDimensions([&tbl](libCZI::DimensionIndex di_, int start_, int size_) -> bool {
+          tbl.emplace(di_, std::make_pair(start_, size_));
           return true;
       });
 
@@ -59,71 +59,71 @@ namespace pylibczi {
   }
 
   std::pair<ImageVector, Reader::Shape>
-  Reader::read_selected(libCZI::CDimCoordinate& planeCoord, bool flatten, int mIndex)
+  Reader::readSelected(libCZI::CDimCoordinate& plane_coord_, bool flatten_, int mIndex_)
   {
-      ssize_t matching_subblock_count = 0;
-      std::vector<IndexMap> order_mapping;
-      m_czireader->EnumerateSubBlocks([&](int idx, const libCZI::SubBlockInfo& info) -> bool {
-          if (isPyramid0(info) && dimsMatch(planeCoord, info.coordinate)) {
-              order_mapping.emplace_back(idx, info);
-              matching_subblock_count++;
+      ssize_t matchingSubblockCount = 0;
+      std::vector<IndexMap> orderMapping;
+      m_czireader->EnumerateSubBlocks([&](int index_, const libCZI::SubBlockInfo& info_) -> bool {
+          if (isPyramid0(info_) && dimsMatch(plane_coord_, info_.coordinate)) {
+              orderMapping.emplace_back(index_, info_);
+              matchingSubblockCount++;
           }
           return true;
       });
 
-      add_sort_order_index(order_mapping);
+      addSortOrderIndex(orderMapping);
 
       // get scene index if specified
-      int scene_index;
+      int sceneIndex;
       libCZI::IntRect sceneBox = {0, 0, -1, -1};
-      if (planeCoord.TryGetPosition(libCZI::DimensionIndex::S, &scene_index)) {
-          auto itt = m_statistics.sceneBoundingBoxes.find(scene_index);
+      if (plane_coord_.TryGetPosition(libCZI::DimensionIndex::S, &sceneIndex)) {
+          auto itt = m_statistics.sceneBoundingBoxes.find(sceneIndex);
           if (itt==m_statistics.sceneBoundingBoxes.end())
               sceneBox = itt->second.boundingBoxLayer0; // layer0 specific
           else
               sceneBox.Invalidate();
       }
       else {
-          scene_index = -1;
+          sceneIndex = -1;
       }
 
       ImageVector images;
-      images.reserve(matching_subblock_count);
+      images.reserve(matchingSubblockCount);
 
-      m_czireader->EnumerateSubBlocks([&](int idx, const libCZI::SubBlockInfo& info) {
+      m_czireader->EnumerateSubBlocks([&](int index_, const libCZI::SubBlockInfo& info_) {
 
-          if (!isPyramid0(info)) {
+          if (!isPyramid0(info_)) {
               return true;
           }
-          if (sceneBox.IsValid() && !sceneBox.IntersectsWith(info.logicalRect)) {
+          if (sceneBox.IsValid() && !sceneBox.IntersectsWith(info_.logicalRect)) {
               return true;
           }
-          if (!dimsMatch(planeCoord, info.coordinate)) {
+          if (!dimsMatch(plane_coord_, info_.coordinate)) {
               return true;
           }
-          if (isMosaic() && mIndex!=-1 && info.mIndex!=std::numeric_limits<int>::min() && mIndex!=info.mIndex) {
+          if (isMosaic() && mIndex_!=-1 && info_.mIndex!=std::numeric_limits<int>::min() && mIndex_!=info_.mIndex) {
               return true;
           }
           // add the sub-block image
-          auto img = ImageFactory::construct_image(m_czireader->ReadSubBlock(idx)->CreateBitmap(),
-                  &info.coordinate, info.logicalRect, info.mIndex);
-          if (flatten && ImageFactory::n_of_channels(img->pixelType())>1) {
+          auto image = ImageFactory::constructImage(m_czireader->ReadSubBlock(index_)->CreateBitmap(),
+              &info_.coordinate, info_.logicalRect, info_.mIndex);
+          if (flatten_ && ImageFactory::numberOfChannels(image->pixelType())>1) {
               int start(0), sze(0);
               if (m_statistics.dimBounds.TryGetInterval(libCZI::DimensionIndex::C, &start, &sze))
                   std::cerr << "Warning image has C: start(" << start << ") : size(" << sze << ") - how to handle channels?" << std::endl;
-              auto imgs = img->split_channels(start+sze);
-              for_each(imgs.begin(), imgs.end(), [&images](Image::ImVec::value_type& iv) { images.push_back(iv); });
+              auto splitImages = image->splitChannels(start+sze);
+              for_each(splitImages.begin(), splitImages.end(), [&images](Image::ImVec::value_type& image_) { images.push_back(image_); });
           }
           else
-              images.push_back(img);
+              images.push_back(image);
 
           return true;
       });
       if (images.empty()) {
-          throw pylibczi::CdimSelectionZeroImagesException(planeCoord, m_statistics.dimBounds, "No pyramid0 selectable subblocks.");
+          throw pylibczi::CdimSelectionZeroImagesException(plane_coord_, m_statistics.dimBounds, "No pyramid0 selectable subblocks.");
       }
-      auto shape = get_shape(images, isMosaic());
-      images.set_mosaic(isMosaic());
+      auto shape = getShape(images, isMosaic());
+      images.setMosaic(isMosaic());
       return std::make_pair(images, shape);
       // return images;
   }
@@ -132,12 +132,12 @@ namespace pylibczi {
 // private methods
 
   bool
-  Reader::dimsMatch(const libCZI::CDimCoordinate& targetDims, const libCZI::CDimCoordinate& cziDims)
+  Reader::dimsMatch(const libCZI::CDimCoordinate& target_dims_, const libCZI::CDimCoordinate& czi_dims_)
   {
       bool ans = true;
-      targetDims.EnumValidDimensions([&](libCZI::DimensionIndex dim, int value) -> bool {
+      target_dims_.EnumValidDimensions([&](libCZI::DimensionIndex dim, int value) -> bool {
           int cziDimValue = 0;
-          if (cziDims.TryGetPosition(dim, &cziDimValue)) {
+          if (czi_dims_.TryGetPosition(dim, &cziDimValue)) {
               ans = (cziDimValue==value);
           }
           return ans;
@@ -146,104 +146,105 @@ namespace pylibczi {
   }
 
   void
-  Reader::add_sort_order_index(vector<IndexMap>& vec)
+  Reader::addSortOrderIndex(vector<IndexMap>& vector_of_index_maps_)
   {
       int counter = 0;
-      std::sort(vec.begin(), vec.end(), [](IndexMap& a, IndexMap& b) -> bool { return (a<b); });
-      for (auto&& a : vec)
+      std::sort(vector_of_index_maps_.begin(), vector_of_index_maps_.end(), [](IndexMap& a, IndexMap& b) -> bool { return (a<b); });
+      for (auto&& a : vector_of_index_maps_)
           a.position(counter++);
-      std::sort(vec.begin(), vec.end(),
-              [](IndexMap& a, IndexMap& b) -> bool { return a.lessThanSubblock(b); });
+      std::sort(vector_of_index_maps_.begin(), vector_of_index_maps_.end(),
+          [](IndexMap& a_, IndexMap& b_) -> bool { return a_.lessThanSubBlock(b_); });
   }
 
   bool
-  Reader::isValidRegion(const libCZI::IntRect& inBox, const libCZI::IntRect& cziBox)
+  Reader::isValidRegion(const libCZI::IntRect& in_box_, const libCZI::IntRect& czi_box_)
   {
       bool ans = true;
       // check origin is in domain
-      if (inBox.x<cziBox.x || cziBox.x+cziBox.w<inBox.x) ans = false;
-      if (inBox.y<cziBox.y || cziBox.y+cziBox.h<inBox.y) ans = false;
+      if (in_box_.x<czi_box_.x || czi_box_.x+czi_box_.w<in_box_.x) ans = false;
+      if (in_box_.y<czi_box_.y || czi_box_.y+czi_box_.h<in_box_.y) ans = false;
 
       // check  (x1, y1) point is in domain
-      int x1 = inBox.x+inBox.w;
-      int y1 = inBox.y+inBox.h;
-      if (x1<cziBox.x || cziBox.x+cziBox.w<x1) ans = false;
-      if (y1<cziBox.y || cziBox.y+cziBox.h<y1) ans = false;
+      int x1 = in_box_.x+in_box_.w;
+      int y1 = in_box_.y+in_box_.h;
+      if (x1<czi_box_.x || czi_box_.x+czi_box_.w<x1) ans = false;
+      if (y1<czi_box_.y || czi_box_.y+czi_box_.h<y1) ans = false;
 
-      if (!ans) throw RegionSelectionException(inBox, cziBox, "Requested region not in image!");
-      if (inBox.w<1 || 1>inBox.h)
-          throw RegionSelectionException(inBox, cziBox, "Requested region must have non-negative width and height!");
+      if (!ans) throw RegionSelectionException(in_box_, czi_box_, "Requested region not in image!");
+      if (in_box_.w<1 || 1>in_box_.h)
+          throw RegionSelectionException(in_box_, czi_box_, "Requested region must have non-negative width and height!");
 
       return ans;
   }
 
   ImageVector
-  Reader::read_mosaic(libCZI::CDimCoordinate planeCoord, float scaleFactor, libCZI::IntRect imBox)
+  Reader::readMosaic(libCZI::CDimCoordinate plane_coord_, float scale_factor_, libCZI::IntRect im_box_)
   {
       // handle the case where the function was called with region=None (default to all)
-      if (imBox.w==-1 && imBox.h==-1) imBox = m_statistics.boundingBox;
-      isValidRegion(imBox, m_statistics.boundingBox); // if not throws RegionSelectionException
+      if (im_box_.w==-1 && im_box_.h==-1) im_box_ = m_statistics.boundingBox;
+      isValidRegion(im_box_, m_statistics.boundingBox); // if not throws RegionSelectionException
 
       std::map<libCZI::DimensionIndex, std::pair<int, int> > limitTbl;
-      m_statistics.dimBounds.EnumValidDimensions([&limitTbl](libCZI::DimensionIndex di, int start, int size) -> bool {
-          limitTbl.emplace(di, std::make_pair(start, size));
+      m_statistics.dimBounds.EnumValidDimensions([&limitTbl](libCZI::DimensionIndex di_, int start_, int size_) -> bool {
+          limitTbl.emplace(di_, std::make_pair(start_, size_));
           return true;
       });
 
       auto accessor = m_czireader->CreateSingleChannelScalingTileAccessor();
 
       // multiTile accessor is not compatible with S, it composites the Scenes and the mIndexs together
-      auto multiTileComposit = accessor->Get(
-              imBox,
-              &planeCoord,
-              scaleFactor,
-              nullptr);   // use default options
+      auto multiTileComposite = accessor->Get(
+          im_box_,
+          &plane_coord_,
+          scale_factor_,
+          nullptr);   // use default options
 
-      // TODO how to handle 3 channel BGR image split them as in read_selected or ???
-      auto img = ImageFactory::construct_image(multiTileComposit, &planeCoord, imBox, -1);
-      ImageVector image_vector;
-      image_vector.reserve(1);
-      if (ImageFactory::n_of_channels(img->pixelType())>1) {
+      // TODO how to handle 3 channel BGR image split them as in readSelected or ???
+      auto image = ImageFactory::constructImage(multiTileComposite, &plane_coord_, im_box_, -1);
+      ImageVector imageVector;
+      imageVector.reserve(1);
+      if (ImageFactory::numberOfChannels(image->pixelType())>1) {
           int start(0), sze(0);
           if (m_statistics.dimBounds.TryGetInterval(libCZI::DimensionIndex::C, &start, &sze))
               std::cerr << "Warning image has C: start(" << start << ") : size(" << sze << ") - how to handle channels?" << std::endl;
-          auto imgs = img->split_channels(start+sze);
-          for_each(imgs.begin(), imgs.end(), [&image_vector](Image::ImVec::value_type& iv) { image_vector.push_back(iv); });
+          auto splitImages = image->splitChannels(start+sze);
+          for_each(splitImages.begin(), splitImages.end(),
+              [&imageVector](Image::ImVec::value_type& image_) { imageVector.push_back(image_); });
       }
       else
-          image_vector.push_back(img);
+          imageVector.push_back(image);
 
-      image_vector.set_mosaic(isMosaic());
-      return image_vector;
+      imageVector.setMosaic(isMosaic());
+      return imageVector;
   }
 
   std::vector<std::pair<char, int> >
-  Reader::get_shape(pylibczi::ImageVector& imgs, bool is_mosaic)
+  Reader::getShape(pylibczi::ImageVector& images_, bool is_mosaic_)
   {
       using ImVec = pylibczi::Image::ImVec;
-      std::sort(imgs.begin(), imgs.end(), [](ImVec::value_type& a, ImVec::value_type& b) {
-          return *a<*b;
+      std::sort(images_.begin(), images_.end(), [](ImVec::value_type& a_, ImVec::value_type& b_) {
+          return *a_<*b_;
       });
-      std::vector<std::vector<std::pair<char, int> > > valid_indexs;
-      for (const auto& img : imgs) {
-          valid_indexs.push_back(img->get_valid_indexs(is_mosaic)); // only add M if it's a mosaic file
+      std::vector<std::vector<std::pair<char, int> > > validIndexes;
+      for (const auto& image : images_) {
+          validIndexes.push_back(image->getValidIndexes(is_mosaic_)); // only add M if it's a mosaic file
       }
 
-      std::vector<std::pair<char, int> > char_sizes;
+      std::vector<std::pair<char, int> > charSizes;
       std::set<int> condensed;
-      for (int i = 0; !valid_indexs.empty() && i<valid_indexs.front().size(); i++) {
+      for (int i = 0; !validIndexes.empty() && i<validIndexes.front().size(); i++) {
           char c;
-          for (const auto& vi : valid_indexs) {
+          for (const auto& vi : validIndexes) {
               c = vi[i].first;
               condensed.insert(vi[i].second);
           }
-          char_sizes.emplace_back(c, condensed.size());
+          charSizes.emplace_back(c, condensed.size());
           condensed.clear();
       }
-      auto h_by_w = imgs.front()->shape(); // assumption: images are the same shape, if not 🙃
-      char_sizes.emplace_back('Y', h_by_w[0]); // H
-      char_sizes.emplace_back('X', h_by_w[1]); // W
-      return char_sizes;
+      auto heightByWidth = images_.front()->shape(); // assumption: images are the same shape, if not 🙃
+      charSizes.emplace_back('Y', heightByWidth[0]); // H
+      charSizes.emplace_back('X', heightByWidth[1]); // W
+      return charSizes;
   }
 
 }

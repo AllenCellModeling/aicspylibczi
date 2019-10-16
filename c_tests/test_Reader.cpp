@@ -1,7 +1,3 @@
-//
-// Created by James Sherman on 9/6/19.
-//
-
 #include "catch.hpp"
 #include "../_pylibczi/Reader.h"
 #include <cstdio>
@@ -11,7 +7,7 @@ class CziCreator {
     std::unique_ptr<pylibczi::Reader> m_czi;
 public:
     CziCreator()
-            :m_czi(new pylibczi::Reader(std::fopen("resources/s_1_t_1_c_1_z_1.czi", "rb"))) { }
+        :m_czi(new pylibczi::Reader(std::fopen("resources/s_1_t_1_c_1_z_1.czi", "rb"))) { }
     pylibczi::Reader* get() { return m_czi.get(); }
 };
 
@@ -19,7 +15,7 @@ class CziCreator2 {
     std::unique_ptr<pylibczi::Reader> m_czi;
 public:
     CziCreator2()
-            :m_czi(new pylibczi::Reader(std::fopen("resources/s_3_t_1_c_3_z_5.czi", "rb"))) { }
+        :m_czi(new pylibczi::Reader(std::fopen("resources/s_3_t_1_c_3_z_5.czi", "rb"))) { }
     pylibczi::Reader* get() { return m_czi.get(); }
 };
 
@@ -43,7 +39,7 @@ TEST_CASE("test_reader_constructor", "[Reader]")
 TEST_CASE_METHOD(CziCreator, "test_reader_dims_1", "[Reader_Dims]")
 {
     auto czi = get();
-    auto dims = czi->read_dims();
+    auto dims = czi->readDims();
     REQUIRE(dims.size()==2); // B=0, C=0 for this file
 }
 
@@ -56,7 +52,7 @@ TEST_CASE_METHOD(CziCreator, "test_is_mosaic", "[Reader_Is_Mosaic]")
 TEST_CASE_METHOD(CziCreator, "test_meta_reader", "[Reader_read_meta]")
 {
     auto czi = get();
-    std::string xml = czi->read_meta();
+    std::string xml = czi->readMeta();
     std::string ans("<?xml version=\"1.0\"?>\n"
                     "<ImageDocument>\n"
                     " <Metadata>\n"
@@ -70,12 +66,11 @@ TEST_CASE_METHOD(CziCreator, "test_read_selected", "[Reader_read_selected]")
     auto czi = get();
     auto c_dims = libCZI::CDimCoordinate{{libCZI::DimensionIndex::B, 0},
                                          {libCZI::DimensionIndex::C, 0}};
-    auto imvec = czi->read_selected(c_dims).first;
+    auto imvec = czi->readSelected(c_dims).first;
     REQUIRE(imvec.size()==1);
     auto shape = imvec.front()->shape();
     REQUIRE(shape[0]==325); // height
     REQUIRE(shape[1]==475); // width
-    //pb_helpers::pack_array(imvec);
 }
 
 TEST_CASE_METHOD(CziCreator2, "test_read_selected2", "[Reader_read_selected]")
@@ -83,12 +78,11 @@ TEST_CASE_METHOD(CziCreator2, "test_read_selected2", "[Reader_read_selected]")
     auto czi = get();
     auto c_dims = libCZI::CDimCoordinate{{libCZI::DimensionIndex::B, 0},
                                          {libCZI::DimensionIndex::C, 0}};
-    auto imvec = czi->read_selected(c_dims).first;
+    auto imvec = czi->readSelected(c_dims).first;
     REQUIRE(imvec.size()==15);
     auto shape = imvec.front()->shape();
     REQUIRE(shape[0]==325); // height
     REQUIRE(shape[1]==475); // width
-    //pb_helpers::pack_array(imvec);
 }
 
 // TODO I need a small file for testing mosaic functionality
@@ -97,11 +91,10 @@ TEST_CASE_METHOD(CziCreator2, "test_read_selected2", "[Reader_read_selected]")
 TEST_CASE_METHOD(CziMCreator, "test_read_mosaic", "[Reader_read_mosaic]"){
 	auto czi = get();
 	auto c_dims = libCZI::CDimCoordinate{ { libCZI::DimensionIndex::C,0 } };
-	auto imvec = czi->read_mosaic(c_dims);
+	auto imvec = czi->readMosaic(c_dims);
 	REQUIRE(imvec.size() == 1);
 	//auto shape = imvec.front()->shape();
 	//REQUIRE(shape[0] == 325); // height
 	//REQUIRE(shape[1] == 475); // width
-	//pb_helpers::pack_array(imvec);
 }
 */

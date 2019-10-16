@@ -1,76 +1,39 @@
-//
-// Created by Jamie Sherman on 2019-09-19.
-//
-
-#include "pb_helpers.h"
-
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <memory>
 #include <vector>
 #include <set>
-#include <iostream>
+
+#include "pb_helpers.h"
 #include "Image.h"
-#include "TypedImage.h"
-#include "ImageFactory.h"
 #include "Reader.h"
 #include "exceptions.h"
 
 namespace pb_helpers {
 
-  using ImVec = pylibczi::Image::ImVec;
-
-  template<typename T>
-  py::array* make_array(int new_size, std::vector<ssize_t>& shp, ImVec& imgs)
-  {
-      if (new_size==0) return new py::array_t<T>({1}, new T);
-      T* ptr;
-      try {
-          ptr = new T[new_size];
-      }
-      catch (std::bad_alloc& ba) {
-          throw pylibczi::ImageCopyAllocFailed("try using a more constraints (S=1, T=5, etc on the DimensionIndex).", new_size);
-      }
-
-      T* pos = ptr;
-      for (auto img : imgs) {
-          auto typed_img = pylibczi::ImageFactory::get_derived<T>(img);
-          int len = typed_img->length();
-          std::copy(typed_img->get_raw_ptr(), typed_img->get_raw_ptr()+len, pos);
-          pos += len;
-      }
-
-      py::capsule free_when_done(ptr, [](void* f) {
-          T* ptr = reinterpret_cast<T*>(f);
-          delete[] ptr;
-      });
-
-      return new py::array_t<T>(shp, ptr, free_when_done);
-  }
-
-  py::array pack_array(pylibczi::ImageVector& imgs)
+  py::array packArray(pylibczi::ImageVector& images_)
   {
       // assumptions: The array contains images of the same size and the array is contiguous.
-      auto char_sizes = pylibczi::Reader::get_shape(imgs, imgs.is_mosaic());
-      int new_size = imgs.front()->length()*imgs.size();
-      std::vector<ssize_t> shp(char_sizes.size(), 0);
-      std::transform(char_sizes.begin(), char_sizes.end(), shp.begin(), [](const std::pair<char, int>& a) {
+      auto charSizes = pylibczi::Reader::getShape(images_, images_.isMosaic());
+      unsigned long newSize = images_.front()->length()*images_.size();
+      std::vector<ssize_t> shape(charSizes.size(), 0);
+      std::transform(charSizes.begin(), charSizes.end(), shape.begin(), [](const std::pair<char, int>& a) {
           return a.second;
       });
-      py::array* arr_p = nullptr;
-      switch (imgs.front()->pixelType()) {
+      py::array* arrP = nullptr;
+      switch (images_.front()->pixelType()) {
       case libCZI::PixelType::Gray8:
-      case libCZI::PixelType::Bgr24: arr_p = make_array<uint8_t>(new_size, shp, imgs);
+      case libCZI::PixelType::Bgr24: arrP = makeArray<uint8_t>(newSize, shape, images_);
           break;
       case libCZI::PixelType::Gray16:
-      case libCZI::PixelType::Bgr48: arr_p = make_array<uint16_t>(new_size, shp, imgs);
+      case libCZI::PixelType::Bgr48: arrP = makeArray<uint16_t>(newSize, shape, images_);
           break;
       case libCZI::PixelType::Gray32Float:
-      case libCZI::PixelType::Bgr96Float: arr_p = make_array<float>(new_size, shp, imgs);
+      case libCZI::PixelType::Bgr96Float: arrP = makeArray<float>(newSize, shape, images_);
           break;
-      default: throw pylibczi::PixelTypeException(imgs.front()->pixelType(), "Unsupported pixel type");
+      default: throw pylibczi::PixelTypeException(images_.front()->pixelType(), "Unsupported pixel type");
       }
-      return *arr_p;
+      return *arrP;
   }
 
 }

@@ -1,7 +1,3 @@
-//
-// Created by Jamie Sherman on 2019-08-17.
-//
-
 #ifndef _PYLIBCZI_INDEXMAP_H
 #define _PYLIBCZI_INDEXMAP_H
 
@@ -18,32 +14,32 @@ namespace pylibczi {
    * if the sort order is changed to be something other than the STCZYX. In normal sort order it has no real effect.
    */
   class IndexMap {
-      typedef std::pair<const libCZI::DimensionIndex, int> value_type;
-      typedef std::map<libCZI::DimensionIndex, int> map_type;
-      int m_subblockIndex; // the subblock index from the file
+      typedef std::pair<const libCZI::DimensionIndex, int> ValueType;
+      typedef std::map<libCZI::DimensionIndex, int> MapType;
+      int m_subBlockIndex; // the subBlock index from the file
       int m_index; // the mIndex
-      int m_position; // the index of the subblock in the file within the subset included
-      map_type m_dims;
+      int m_position; // the index of the subBlock in the file within the subset included
+      MapType m_dims;
 
-      static const std::vector<libCZI::DimensionIndex> m_sortOrder;
+      static const std::vector<libCZI::DimensionIndex> s_sortOrder;
 
   public:
-      IndexMap(int idx, const libCZI::SubBlockInfo& info);
+      IndexMap(int index_, const libCZI::SubBlockInfo& info_);
 
       IndexMap()
-              :m_subblockIndex(), m_index(), m_position(), m_dims() { }
+          :m_subBlockIndex(), m_index(), m_position(), m_dims() { }
 
-      bool operator<(const IndexMap& b);
+      bool operator<(const IndexMap& other_);
 
-      bool lessThanSubblock(const IndexMap& b) const { return this->m_subblockIndex<b.m_subblockIndex; }
+      bool lessThanSubBlock(const IndexMap& other_) const { return this->m_subBlockIndex<other_.m_subBlockIndex; }
 
-      bool IsMIndexValid() const;
+      bool isMIndexValid() const;
 
       int mIndex() const { return m_index; }
 
-      void position(int x) { m_position = x; }
+      void position(int x_) { m_position = x_; }
 
-      map_type dimIndex()
+      MapType dimIndex()
       {
           return m_dims;
       }

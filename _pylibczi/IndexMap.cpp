@@ -1,59 +1,54 @@
-//
-// Created by Jamie Sherman on 2019-08-17.
-//
-
-#include <cstdio>
-#include <cstdlib>
-#include "IndexMap.h"
 #include <algorithm>
+
+#include "IndexMap.h"
 
 namespace pylibczi {
 
-  const std::vector<libCZI::DimensionIndex> IndexMap::m_sortOrder = {
-          libCZI::DimensionIndex::V,
-          libCZI::DimensionIndex::H,
-          libCZI::DimensionIndex::I,
-          libCZI::DimensionIndex::R,
-          libCZI::DimensionIndex::S,
-          libCZI::DimensionIndex::T,
-          libCZI::DimensionIndex::C,
-          libCZI::DimensionIndex::Z
+  const std::vector<libCZI::DimensionIndex> IndexMap::s_sortOrder{
+      libCZI::DimensionIndex::V,
+      libCZI::DimensionIndex::H,
+      libCZI::DimensionIndex::I,
+      libCZI::DimensionIndex::R,
+      libCZI::DimensionIndex::S,
+      libCZI::DimensionIndex::T,
+      libCZI::DimensionIndex::C,
+      libCZI::DimensionIndex::Z
   };
 
-  IndexMap::IndexMap(int idx, const libCZI::SubBlockInfo& info)
-          :m_subblockIndex(idx), m_dims(), m_position(-1)
+  IndexMap::IndexMap(int index_, const libCZI::SubBlockInfo& info_)
+      :m_subBlockIndex(index_), m_dims(), m_position(-1)
   {
-      info.coordinate.EnumValidDimensions([&](libCZI::DimensionIndex dim, int value) {
-          m_dims.emplace(dim, value);
+      info_.coordinate.EnumValidDimensions([&](libCZI::DimensionIndex dimension_, int value_) {
+          m_dims.emplace(dimension_, value_);
           return true;
       });
-      m_index = info.mIndex;
+      m_index = info_.mIndex;
   }
 
   bool
-  IndexMap::IsMIndexValid() const
+  IndexMap::isMIndexValid() const
   {
       return m_index!=(std::numeric_limits<int>::min)();
   }
 
   bool
-  IndexMap::operator<(const IndexMap& b)
+  IndexMap::operator<(const IndexMap& other_)
   {
 
-      auto match = std::find_if(m_sortOrder.begin(), m_sortOrder.end(), [&](const libCZI::DimensionIndex& dim) {
+      auto match = std::find_if(s_sortOrder.begin(), s_sortOrder.end(), [&](const libCZI::DimensionIndex& dim) {
 
-          auto matchDim = [dim](const map_type::value_type& p) -> bool {
+          auto matchDim = [dim](const MapType::value_type& p) -> bool {
               return (p.first==dim);
           };
-          auto m_itt = std::find_if(m_dims.begin(), m_dims.end(), matchDim);
-          auto b_itt = std::find_if(b.m_dims.begin(), b.m_dims.end(), matchDim);
-          if (m_itt==m_dims.end() || b_itt==b.m_dims.end())
+          auto thisMatchIterator = std::find_if(m_dims.begin(), m_dims.end(), matchDim);
+          auto otherMatchIterator = std::find_if(other_.m_dims.begin(), other_.m_dims.end(), matchDim);
+          if (thisMatchIterator==m_dims.end() || otherMatchIterator==other_.m_dims.end())
               return false;
-          return (m_itt->second<b_itt->second);
+          return (thisMatchIterator->second<otherMatchIterator->second);
       });
 
-      if (match==m_sortOrder.end() && IsMIndexValid() && b.IsMIndexValid()) {
-          return (m_index<b.m_index);
+      if (match==s_sortOrder.end() && isMIndexValid() && other_.isMIndexValid()) {
+          return (m_index<other_.m_index);
       }
       return false;
   }

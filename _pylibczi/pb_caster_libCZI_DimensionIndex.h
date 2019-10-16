@@ -1,11 +1,8 @@
-//
-// Created by Jamie Sherman on 2019-08-23.
-//
-
 #ifndef PYLIBCZI__PYLIBCZI_PB_LIBCZI_DIMENSIONINDEX_H
 #define PYLIBCZI__PYLIBCZI_PB_LIBCZI_DIMENSIONINDEX_H
 
 #include <pybind11/pybind11.h>
+
 #include "inc_libCZI.h"
 
 namespace pybind11 {
@@ -24,13 +21,13 @@ namespace pybind11 {
          * instance or return false upon failure. The second argument
          * indicates whether implicit conversions should be applied.
          */
-        bool load(handle src, bool)
+        bool load(handle src_, bool)
         {
             /* Extract PyObject from handle */
-            PyObject* source = src.ptr();
-            const char* letterp = PyUnicode_AsUTF8(source);
-            if (letterp==nullptr) return false;
-            char letter = letterp[0];
+            PyObject* source = src_.ptr();
+            const char* letterPtr = PyUnicode_AsUTF8(source);
+            if (letterPtr==nullptr) return false;
+            char letter = letterPtr[0];
             value = libCZI::Utils::CharToDimension(letter);
             return (value!=libCZI::DimensionIndex::invalid && !PyErr_Occurred());
         }
@@ -42,14 +39,14 @@ namespace pybind11 {
          * ``return_value_policy::reference_internal``) and are generally
          * ignored by implicit casters.
          */
-        static handle cast(libCZI::DimensionIndex src, return_value_policy /* policy */, handle /* parent */)
+        static handle cast(libCZI::DimensionIndex src_, return_value_policy /* policy */, handle /* parent */)
         {
             /*
              * FROM Python docs https://docs.python.org/3/c-api/file.html
              * Warning Since Python streams have their own buffering layer, mixing them with OS-level file
              * descriptors can produce various issues (such as unexpected ordering of data).
              * */
-            std::string tmp(1, libCZI::Utils::DimensionToChar(src));
+            std::string tmp(1, libCZI::Utils::DimensionToChar(src_));
             return PyUnicode_FromString(tmp.c_str());
         }
     };

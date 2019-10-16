@@ -1,7 +1,3 @@
-//
-// Created by James Sherman on 9/6/19.
-//
-
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 #include <pybind11/embed.h>

@@ -1,16 +1,13 @@
-//
-// Created by James Sherman on 9/2/19.
-//
-
 #ifndef _PYLIBCZI_ITERATOR_H
 #define _PYLIBCZI_ITERATOR_H
 
-#include "exceptions.h"
 #include <array>
 #include <cstdio>
 #include <cstdlib>
 #include <functional>
 #include <vector>
+
+#include "exceptions.h"
 
 namespace pylibczi {
 
@@ -19,47 +16,47 @@ namespace pylibczi {
       T* m_begin;
       T* m_end;
       size_t m_stride;
-      size_t m_pixels_per_stride;
+      size_t m_pixelsPerStride;
       size_t m_channels;
 
   public:
-      SourceRange(size_t _channels, T* _begin, T* _end, size_t _stride, size_t pxls_per_stride)
-              :m_channels(_channels), m_begin(_begin), m_end(_end), m_stride(_stride),
-               m_pixels_per_stride(pxls_per_stride) { }
+      SourceRange(size_t channels_, T* begin_, T* end_, size_t stride_, size_t pixels_per_stride_)
+          :m_channels(channels_), m_begin(begin_), m_end(end_), m_stride(stride_),
+           m_pixelsPerStride(pixels_per_stride_) { }
 
-      class source_channel_iterator {
+      class SourceChannelIterator {
           std::vector<T*> m_ptr;
 
       public:
-          source_channel_iterator(size_t ch, T* ptr)
-                  :m_ptr(ch)
+          SourceChannelIterator(size_t number_of_channels_, T* ptr_)
+              :m_ptr(number_of_channels_)
           {
-              std::generate(m_ptr.begin(), m_ptr.end(), [ptr]() mutable { return ptr++; });
+              std::generate(m_ptr.begin(), m_ptr.end(), [ptr_]() mutable { return ptr_++; });
           }
 
-          source_channel_iterator& operator++()
+          SourceChannelIterator& operator++()
           {
-              size_t n_of_c = m_ptr.size();
+              size_t numberOfChannels = m_ptr.size();
               std::for_each(m_ptr.begin(), m_ptr.end(),
-                      [n_of_c](T*& p) { p = p+n_of_c; });
+                  [numberOfChannels](T*& p) { p = p+numberOfChannels; });
               return *this;
           }
 
-          source_channel_iterator operator++(int)
+          SourceChannelIterator operator++(int)
           {
-              source_channel_iterator retval = *this;
+              SourceChannelIterator preIncrementIterator = *this;
               ++(*this);
-              return retval;
+              return preIncrementIterator;
           }
 
-          bool operator==(const source_channel_iterator& other) const
+          bool operator==(const SourceChannelIterator& other_) const
           {
-              return *(m_ptr.begin())==*(other.m_ptr.begin());
+              return *(m_ptr.begin())==*(other_.m_ptr.begin());
           }
 
-          bool operator!=(const source_channel_iterator& other) const
+          bool operator!=(const SourceChannelIterator& other_) const
           {
-              return !(*this==other);
+              return !(*this==other_);
           }
 
           std::vector<T*> operator*()
@@ -74,28 +71,28 @@ namespace pylibczi {
           using iterator_category = std::forward_iterator_tag;
       };
 
-      source_channel_iterator begin()
+      SourceChannelIterator begin()
       {
-          return source_channel_iterator(m_channels, m_begin);
+          return SourceChannelIterator(m_channels, m_begin);
       }
 
-      source_channel_iterator stride_begin(size_t h)
+      SourceChannelIterator strideBegin(size_t y_index_)
       {
-          return source_channel_iterator(m_channels, (T*) (((uint8_t*) m_begin)+h*m_stride));
+          return SourceChannelIterator(m_channels, (T*) (((uint8_t*) m_begin)+y_index_*m_stride));
       }
 
-      source_channel_iterator stride_end(size_t h)
+      SourceChannelIterator strideEnd(size_t y_index_)
       {
           auto tmp = (uint8_t*) m_begin;
-          tmp += h*m_stride+m_pixels_per_stride*m_channels*sizeof(T);
-          T* send = (T*) tmp;
-          if (send>m_end)
+          tmp += y_index_*m_stride+m_pixelsPerStride*m_channels*sizeof(T);
+          T* sEnd = (T*) tmp;
+          if (sEnd>m_end)
               throw ImageIteratorException(
-                      "stride advanced pointer beyond end of array.");
-          return source_channel_iterator(m_channels, send);
+                  "stride advanced pointer beyond end of array.");
+          return SourceChannelIterator(m_channels, sEnd);
       }
 
-      source_channel_iterator end() { return source_channel_iterator(m_channels, m_end); }
+      SourceChannelIterator end() { return SourceChannelIterator(m_channels, m_end); }
   };
 
   template<typename T>
@@ -109,46 +106,46 @@ namespace pylibczi {
       size_t area() { return m_width*m_height; }
 
   public:
-      TargetRange(size_t channels, size_t w, size_t h, T* _begin, T* _end)
-              :m_channels(channels), m_width(w), m_height(h), m_begin(_begin), m_end(_end) { }
+      TargetRange(size_t channels_, size_t width_, size_t height_, T* begin_, T* end_)
+          :m_channels(channels_), m_width(width_), m_height(height_), m_begin(begin_), m_end(end_) { }
 
-      void addPixels(size_t offset) { m_begin += offset; }
+      void addPixels(size_t offset_) { m_begin += offset_; }
 
-      class target_channel_iterator {
+      class TargetChannelIterator {
           std::vector<T*> m_ptr;
 
       public:
-          target_channel_iterator(size_t ch, T* ps, size_t wh)
-                  :m_ptr(ch)
+          TargetChannelIterator(size_t number_of_channels_, T* ptr_, size_t witdth_times_height_)
+              :m_ptr(number_of_channels_)
           {
               size_t h = 0;
-              std::generate(m_ptr.begin(), m_ptr.end(), [ps, h, wh]() mutable {
+              std::generate(m_ptr.begin(), m_ptr.end(), [ptr_, h, witdth_times_height_]() mutable {
                   h++;
-                  return ps+wh*(h-1);
+                  return ptr_+witdth_times_height_*(h-1);
               });
           }
 
-          target_channel_iterator& operator++()
+          TargetChannelIterator& operator++()
           {
               std::for_each(m_ptr.begin(), m_ptr.end(), [](T*& p) { ++p; });
               return *this;
           }
 
-          target_channel_iterator operator++(int)
+          TargetChannelIterator operator++(int)
           {
-              target_channel_iterator retval = *this;
+              TargetChannelIterator retval = *this;
               ++(*this);
               return retval;
           }
 
-          bool operator==(target_channel_iterator other) const
+          bool operator==(TargetChannelIterator other_) const
           {
-              return m_ptr.begin()==other.m_ptr.begin();
+              return m_ptr.begin()==other_.m_ptr.begin();
           }
 
-          bool operator!=(target_channel_iterator other) const
+          bool operator!=(TargetChannelIterator other_) const
           {
-              return !(*this==other);
+              return !(*this==other_);
           }
 
           std::vector<T*> operator*()
@@ -163,19 +160,19 @@ namespace pylibczi {
           using iterator_category = std::forward_iterator_tag;
       };
 
-      target_channel_iterator begin()
+      TargetChannelIterator begin()
       {
-          return target_channel_iterator(m_channels, m_begin, area());
+          return TargetChannelIterator(m_channels, m_begin, area());
       }
 
-      target_channel_iterator stride_begin(size_t h)
+      TargetChannelIterator strideBegin(size_t height_)
       {
-          return target_channel_iterator(m_channels, m_begin+h*m_width, area());
+          return TargetChannelIterator(m_channels, m_begin+height_*m_width, area());
       }
 
-      target_channel_iterator end()
+      TargetChannelIterator end()
       {
-          return target_channel_iterator(m_channels, m_end-2*area(), area());
+          return TargetChannelIterator(m_channels, m_end-2*area(), area());
       }
   };
 

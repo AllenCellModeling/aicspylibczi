@@ -1,13 +1,6 @@
-//
-// Created by Jamie Sherman on 2019-08-28.
-//
-
 #ifndef _PYLIBCZI__PYLIBCZI_IMAGE_H
 #define _PYLIBCZI__PYLIBCZI_IMAGE_H
 
-#include "exceptions.h"
-#include "Iterator.h"
-#include "helper_algorithms.h"
 #include <array>
 #include <cstdio>
 #include <cstdlib>
@@ -18,6 +11,10 @@
 #include <numeric>
 #include <utility>
 #include <vector>
+
+#include "exceptions.h"
+#include "Iterator.h"
+#include "helper_algorithms.h"
 
 namespace pylibczi {
 
@@ -45,21 +42,20 @@ namespace pylibczi {
 
 
 
-      static std::map<libCZI::PixelType, std::string>
-              s_pixelToTypeName;
+      static std::map<libCZI::PixelType, std::string> s_pixelToTypeName;
 
   public:
       using ImVec = std::vector<std::shared_ptr<Image> >;
 
-      Image(std::vector<size_t> shp, libCZI::PixelType pt, const libCZI::CDimCoordinate* cdim,
-              libCZI::IntRect ir, int mIndex)
-              :m_shape(std::move(shp)), m_pixelType(pt), m_planeCoordinates(*cdim),
-               m_xywh(ir), m_mIndex(mIndex) { }
+      Image(std::vector<size_t> shape_, libCZI::PixelType pixel_type_, const libCZI::CDimCoordinate* plane_coordinates_,
+          libCZI::IntRect box_, int m_index_)
+          :m_shape(std::move(shape_)), m_pixelType(pixel_type_), m_planeCoordinates(*plane_coordinates_),
+           m_xywh(box_), m_mIndex(m_index_) { }
 
-      size_t calculate_idx(const std::vector<size_t>& idxs);
+      size_t calculateIdx(const std::vector<size_t>& indexes_);
 
       template<typename T>
-      bool is_type_match();
+      bool isTypeMatch();
 
       std::vector<size_t> shape() { return m_shape; }
 
@@ -68,43 +64,37 @@ namespace pylibczi {
           return std::accumulate(m_shape.begin(), m_shape.end(), (size_t) 1, std::multiplies<>());
       }
 
-      std::vector<std::pair<char, int> > get_valid_indexs(bool isMosaic = false);
+      std::vector<std::pair<char, int> > getValidIndexes(bool is_mosaic_ = false);
 
-      bool operator<(Image& other);
+      bool operator<(Image& other_);
 
       libCZI::PixelType pixelType() { return m_pixelType; }
 
-      virtual void load_image(const std::shared_ptr<libCZI::IBitmapData>& pBitmap, size_t channels) = 0;
+      virtual void loadImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_ptr_, size_t channels_) = 0;
 
-      virtual ImVec split_channels(int startFrom) = 0;
+      virtual ImVec splitChannels(int start_from_) = 0;
   };
 
   template<typename T>
   inline bool
-  Image::is_type_match()
+  Image::isTypeMatch()
   {
       auto pt = s_pixelToTypeName[m_pixelType];
       return (typeid(T).name()==s_pixelToTypeName[m_pixelType]);
   }
-
-
-
 
   /*!
    * @brief This class is a std::vector< std::shared_ptr<ImageBC> >, it's sole reason for existing is to enable a custom binding
    * to convert the structure into a numpy.ndarray. From the C++ side it serves no purpose.
    */
   class ImageVector: public std::vector<std::shared_ptr<Image> > {
-      bool m_is_mosaic = false;
+      bool m_isMosaic = false;
 
   public:
-      bool is_mosaic() { return m_is_mosaic; }
-      void set_mosaic(bool val) { m_is_mosaic = val; }
+      bool isMosaic() { return m_isMosaic; }
+      void setMosaic(bool val_) { m_isMosaic = val_; }
 
   };
-
-
-
 
 } // namespace pylibczi
 

@@ -13,116 +13,116 @@ namespace pylibczi {
       /*!
        * @brief The Image constructor creates the container and memory for storing an image from a ZeissRaw/CZI file. This class
        * is really intended to be created by ImageFactory.
-       * @param shape The shape of the image can be in a vector or a tuple but <b>MUST be in {C, Y, X} order</b>.
-       * @param pixel_type The Pixel type of the image,
-       * @param cdim The coordinate structure used to define the plane, what scene, channel, time-point etc.
-       * @param box The (x0, y0, w, h) structure containing the logical position of the image.
-       * @param mIndex The mosaic index for the image, this is only relevant if the file is a mosaic file.
+       * @param shape_ The shape of the image can be in a vector or a tuple but <b>MUST be in {C, Y, X} order</b>.
+       * @param pixel_type_ The Pixel type of the image,
+       * @param plane_coordantes_ The coordinate structure used to define the plane, what scene, channel, time-point etc.
+       * @param box_ The (x0, y0, w, h) structure containing the logical position of the image.
+       * @param m_index_ The mosaic index for the image, this is only relevant if the file is a mosaic file.
        */
-      TypedImage(std::vector<size_t> shape, libCZI::PixelType pixel_type, const libCZI::CDimCoordinate* cdim, libCZI::IntRect box, int mIndex)
-              :Image(shape, pixel_type, cdim, box, mIndex),
-               m_array(new T[std::accumulate(shape.begin(), shape.end(), (size_t) 1, std::multiplies<>())])
+      TypedImage(std::vector<size_t> shape_, libCZI::PixelType pixel_type_, const libCZI::CDimCoordinate* plane_coordantes_,
+          libCZI::IntRect box_, int m_index_)
+          :Image(shape_, pixel_type_, plane_coordantes_, box_, m_index_),
+           m_array(new T[std::accumulate(shape_.begin(), shape_.end(), (size_t) 1, std::multiplies<>())])
       {
-          if (!is_type_match<T>())
+          if (!isTypeMatch<T>())
               throw PixelTypeException(m_pixelType, "TypedImage asked to create a container for PixelType with inconsitent type.");
       }
 
       /*!
        * @brief the [] accessor, for accessing or changing a pixel value
-       * @param idxsXY The X, Y coordinate in the plane (or X, Y, C} order if 3D. can be provided as an initializer list {x, y, c}
+       * @param idxs_xy_ The X, Y coordinate in the plane (or X, Y, C} order if 3D. can be provided as an initializer list {x, y, c}
        * @return a reference to the pixel
        */
-      T& operator[](const std::vector<size_t>& idxsXY);
+      T& operator[](const std::vector<size_t>& idxs_xy_);
 
       /*!
        * @brief an alternate accessor to the pixel value in CYX order
-       * @param idxsCYX a vector or initializer list of C,Y,X indices
+       * @param idxs_cyx_ a vector or initializer list of C,Y,X indices
        * @return a reference to the pixel
        */
-      T& getCYX(std::vector<size_t> idxsCYX) { return (*this)[std::vector<size_t>(idxsCYX.rbegin(), idxsCYX.rend())]; }
+      T& getCYX(std::vector<size_t> idxs_cyx_) { return (*this)[std::vector<size_t>(idxs_cyx_.rbegin(), idxs_cyx_.rend())]; }
 
       /*!
        * @brief return the raw_pointer to the memory the image class contains, be careful with raw pointer manipulation. here be segfaults
-       * @param jumpTo an integer offset from the beginning of the array.
+       * @param jump_to_ an integer offset from the beginning of the array.
        * @return a pointer to the internally managed memory. Image maintains ownership!
        */
-      T* get_raw_ptr(int jumpTo = 0) { return m_array.get()+jumpTo; }
+      T* getRawPtr(int jump_to_ = 0) { return m_array.get()+jump_to_; }
 
       /*!
        * return a pointer to the specified memory poisiton
-       * @param lst a list of coordinates consistent with the internal storage
+       * @param list_ a list of coordinates consistent with the internal storage
        * @return A pointer into the raw internal data (Image still maintains ownership of the memory).
        */
-      T* get_raw_ptr(std::vector<size_t> lst); // inline definititon below
+      T* getRawPtr(std::vector<size_t> list_); // inline definititon below
 
       /*!
        * @brief This function releases the memory from the container and gives it to the recipient to handle. The recipient takes
        * responsible for freeing the memory.
        * @return The raw pointer of type T*, where T is the storage type corresponding with the PixelType
        */
-      T* release_memory()
+      T* releaseMemory()
       {
-          if (!is_type_match<T>())
+          if (!isTypeMatch<T>())
               throw PixelTypeException(pixelType(), "TypedImage PixelType is inconsistent with requested memory type.");
           return m_array.release();
       }
 
       /*!
        * @brief Copy the image from the libCZI bitmap object into this Image object
-       * @param pBitmap is the image bitmap from libCZI
-       * @param channels the number of channels 1 for GrayX, 3 for BgrX etc. (ie the number of XY planes required to hold the image)
+       * @param bitmap_ptr_ is the image bitmap from libCZI
+       * @param channels_ the number of channels 1 for GrayX, 3 for BgrX etc. (ie the number of XY planes required to hold the image)
        */
-      void load_image(const std::shared_ptr<libCZI::IBitmapData>& pBitmap,
-              size_t channels) override;
+      void loadImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_ptr_, size_t channels_) override;
 
       /*!
        * @brief If this container is a 3channel BGR image split it into single channel images so they can be merged into an data matrix
-       * @param startFrom is an integer offset to start assigning the new channels from.
+       * @param start_from_ is an integer offset to start assigning the new channels from.
        * @return a vector of smart pointers wrapping Images (2D)
        */
-      ImVec split_channels(int startFrom) override;
+      ImVec splitChannels(int start_from_) override;
 // TODO Implement set_sort_order() and operator()<
   };
 
   template<typename T>
-  inline T& TypedImage<T>::operator[](const std::vector<size_t>& idxs)
+  inline T& TypedImage<T>::operator[](const std::vector<size_t>& idxs_xy_)
   {
-      if (idxs.size()!=m_shape.size())
-          throw ImageAccessUnderspecifiedException(idxs.size(), m_shape.size(), "from TypedImage.operator[].");
-      size_t idx = calculate_idx(idxs);
+      if (idxs_xy_.size()!=m_shape.size())
+          throw ImageAccessUnderspecifiedException(idxs_xy_.size(), m_shape.size(), "from TypedImage.operator[].");
+      size_t idx = calculateIdx(idxs_xy_);
       return m_array[idx];
   }
 
   template<typename T>
-  inline T* TypedImage<T>::get_raw_ptr(std::vector<size_t> lst)
+  inline T* TypedImage<T>::getRawPtr(std::vector<size_t> list_)
   {
       std::vector<size_t> zeroPadded(0, m_shape.size());
-      std::copy(lst.rbegin(), lst.rend(), zeroPadded.rbegin());
-      return this->operator[](calculate_idx(zeroPadded));
+      std::copy(list_.rbegin(), list_.rend(), zeroPadded.rbegin());
+      return this->operator[](calculateIdx(zeroPadded));
   }
   template<typename T>
-  inline void TypedImage<T>::load_image(const std::shared_ptr<libCZI::IBitmapData>& pBitmap, size_t channels)
+  inline void TypedImage<T>::loadImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_ptr_, size_t channels_)
   {
-      libCZI::IntSize size = pBitmap->GetSize();
+      libCZI::IntSize size = bitmap_ptr_->GetSize();
       {
-          libCZI::ScopedBitmapLockerP lckScoped{pBitmap.get()};
+          libCZI::ScopedBitmapLockerP lckScoped{bitmap_ptr_.get()};
           // WARNING do not compute the end of the array by multiplying stride by height, they are both uint32_t and you'll get an overflow for larger images
           uint8_t* sEnd = static_cast<uint8_t*>(lckScoped.ptrDataRoi)+lckScoped.size;
-          SourceRange<T> sourceRange(channels, static_cast<T*>(lckScoped.ptrDataRoi), (T*) (sEnd), lckScoped.stride, size.w);
-          TargetRange<T> targetRange(channels, size.w, size.h, m_array.get(), m_array.get()+length());
-          for (std::uint32_t h = 0; h<pBitmap->GetHeight(); ++h) {
-              paired_for_each(sourceRange.stride_begin(h), sourceRange.stride_end(h), targetRange.stride_begin(h),
-                      [&](std::vector<T*> src, std::vector<T*> tgt) {
-                          paired_for_each(src.begin(), src.end(), tgt.begin(), [&](T* s, T* t) {
-                              *t = *s;
-                          });
+          SourceRange<T> sourceRange(channels_, static_cast<T*>(lckScoped.ptrDataRoi), (T*) (sEnd), lckScoped.stride, size.w);
+          TargetRange<T> targetRange(channels_, size.w, size.h, m_array.get(), m_array.get()+length());
+          for (std::uint32_t h = 0; h<bitmap_ptr_->GetHeight(); ++h) {
+              paired_for_each(sourceRange.strideBegin(h), sourceRange.strideEnd(h), targetRange.strideBegin(h),
+                  [&](std::vector<T*> src_, std::vector<T*> tgt_) {
+                      paired_for_each(src_.begin(), src_.end(), tgt_.begin(), [&](T* s_, T* t_) {
+                          *t_ = *s_;
                       });
+                  });
           }
       }
   }
 
   template<typename T>
-  inline Image::ImVec TypedImage<T>::split_channels(int startFrom)
+  inline Image::ImVec TypedImage<T>::splitChannels(int start_from_)
   {
       ImVec ivec;
       if (m_shape.size()<3)
@@ -133,7 +133,7 @@ namespace pylibczi {
           throw ImageSplitChannelException("attempting to split channels", cStart);
       for (int i = 0; i<m_shape[0]; i++) {
           libCZI::CDimCoordinate tmp(m_planeCoordinates);
-          tmp.Set(libCZI::DimensionIndex::C, i+startFrom); // assign the channel from the BGR
+          tmp.Set(libCZI::DimensionIndex::C, i+start_from_); // assign the channel from the BGR
           // TODO should I change the pixel type from a BGRx to a Grayx/3
           ivec.emplace_back(new TypedImage<T>({m_shape[1], m_shape[2]}, m_pixelType, &tmp, m_xywh, m_mIndex));
       }

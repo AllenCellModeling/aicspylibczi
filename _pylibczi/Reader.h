@@ -1,7 +1,3 @@
-//
-// Created by Jamie Sherman on 7/11/19.
-//
-
 #ifndef PYLIBCZI_AICS_ADDED_HPP
 #define PYLIBCZI_AICS_ADDED_HPP
 
@@ -74,25 +70,25 @@ namespace pylibczi {
       FILE* m_fp;
   public:
       FileHolder() { m_fp = nullptr; }
-      FileHolder(FILE* p) { m_fp = p; }
+      FileHolder(FILE* p_) { m_fp = p_; }
       FILE* get() { return m_fp; }
-      FileHolder& operator=(FILE* p)
+      FileHolder& operator=(FILE* p_)
       {
-          m_fp = p;
+          m_fp = p_;
           return *this;
       }
   };
 
 /// <summary>	A wrapper that takes a FILE * and creates an libCZI::IStream object out of it
 
-  class CSimpleStreamImplFromFP: public libCZI::IStream {
+  class CSimpleStreamImplFromFp: public libCZI::IStream {
   private:
-      FILE* fp;
+      FILE* m_fp;
   public:
-      CSimpleStreamImplFromFP() = delete;
-      CSimpleStreamImplFromFP(FILE* file_pointer) { fp = file_pointer; }
-      ~CSimpleStreamImplFromFP() override { fclose(fp); };
-      void Read(std::uint64_t offset, void* pv, std::uint64_t size, std::uint64_t* ptrBytesRead) override;
+      CSimpleStreamImplFromFp() = delete;
+      explicit CSimpleStreamImplFromFp(FILE* file_pointer_) { m_fp = file_pointer_; }
+      ~CSimpleStreamImplFromFp() override { fclose(m_fp); };
+      void Read(std::uint64_t offset_, void* data_ptr_, std::uint64_t size_, std::uint64_t* bytes_read_ptr_) override;
   };
 
   /*!
@@ -108,7 +104,7 @@ namespace pylibczi {
       std::shared_ptr<CCZIReader> m_czireader; // required for cast in libCZI
       libCZI::SubBlockStatistics m_statistics;
   public:
-      typedef std::map<libCZI::DimensionIndex, std::pair<int, int> > mapDiP;
+      using MapDiP = std::map<libCZI::DimensionIndex, std::pair<int, int> >;
       using Shape = std::vector<std::pair<char, int> >;
       /*!
        * @brief Construct the Reader and load the file statistics (dimensions etc)
@@ -119,9 +115,9 @@ namespace pylibczi {
        *    czi = pylibczi::Reader(fp);
        * @endcode
        *
-       * @param f_in A C-style FILE pointer to the CZI file
+       * @param f_in_ A C-style FILE pointer to the CZI file
        */
-      explicit Reader(FileHolder f_in);
+      explicit Reader(FileHolder f_in_);
 
       /*!
        * @brief Check if the file is a mosaic file.
@@ -150,13 +146,13 @@ namespace pylibczi {
        *
        * @return A map< DimensionIndex, pair<int(start), int(size)> >
        */
-      Reader::mapDiP read_dims();
+      Reader::MapDiP readDims();
 
       /*!
        * @brief Get the metadata from the CZI file.
        * @return A string containing the xml metadata from the file
        */
-      std::string read_meta();
+      std::string readMeta();
 
       /*!
        * @brief Given a CDimCoordinate, even an empty one, return the planes that match as a numpy ndarray
@@ -170,17 +166,17 @@ namespace pylibczi {
        *    auto img_coords_dims = czi.cziread_selected(dims)
        * @endcode
        *
-       * @param planeCoord A structure containing the Dimension constraints
-       * @param flatten if false this won't flatten 3 channel images, from python this should always be true.
-       * @param mIndex Is only relevant for mosaic files, if you wish to select one frame.
+       * @param plane_coord_ A structure containing the Dimension constraints
+       * @param flatten_ if false this won't flatten 3 channel images, from python this should always be true.
+       * @param mIndex_ Is only relevant for mosaic files, if you wish to select one frame.
        */
-      std::pair<ImageVector, Shape> read_selected(libCZI::CDimCoordinate& planeCoord, bool flatten = true, int mIndex = -1);
+      std::pair<ImageVector, Shape> readSelected(libCZI::CDimCoordinate& plane_coord_, bool flatten_ = true, int mIndex_ = -1);
 
       /*!
        * @brief If the czi file is a mosaic tiled image this function can be used to reconstruct it into an image.
-       * @param planeCoord A class constraining the data to an individual plane.
-       * @param scaleFactor (optional) The native size for mosaic files can be huge the scale factor allows one to get something back of a more reasonable size. The default is 0.1 meaning 10% of the native image.
-       * @param imBox (optional) The {x0, y0, width, height} of a sub-region, the default is the whole image.
+       * @param plane_coord_ A class constraining the data to an individual plane.
+       * @param scale_factor_ (optional) The native size for mosaic files can be huge the scale factor allows one to get something back of a more reasonable size. The default is 0.1 meaning 10% of the native image.
+       * @param im_box_ (optional) The {x0, y0, width, height} of a sub-region, the default is the whole image.
        * @return an ImageVector of shared pointers containing an ImageBC*. See description of Image<> and ImageBC.
        *
        * @code
@@ -198,15 +194,15 @@ namespace pylibczi {
        * @endcode
        */
       ImageVector
-      read_mosaic(const libCZI::CDimCoordinate planeCoord, float scaleFactor = 0.1, libCZI::IntRect imBox = {0, 0, -1, -1});
-        // changed from {.w=-1, .h=-1} to above to support MSVC and GCC - lagging on C++14 std
+      readMosaic(libCZI::CDimCoordinate plane_coord_, float scale_factor_ = 0.1, libCZI::IntRect im_box_ = {0, 0, -1, -1});
+      // changed from {.w=-1, .h=-1} to above to support MSVC and GCC - lagging on C++14 std
 
       /*!
        * Convert the libCZI::DimensionIndex to a character
-       * @param di, The libCZI::DimensionIndex to be converted
+       * @param di_, The libCZI::DimensionIndex to be converted
        * @return The character representing the DimensionIndex
        */
-      char dim_to_char(libCZI::DimensionIndex di) { return libCZI::Utils::DimensionToChar(di); }
+      char dimToChar(libCZI::DimensionIndex di_) { return libCZI::Utils::DimensionToChar(di_); }
 
       virtual ~Reader()
       {
@@ -217,22 +213,22 @@ namespace pylibczi {
        * Get the full size of the mosaic image without scaling. If you're selecting a subregion it must be within the box returned.
        * @return an IntRect {x, y, w, h}
        */
-      libCZI::IntRect mosaic_shape() { return m_statistics.boundingBoxLayer0Only; }
+      libCZI::IntRect mosaicShape() { return m_statistics.boundingBoxLayer0Only; }
 
-      static Shape get_shape(pylibczi::ImageVector& imgs, bool is_mosaic);
+      static Shape getShape(pylibczi::ImageVector& images_, bool is_mosaic_);
 
   private:
 
-      static bool dimsMatch(const libCZI::CDimCoordinate& targetDims, const libCZI::CDimCoordinate& cziDims);
+      static bool dimsMatch(const libCZI::CDimCoordinate& target_dims_, const libCZI::CDimCoordinate& czi_dims_);
 
-      static void add_sort_order_index(vector<IndexMap>& vec);
+      static void addSortOrderIndex(vector<IndexMap>& vector_of_index_maps_);
 
-      static bool isPyramid0(const libCZI::SubBlockInfo& info)
+      static bool isPyramid0(const libCZI::SubBlockInfo& info_)
       {
-          return (info.logicalRect.w==info.physicalSize.w && info.logicalRect.h==info.physicalSize.h);
+          return (info_.logicalRect.w==info_.physicalSize.w && info_.logicalRect.h==info_.physicalSize.h);
       }
 
-      static bool isValidRegion(const libCZI::IntRect& inBox, const libCZI::IntRect& cziBox);
+      static bool isValidRegion(const libCZI::IntRect& in_box_, const libCZI::IntRect& czi_box_);
   };
 
 }

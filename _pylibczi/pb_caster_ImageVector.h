@@ -1,7 +1,3 @@
-//
-// Created by Jamie Sherman on 2019-09-17.
-//
-
 #ifndef _PYLIBCZI_PB_CASTER_IMAGEVECTOR_H
 #define _PYLIBCZI_PB_CASTER_IMAGEVECTOR_H
 
@@ -26,12 +22,12 @@ namespace pybind11 {
          * instance or return false upon failure. The second argument
          * indicates whether implicit conversions should be applied.
          */
-        bool load(handle src, bool)
+        bool load(handle src_, bool)
         {
             // Currently not used, if casting a numpy.ndarray to an ImageVector is required this must be implemented=
 
             /* Extract PyObject from handle */
-            PyObject* source = src.ptr();
+            PyObject* source = src_.ptr();
             return (false); // no conversion is done here so if this code is called always fail
         }
 
@@ -42,9 +38,9 @@ namespace pybind11 {
          * ``return_value_policy::reference_internal``) and are generally
          * ignored by implicit casters.
          */
-        static handle cast(pylibczi::ImageVector src, return_value_policy /* policy */, handle /* parent */)
+        static handle cast(pylibczi::ImageVector src_, return_value_policy /* policy */, handle /* parent */)
         {
-            return pb_helpers::pack_array(src);
+            return pb_helpers::packArray(src_);
         }
     };
   }

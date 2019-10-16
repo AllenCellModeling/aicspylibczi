@@ -10,37 +10,33 @@ namespace pylibczi {
   class TypedImage;
 
   class ImageFactory {
-      using PT = libCZI::PixelType;
-      using V_ST = std::vector<size_t>;
-      using ConstrMap = std::map<libCZI::PixelType,
-                                 std::function<std::shared_ptr<Image>(
-                                         std::vector<size_t>, libCZI::PixelType pt, const libCZI::CDimCoordinate* cdim,
-                                         libCZI::IntRect ir, int mIndex)
-                                 > >;
+      using PixelType = libCZI::PixelType;
+      using CtorMap = std::map<libCZI::PixelType,
+                               std::function<std::shared_ptr<Image>(
+                                   std::vector<size_t>, libCZI::PixelType pixel_type_, const libCZI::CDimCoordinate* plane_coordinate_,
+                                   libCZI::IntRect box_, int mIndex_)
+                               > >;
 
-      using LCD = const libCZI::CDimCoordinate;
-      using IR = libCZI::IntRect;
-
-      static ConstrMap s_pixelToImage;
+      static CtorMap s_pixelToImage;
 
   public:
-      static size_t size_of_pixel_type(PT pixel_type);
+      static size_t sizeOfPixelType(PixelType pixel_type_);
 
-      static size_t n_of_channels(PT pixel_type);
+      static size_t numberOfChannels(PixelType pixel_type_);
 
       template<typename T>
       static std::shared_ptr<TypedImage<T> >
-      get_derived(std::shared_ptr<Image>
-      ptr)
+      getDerived(std::shared_ptr<Image> image_ptr_)
       {
-          if (!ptr->is_type_match<T>())
-              throw PixelTypeException(ptr->pixelType(), "TypedImage PixelType doesn't match requested memory type.");
-          return std::dynamic_pointer_cast<TypedImage<T>>(ptr);
+          if (!image_ptr_->isTypeMatch<T>())
+              throw PixelTypeException(image_ptr_->pixelType(), "TypedImage PixelType doesn't match requested memory type.");
+          return std::dynamic_pointer_cast<TypedImage<T>>(image_ptr_);
       }
 
       static std::shared_ptr<Image>
-      construct_image(const std::shared_ptr<libCZI::IBitmapData>& pBitmap, const libCZI::CDimCoordinate* cdims, libCZI::IntRect box,
-              int mIndex);
+      constructImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_ptr_, const libCZI::CDimCoordinate* plane_coordinate_,
+          libCZI::IntRect box_,
+          int mIndex_);
   };
 }
 
