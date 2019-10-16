@@ -3,7 +3,7 @@
 #include "ImageFactory.h"
 #include "Reader.h"
 #include "exceptions.h"
-#include "Iterator.h"
+#include "TargetRange.h"
 #include "helper_algorithms.h"
 
 using namespace pylibczi;
@@ -35,10 +35,10 @@ public:
         :m_czi(new Reader(std::fopen("resources/s_1_t_1_c_1_z_1.czi", "rb"))) { }
     std::shared_ptr<Image> get()
     {
-        auto c_dims = libCZI::CDimCoordinate{{libCZI::DimensionIndex::B, 0},
-                                             {libCZI::DimensionIndex::C, 0}};
-        auto imvec = m_czi->readSelected(c_dims).first;
-        return imvec.front();
+        auto cDims = libCZI::CDimCoordinate{{libCZI::DimensionIndex::B, 0},
+                                            {libCZI::DimensionIndex::C, 0}};
+        auto imVec = m_czi->readSelected(cDims).first;
+        return imVec.front();
     }
 };
 

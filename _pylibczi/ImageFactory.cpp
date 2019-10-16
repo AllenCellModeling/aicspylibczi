@@ -29,10 +29,10 @@ namespace pylibczi {
                new TypedImage<uint16_t>(std::move(shape_), pixel_type_, plane_coordinate_, box_, mIndex_));
        }},
       {PixelType::Gray32Float,
-       [](std::vector<size_t> shape_, PixelType pixel_type__, const libCZI::CDimCoordinate* plane_coordinate_, libCZI::IntRect box_,
+       [](std::vector<size_t> shape_, PixelType pixel_type_, const libCZI::CDimCoordinate* plane_coordinate_, libCZI::IntRect box_,
            int mIndex_) {
            return std::shared_ptr<TypedImage<float>>(
-               new TypedImage<float>(std::move(shape_), pixel_type__, plane_coordinate_, box_, mIndex_));
+               new TypedImage<float>(std::move(shape_), pixel_type_, plane_coordinate_, box_, mIndex_));
        }},
       {PixelType::Bgr96Float,
        [](std::vector<size_t> shape_, PixelType pixel_type_, const libCZI::CDimCoordinate* plane_coordinate_, libCZI::IntRect box_,
@@ -59,18 +59,16 @@ namespace pylibczi {
   size_t
   ImageFactory::numberOfChannels(libCZI::PixelType pixel_type_)
   {
-      using PT = libCZI::PixelType;
       switch (pixel_type_) {
-      case PT::Gray8:
-      case PT::Gray16:
-      case PT::Gray32Float:return 1;
-      case PT::Bgr24:
-      case PT::Bgr48:
-      case PT::Bgr96Float:return 3;
+      case PixelType::Gray8:
+      case PixelType::Gray16:
+      case PixelType::Gray32Float:return 1;
+      case PixelType::Bgr24:
+      case PixelType::Bgr48:
+      case PixelType::Bgr96Float:return 3;
       default:throw PixelTypeException(pixel_type_, "Pixel Type unsupported by libCZI.");
       }
-
-  };
+  }
 
   std::shared_ptr<Image> ImageFactory::constructImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_ptr_,
       const libCZI::CDimCoordinate* plane_coordinate_,
@@ -78,7 +76,7 @@ namespace pylibczi {
       int mIndex_)
   {
       libCZI::IntSize size = bitmap_ptr_->GetSize();
-      libCZI::PixelType pixelType = bitmap_ptr_->GetPixelType();
+      PixelType pixelType = bitmap_ptr_->GetPixelType();
 
       std::vector<size_t> shape;
       size_t channels = numberOfChannels(pixelType);

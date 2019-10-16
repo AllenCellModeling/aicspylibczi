@@ -2,6 +2,8 @@
 #define _PYLIBCZI_TYPEDIMAGE_H
 
 #include "Image.h"
+#include "SourceRange.h"
+#include "TargetRange.h"
 
 namespace pylibczi {
 

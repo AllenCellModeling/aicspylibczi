@@ -2,12 +2,10 @@
 #define _PYLIBCZI_IMAGEFACTORY_H
 
 #include "Image.h"
+#include "TypedImage.h"
 #include "exceptions.h"
 
 namespace pylibczi {
-
-  template<typename T>
-  class TypedImage;
 
   class ImageFactory {
       using PixelType = libCZI::PixelType;
@@ -25,7 +23,7 @@ namespace pylibczi {
       static size_t numberOfChannels(PixelType pixel_type_);
 
       template<typename T>
-      static std::shared_ptr<TypedImage<T> >
+      static std::shared_ptr< TypedImage<T> >
       getDerived(std::shared_ptr<Image> image_ptr_)
       {
           if (!image_ptr_->isTypeMatch<T>())

@@ -1,7 +1,8 @@
 #include <vector>
 
 #include "catch.hpp"
-#include "Iterator.h"
+#include "SourceRange.h"
+#include "TargetRange.h"
 #include "helper_algorithms.h"
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>

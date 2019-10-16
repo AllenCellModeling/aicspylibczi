@@ -13,7 +13,6 @@
 #include <vector>
 
 #include "exceptions.h"
-#include "Iterator.h"
 #include "helper_algorithms.h"
 
 namespace pylibczi {
