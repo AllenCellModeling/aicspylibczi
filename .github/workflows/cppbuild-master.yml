@@ -13,21 +13,31 @@ jobs:
       max-parallel: 6
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
+        compiler: [llvm, gnu]
 
     steps:
       - uses: actions/checkout@master
         with:
           submodules: true
-      - name: build with cmake
+      - name: llvm build and test
+        if: matrix.compiler == 'llvm'
+        env:
+          CC: clang
+          CXX: clang++
         run: |
-          which clang
-          export CC=clang
-          export CXX=clang++
           mkdir ./cmake-build-debug
           cd cmake-build-debug
           cmake ../
-          make
-      - name: run C++ tests
-        run: |
-          cd ./cmake-build-debug/c_tests/
-          ./test_libczi_c++_extension
+          cmake --build .
+        shell: bash
+      - name: gnu build and test
+        if: matrix.compiler == 'gnu'
+        env:
+          CC: gcc
+          CXX: g++
+          run: |
+            mkdir ./cmake-build-debug
+            cd cmake-build-debug
+            cmake ../
+            cmake --build .
+          shell: bash
