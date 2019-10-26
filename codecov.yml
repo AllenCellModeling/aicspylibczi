@@ -2,7 +2,6 @@ ignore:
   - "**/__init__.py"
   - "pylibczi/tests"
   - "pylibczi/bin"
-  - "pylibczi/CziScene.py"
   - "pylibczi/exceptions.py"
   - "pylibczi/types.py"
   - "pybind11"

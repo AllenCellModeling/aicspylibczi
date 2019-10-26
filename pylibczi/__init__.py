@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with pylibczi.  If not, see <https://www.gnu.org/licenses/>.
 
-__all__ = ["CziFile", "CziScene"]
-from .CziScene import CziScene
+__all__ = ["CziFile"]
 from .CziFile import CziFile
 from ._version import __version__
