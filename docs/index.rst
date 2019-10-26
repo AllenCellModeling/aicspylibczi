@@ -23,10 +23,16 @@ Welcome to pylibczi's documentation!
 ====================================
 
 .. toctree::
-   :maxdepth: 2
+   :hidden:
+   :maxdepth: 1
    :caption: Contents:
 
-   api/api
+   Overview <self>
+   installation
+   Package modules <modules>
+   contributing
+
+.. mdinclude:: ../README.md
 
 Indices and tables
 ==================
@@ -34,3 +40,4 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
