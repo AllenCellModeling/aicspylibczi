@@ -1,9 +1,9 @@
 ignore:
   - "**/__init__.py"
   - "pylibczi/tests"
+  - "pylibczi/c_tests"
+  - "pylibczi/docs"
   - "pylibczi/bin"
-  - "pylibczi/exceptions.py"
-  - "pylibczi/types.py"
   - "pybind11"
   - "libCZI"
   - ".github"

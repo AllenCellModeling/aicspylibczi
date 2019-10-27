@@ -17,10 +17,11 @@
 # Parent class for python wrapper to libczi file for accessing Zeiss czi image and metadata.
 
 import io
-import numpy as np
-from lxml import etree as etree
 from pathlib import Path
 from typing import Tuple
+
+import numpy as np
+from lxml import etree as etree
 
 from . import types
 
@@ -59,7 +60,8 @@ class CziFile(object):
     ####
     ZISRAW_DIMS = {'Z', 'C', 'T', 'R', 'S', 'I', 'H', 'V', 'B'}
 
-    def __init__(self, czi_filename: types.FileLike, metafile_out: types.PathLike = '', use_pylibczi: bool = True, verbose: bool = False):
+    def __init__(self, czi_filename: types.FileLike, metafile_out: types.PathLike = '', use_pylibczi: bool = True,
+                 verbose: bool = False):
         # Convert to BytesIO (bytestream)
         self._bytes = self.convert_to_buffer(czi_filename)
         self.czi_filename = None
