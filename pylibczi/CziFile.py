@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Tuple
 
 import numpy as np
-from lxml import etree as etree
+from lxml import etree
 
 from . import types
 
@@ -29,13 +29,13 @@ from . import types
 class CziFile(object):
     """Zeiss CZI file object.
 
-      Args:
-        |  czi_filename (str): Filename of czifile to access.
+    Args:
+      |  czi_filename (str): Filename of czifile to access.
 
-      Kwargs:
-        |  metafile_out (str): Filename of xml file to optionally export czi meta data to.
-        |  use_pylibczi (bool): Set to false to use Christoph Gohlke's czifile reader instead of libCZI.
-        |  verbose (bool): Print information and times during czi file access.
+    Kwargs:
+      |  metafile_out (str): Filename of xml file to optionally export czi meta data to.
+      |  use_pylibczi (bool): Set to false to use Christoph Gohlke's czifile reader instead of libCZI.
+      |  verbose (bool): Print information and times during czi file access.
 
     .. note::
 

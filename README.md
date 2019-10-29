@@ -1,6 +1,6 @@
 # pylibczi
-[![C++ Build & Test](https://github.com/AllenCellModeling/pylibczi/workflows/C%2B%2B+Master+Build/badge.svg)](https://github.com/AllenCellModeling/pylibczi/actions)
-[![Python Build & Test](https://github.com/AllenCellModeling/pylibczi/workflows/Python+Master+Build/badge.svg)](https://github.com/AllenCellModeling/pylibczi/actions)
+[![C++ Build & Test](https://github.com/AllenCellModeling/pylibczi/workflows/C%2B%2B%20Master%20Build/badge.svg)](https://github.com/AllenCellModeling/pylibczi/actions)
+[![Python Build & Test](https://github.com/AllenCellModeling/pylibczi/workflows/Python%20Master%20Build/badge.svg)](https://github.com/AllenCellModeling/pylibczi/actions)
 [![codecov](https://codecov.io/gh/AllenCellModeling/pylibczi/branch/feature/pybind11/graph/badge.svg)](https://codecov.io/gh/AllenCellModeling/pylibczi)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -13,6 +13,7 @@ The first example show how to work with a standard CZI file (Single or Multe-Sce
 
 #### Example 1:  Read in a czi and select a portion of the image to display
 ```python
+import numpy as np
 import pylibczi
 import pathlib
 from PIL import Image
@@ -37,10 +38,11 @@ i2 = np.clip((img - norm_by[0])/(norm_by[1]-norm_by[0]), 0, 1)*255
 
 img_disp = Image.fromarray(i2[0,0,0,0,200:1100,500:1000].astype(np.uint8))
 ```
-![Colony Image](colony.png)
+![Colony Image](images/colony.png)
 
 #### Example 2:  Read in a mosaic file 
 ```python
+import numpy as np
 import pylibczi
 import pathlib
 from PIL import Image
@@ -61,7 +63,7 @@ norm_by = np.percentile(mosaic_data, [5, 98])
 normed_mosaic_data = np.clip((itwo - norm_by[0])/(norm_by[1]-norm_by[0]), 0, 1)*255
 img = Image.fromarray(normed_mosaic_data[0,0, 250:750, 250:750].astype(np.uint8))
 ```
-![Mosaic Histology Image](histo.png)
+![Mosaic Histology Image](images/histo.png)
 
 ## Installation
 

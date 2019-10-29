@@ -57,4 +57,5 @@ add_custom_command(TARGET ${TARGET_TWO} POST_BUILD
         )
 
 add_subdirectory(c_tests)
+add_subdirectory(docs)
 

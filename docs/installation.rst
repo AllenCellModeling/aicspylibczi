@@ -32,13 +32,7 @@ You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/AllenCellModeling/pylibczi
-
-Or download the `tarball`_:
-
-.. code-block:: console
-
-    $ curl  -OL https://github.com/AllenCellModeling/pylibczi/tarball/master
+    $ git clone --recurse-submodules https://github.com/AllenCellModeling/pylibczi
 
 Once you have a copy of the source, you can install it with:
 

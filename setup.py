@@ -14,6 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with pylibczi.  If not, see <https://www.gnu.org/licenses/>.
 
+from setuptools import Extension, setup
+from setuptools.command.build_ext import build_ext
+
 import os
 import platform
 import re
@@ -21,19 +24,14 @@ import subprocess
 import sys
 from distutils.version import LooseVersion
 
-from setuptools import Extension, setup
-from setuptools.command.build_ext import build_ext
 
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
 requirements = [
     "numpy>=1.14.1",
-    "scipy",
     "lxml",
     "scikit-image",
-    "matplotlib>=2.0.0",
-    "tifffile",
 ]
 
 test_requirements = [
@@ -56,6 +54,7 @@ dev_requirements = [
     "pytest-runner>=4.4",
     "Sphinx>=2.0.0b1",
     "sphinx_rtd_theme>=0.1.2",
+    "breathe",
     "tox>=3.5.2",
     "twine>=1.13.0",
     "wheel>=0.33.1",
@@ -133,7 +132,7 @@ class CMakeBuild(build_ext):
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
-        subprocess.check_call(['cmake', '--build', '.'] + build_args, cwd=self.build_temp)
+        subprocess.check_call(['cmake', '--build', '.', '--target', '_pylibczi'] + build_args, cwd=self.build_temp)
 
 
 setup(
