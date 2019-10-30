@@ -35,6 +35,8 @@ PYBIND11_MODULE(_pylibczi, m)
         .def("read_meta", &pylibczi::Reader::readMeta)
         .def("read_selected", &pylibczi::Reader::readSelected)
         .def("mosaic_shape", &pylibczi::Reader::mosaicShape)
+        .def("get_num_scenes", &pylibczi::Reader::getNumScenes)
+        .def("scene_shape", &pylibczi::Reader::sceneShape)
         .def("read_mosaic", &pylibczi::Reader::readMosaic);
 
     py::class_<pylibczi::IndexMap>(m, "IndexMap")

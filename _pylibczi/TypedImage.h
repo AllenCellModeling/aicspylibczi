@@ -27,7 +27,7 @@ namespace pylibczi {
            m_array(new T[std::accumulate(shape_.begin(), shape_.end(), (size_t) 1, std::multiplies<>())])
       {
           if (!isTypeMatch<T>())
-              throw PixelTypeException(m_pixelType, "TypedImage asked to create a container for PixelType with inconsitent type.");
+              throw PixelTypeException(m_pixelType, "TypedImage asked to create a container for PixelType with inconsistent type.");
       }
 
       /*!

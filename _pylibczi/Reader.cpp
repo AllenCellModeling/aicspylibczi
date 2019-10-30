@@ -74,18 +74,10 @@ namespace pylibczi {
       addSortOrderIndex(orderMapping);
 
       // get scene index if specified
-      int sceneIndex;
+      int sceneIndex = -1;
       libCZI::IntRect sceneBox = {0, 0, -1, -1};
-      if (plane_coord_.TryGetPosition(libCZI::DimensionIndex::S, &sceneIndex)) {
-          auto itt = m_statistics.sceneBoundingBoxes.find(sceneIndex);
-          if (itt==m_statistics.sceneBoundingBoxes.end())
-              sceneBox = itt->second.boundingBoxLayer0; // layer0 specific
-          else
-              sceneBox.Invalidate();
-      }
-      else {
-          sceneIndex = -1;
-      }
+      if (plane_coord_.TryGetPosition(libCZI::DimensionIndex::S, &sceneIndex))
+          sceneBox = sceneShape(sceneIndex);
 
       ImageVector images;
       images.reserve(matchingSubblockCount);
@@ -184,11 +176,12 @@ namespace pylibczi {
       if (im_box_.w==-1 && im_box_.h==-1) im_box_ = m_statistics.boundingBox;
       isValidRegion(im_box_, m_statistics.boundingBox); // if not throws RegionSelectionException
 
-      std::map<libCZI::DimensionIndex, std::pair<int, int> > limitTbl;
-      m_statistics.dimBounds.EnumValidDimensions([&limitTbl](libCZI::DimensionIndex di_, int start_, int size_) -> bool {
-          limitTbl.emplace(di_, std::make_pair(start_, size_));
-          return true;
-      });
+      // xxx - what is this for? variable limitTbl is not used
+      //std::map<libCZI::DimensionIndex, std::pair<int, int> > limitTbl;
+      //m_statistics.dimBounds.EnumValidDimensions([&limitTbl](libCZI::DimensionIndex di_, int start_, int size_) -> bool {
+      //    limitTbl.emplace(di_, std::make_pair(start_, size_));
+      //    return true;
+      //});
 
       auto accessor = m_czireader->CreateSingleChannelScalingTileAccessor();
 
@@ -230,6 +223,7 @@ namespace pylibczi {
           validIndexes.push_back(image->getValidIndexes(is_mosaic_)); // only add M if it's a mosaic file
       }
 
+      auto image_shape = images_.front()->shape(); // assumption: images are the same shape, if not 🙃
       std::vector<std::pair<char, int> > charSizes;
       std::set<int> condensed;
       for (int i = 0; !validIndexes.empty() && i<validIndexes.front().size(); i++) {
@@ -238,13 +232,28 @@ namespace pylibczi {
               c = vi[i].first;
               condensed.insert(vi[i].second);
           }
-          charSizes.emplace_back(c, condensed.size());
+          // added special case for images with multiple channels present
+          if (c=='C' && condensed.size()==1 && image_shape.size()==3)
+              charSizes.emplace_back(c, image_shape.end()[-3]); // channels
+          else
+              charSizes.emplace_back(c, condensed.size());
           condensed.clear();
       }
-      auto heightByWidth = images_.front()->shape(); // assumption: images are the same shape, if not 🙃
-      charSizes.emplace_back('Y', heightByWidth[0]); // H
-      charSizes.emplace_back('X', heightByWidth[1]); // W
+      charSizes.emplace_back('Y', image_shape.end()[-2]); // H
+      charSizes.emplace_back('X', image_shape.end()[-1]); // W
       return charSizes;
   }
 
+
+  libCZI::IntRect
+  Reader::sceneShape(int sceneIndex)
+  {
+      libCZI::IntRect sceneBox = {0, 0, -1, -1};
+      auto itt = m_statistics.sceneBoundingBoxes.find(sceneIndex);
+      if (itt!=m_statistics.sceneBoundingBoxes.end())
+          sceneBox = itt->second.boundingBoxLayer0; // layer0 specific
+      else
+          sceneBox.Invalidate();
+      return sceneBox;
+  }
 }

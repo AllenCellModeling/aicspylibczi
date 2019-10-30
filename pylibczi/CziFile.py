@@ -29,23 +29,19 @@ from . import types
 class CziFile(object):
     """Zeiss CZI file object.
 
-    Args:
-      |  czi_filename (str): Filename of czifile to access.
+      Args:
+        |  czi_filename (str): Filename of czifile to access.
 
-    Kwargs:
-      |  metafile_out (str): Filename of xml file to optionally export czi meta data to.
-      |  use_pylibczi (bool): Set to false to use Christoph Gohlke's czifile reader instead of libCZI.
-      |  verbose (bool): Print information and times during czi file access.
+      Kwargs:
+        |  metafile_out (str): Filename of xml file to optionally export czi meta data to.
+        |  use_pylibczi (bool): Set to false to use Christoph Gohlke's czifile reader instead of libCZI.
+        |  verbose (bool): Print information and times during czi file access.
 
     .. note::
 
        Utilizes compiled wrapper to libCZI for accessing the CZI file.
 
     """
-
-    # xxx - likely this is a Zeiss bug,
-    #   units for the scale in the xml file are not correct (says microns, given in meters)
-    # scale_units = 1e6
 
     # Dims as defined in libCZI
     #
@@ -91,7 +87,6 @@ class CziFile(object):
     @staticmethod
     def convert_to_buffer(file: types.FileLike) -> io.BufferedIOBase:
         # Check path
-        print(file)
         if isinstance(file, (str, Path)):
             # This will both fully expand and enforce that the filepath exists
             f = Path(file).expanduser().resolve(strict=True)
@@ -137,22 +132,23 @@ class CziFile(object):
                 file.write(metastr)
         return self.meta_root
 
-    def read_image(self, m_index: int = -1, **kwargs):
+    def read_image(self, m_index: int = -1, flatten: bool = False, **kwargs):
         """
         Read the subblocks in the CZI file and for any subblocks that match all the constraints in kwargs return that data.
         This allows you to select channels/scenes/timepoints/Z-slices etc.
 
         :param m_index: If it's a mosaic file and you wish to select specific M-indexs then use this otherwise ignore it.
+        :param flatten: If it's a BGR image, flatten the channels (xxx - what does this mean?)
         :param kwargs: The keywords below allow you to specify the dimensions that you wish to match. If you underspecify
             the constraints you can easily end up with a massive image stack. ::
-                       Z = 1   # The Z-dimension.
-                       C = 2   # The C-dimension ("channel").
-                       T = 3   # The T-dimension ("time").
-                       R = 4   # The R-dimension ("rotation").
-                       S = 5   # The S-dimension ("scene").
-                       I = 6   # The I-dimension ("illumination").
-                       H = 7   # The H-dimension ("phase").
-                       V = 8   # The V-dimension ("view").
+            Z = 1   # The Z-dimension.
+            C = 2   # The C-dimension ("channel").
+            T = 3   # The T-dimension ("time").
+            R = 4   # The R-dimension ("rotation").
+            S = 5   # The S-dimension ("scene").
+            I = 6   # The I-dimension ("illumination").
+            H = 7   # The H-dimension ("phase").
+            V = 8   # The V-dimension ("view").
 
         :returns: a tuple of (numpy.ndarray, a list of (Dimension, size)) the second element of the tuple is to make sure the numpy.ndarray
             is interpretable. An example of the list is ::
@@ -161,7 +157,7 @@ class CziFile(object):
         """
         plane_constraints = self.czilib.DimCoord()
         [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
-        image, shape = self.reader.read_selected(plane_constraints, m_index, True)
+        image, shape = self.reader.read_selected(plane_constraints, flatten, m_index)
         return image, shape
 
     def read_mosaic_size(self):
@@ -186,21 +182,21 @@ class CziFile(object):
 
         **Example:** Read in the C=1 channel of a mosaic file at 1/10th the size
         ::
-            czi = CziFile(filename)
-            img = czi.read_mosaic(scale_factor=0.1, C=1)
+        czi = CziFile(filename)
+        img = czi.read_mosaic(scale_factor=0.1, C=1)
 
         :param region: a rectangle specifying the extraction box (x, y, width, height) specified in pixels
         :param scale_factor: amount to scale the data by, 0.1 would mean an image 1/10 the height and width of native
         :param kwargs: The keywords below allow you to specify the dimension plane that constrains the 2D data. If the
             constraints are underspecified the function will fail. ::
-                    Z = 1   # The Z-dimension.
-                    C = 2   # The C-dimension ("channel").
-                    T = 3   # The T-dimension ("time").
-                    R = 4   # The R-dimension ("rotation").
-                    S = 5   # The S-dimension ("scene").
-                    I = 6   # The I-dimension ("illumination").
-                    H = 7   # The H-dimension ("phase").
-                    V = 8   # The V-dimension ("view").
+            Z = 1   # The Z-dimension.
+            C = 2   # The C-dimension ("channel").
+            T = 3   # The T-dimension ("time").
+            R = 4   # The R-dimension ("rotation").
+            S = 5   # The S-dimension ("scene").
+            I = 6   # The I-dimension ("illumination").
+            H = 7   # The H-dimension ("phase").
+            V = 8   # The V-dimension ("view").
         :returns: numpy.ndarray (1, height, width)
         """
         plane_constraints = self.czilib.DimCoord()
@@ -210,8 +206,10 @@ class CziFile(object):
             region = self.czilib.IntRect()
             region.w = -1
             region.h = -1
+        elif type(region) is type(self.czilib.IntRect()):
+            pass
         else:
-            assert (len(region) == 4)
+            assert(len(region) == 4)
             tmp = self.czilib.IntRect()
             tmp.x = region[0]
             tmp.y = region[1]

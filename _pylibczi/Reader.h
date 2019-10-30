@@ -215,6 +215,18 @@ namespace pylibczi {
        */
       libCZI::IntRect mosaicShape() { return m_statistics.boundingBoxLayer0Only; }
 
+      /*!
+       * Get the number of scenes defined in the czi file.
+       * @return integer number of scenes
+       */
+      int getNumScenes() { return m_statistics.sceneBoundingBoxes.size(); }
+
+      /*!
+       * Get the full size of the specified scene without scaling.
+       * @return an IntRect {x, y, w, h}
+       */
+      libCZI::IntRect sceneShape(int sceneIndex);
+
       static Shape getShape(pylibczi::ImageVector& images_, bool is_mosaic_);
 
   private:
