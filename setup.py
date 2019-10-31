@@ -139,7 +139,7 @@ setup(
     name='pylibczi',
     # Do not edit this string manually, always use bumpversion
     # Details in CONTRIBUTING.md
-    version='2.0.0',
+    version='1.1.1',
     author='Paul Watkins, Jamie Sherman',
     author_email='pwatkins@gmail.com, jamies@alleninstitute.org',
     description='A python module and a python extension for Zeiss (CZI/ZISRAW) microscopy files.',
