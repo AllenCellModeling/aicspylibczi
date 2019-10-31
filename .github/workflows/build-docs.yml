@@ -3,38 +3,54 @@ name: Docs
 on:
   push:
     branches:
-      - feature/Publish
+      - master
 
 jobs:
   docs:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ghpages: [yes]
     steps:
       - uses: actions/checkout@master
+        with:
+          submodules: true
+      - name: Create gh-pages
+        if: matrix.ghpages == 'no'
+        run: |
+          #need to add env variables
+          echo "Creating remote branch ${BRANCH} as it doesn't exist..."
+          git checkout "${BASE_BRANCH:-master}"
+          git checkout --orphan $BRANCH
+          git rm -rf .
+          touch README.md
+          git add README.md
+          git commit -m "Initial ${BRANCH} commit"
+          git push $REPO_PATH $BRANCH
       - name: setup python
         uses: actions/setup-python@v1
         with:
           python-version: 3.7
-      - name: Install dependencies
+      - name: setup folders
         env:
+          BUILD_HOME: cmake-build-debug
+          FOLDER: docs/html
+          BRANCH: gh-pages
           GHREPO: "pylbiczi"
-          REPO_PATH: "https://${{secret.ACCESS_TOKEN}}@github.com/${{GHREPO}}.git"
-          run: |
-            python -m pip install --upgrade pip
-            pip install sphinx
-            pip install sphinx-rtd-theme
-            export GHPAGES=[ "$(git ls-remote --heads "$REPOSITORY_PATH" "gh-pages" | wc -l)" -eq 0 ]
-          shell: bash
-        - name: Create gh-pages
-          if: $GHPAGES
-          run: |
-            echo "Creating remote branch ${BRANCH} as it doesn't exist..."
-            git checkout "${BASE_BRANCH:-master}"
-            git checkout --orphan $BRANCH
-            git rm -rf .
-            touch README.md
-            git add README.md
-            git commit -m "Initial ${BRANCH} commit"
-            git push $REPOSITORY_PATH $BRANCH
+          REPO_PATH: "https://${{secrets.ACCESS_TOKEN}}@github.com/AllenCellModeling/pylibczi.git"
+        run: |
+          mkdir -p $BUILD_HOME/$FOLDER
+          git clone $REPO_PATH ${BUILD_HOME}/${FOLDER}
+          pushd .
+          cd $BUILD_HOME/$FOLDER
+          git checkout $BRANCH
+          popd
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .[dev]
+        shell: bash
+
       - name: Generate Docs
         env:
           CC: clang
@@ -43,19 +59,17 @@ jobs:
           FOLDER: docs/html
           BRANCH: gh-pages
           GHREPO: "pylbiczi"
-          REPO_PATH: "https://${{secret.ACCESS_TOKEN}}@github.com/${{GHREPO}}.git"
-          run: |
-            mkdir -p $BUILD_HOME/$FOLDER
-            git clone $REPO_PATH $BUILD_HOME/$FOLDER
-            pushd .
-            cd $BUILD_HOME/$FOLDER
-            git checkout $BRANCH
-            popd
-            cd $BUILD_HOME
-            cmake ..
-            cmake --build . --target docs
-            cd $FOLDER
-            touch .nojekyll
-            git commit -a -m "Deploying branch to gh-pages" --quiet
-            git push $REPOSITORY_PATH ${BRANCH}
-          shell: bash
+          REPO_PATH: "https://${{secrets.ACCESS_TOKEN}}@github.com/AllenCellModeling/pylibczi.git"
+        run: |
+          git config --global user.email "jamie.sherman@gmail.com"
+          git config --global user.name "heeler"
+          cd $BUILD_HOME
+          cmake ..
+          cmake --build . --target docs
+          cd $FOLDER
+          touch .nojekyll
+          git add -f .nojekyll
+          git add ./*
+          git commit -m "Deploying branch to gh-pages" --quiet
+          git push $REPO_PATH ${BRANCH} --quiet
+        shell: bash
