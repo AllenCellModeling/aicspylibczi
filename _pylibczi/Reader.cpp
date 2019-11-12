@@ -68,6 +68,10 @@ namespace pylibczi {
           ans += Reader::dimToChar(di_);
           return true;
       });
+
+      std::sort( ans.begin(), ans.end(), [](const char a_, const char b_){
+          return libCZI::Utils::CharToDimension(a_) > libCZI::Utils::CharToDimension(b_);
+      });
       return ans;
   }
 

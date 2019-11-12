@@ -37,7 +37,7 @@ TEST_CASE_METHOD(CziCreator, "test_reader_dims_2", "[Reader_Dims_String]")
 {
     auto czi = get();
     auto dims = czi->dimsString();
-    REQUIRE(dims == std::string("CB")); // B=0, C=0 for this file
+    REQUIRE(dims == std::string("BC")); // B=0, C=0 for this file
 }
 
 TEST_CASE_METHOD(CziCreator, "test_is_mosaic", "[Reader_Is_Mosaic]")

@@ -70,7 +70,7 @@ namespace pylibczi {
       FILE* m_fp;
   public:
       FileHolder() { m_fp = nullptr; }
-      explicit FileHolder(FILE* p_) { m_fp = p_; }
+      FileHolder(FILE* p_) { m_fp = p_; }
       FILE* get() { return m_fp; }
       FileHolder& operator=(FILE* p_)
       {

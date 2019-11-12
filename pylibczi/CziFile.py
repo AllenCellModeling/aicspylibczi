@@ -18,7 +18,7 @@
 
 import io
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, Union
 
 import numpy as np
 from lxml import etree
@@ -60,7 +60,7 @@ class CziFile(object):
     ####
     ZISRAW_DIMS = {'Z', 'C', 'T', 'R', 'S', 'I', 'H', 'V', 'B'}
 
-    def __init__(self, czi_filename: types.FileLike, metafile_out: types.PathLike = '', use_pylibczi: bool = True,
+    def __init__(self, czi_filename: types.FileLike, metafile_out: types.PathLike = '',
                  verbose: bool = False):
         # Convert to BytesIO (bytestream)
         self._bytes = self.convert_to_buffer(czi_filename)
@@ -72,10 +72,22 @@ class CziFile(object):
         self.czilib = _pylibczi
         self.reader = self.czilib.Reader(self._bytes)
 
+    @property
     def dims(self):
         """
-        Get the dimensions for the opened file from the binary data (not the metadata
-        :return: A dictionary containing Dimension / depth, a file with 3 scenes, 7 time-points and 4 Z slices would have
+        Get the dimensions present the binary data (not the metadata)
+        Y and X are not included as the dims as they are required for any image block.
+        :return: A string containing Dimensions letters present
+        ::
+            "STZ"
+        """
+        return self.reader.read_dims_string()
+
+    def dims_shape(self):
+        """
+        Get the dimensions for the opened file from the binary data (not the metadata)
+        :return: A dictionary containing Dimension / depth, a file with 3 scenes, 7 time-points
+        and 4 Z slices would have
         ::
             {'S': 3, 'T': 7, 'Z':4}
         """
@@ -89,7 +101,7 @@ class CziFile(object):
         return self.reader.is_mosaic()
 
     @staticmethod
-    def convert_to_buffer(file: types.FileLike) -> io.BufferedIOBase:
+    def convert_to_buffer(file: types.FileLike) -> Union[types.BufferLike, np.ndarray]:
         if isinstance(file, (str, Path)):
             # This will both fully expand and enforce that the filepath exists
             f = Path(file).expanduser().resolve(strict=True)
@@ -137,12 +149,13 @@ class CziFile(object):
 
     def read_image(self, m_index: int = -1, **kwargs):
         """
-        Read the subblocks in the CZI file and for any subblocks that match all the constraints in kwargs return that data.
-        This allows you to select channels/scenes/timepoints/Z-slices etc.
+        Read the subblocks in the CZI file and for any subblocks that match all the constraints in kwargs return
+        that data. This allows you to select channels/scenes/time-points/Z-slices etc.
 
-        :param m_index: If it's a mosaic file and you wish to select specific M-indexs then use this otherwise ignore it.
-        :param kwargs: The keywords below allow you to specify the dimensions that you wish to match. If you underspecify
-            the constraints you can easily end up with a massive image stack. ::
+        :param m_index: If it's a mosaic file and you wish to select specific M-indexs then use this otherwise ignore
+        it.
+        :param kwargs: The keywords below allow you to specify the dimensions that you wish to match. If you
+            under-specify the constraints you can easily end up with a massive image stack. ::
                        Z = 1   # The Z-dimension.
                        C = 2   # The C-dimension ("channel").
                        T = 3   # The T-dimension ("time").
@@ -152,8 +165,8 @@ class CziFile(object):
                        H = 7   # The H-dimension ("phase").
                        V = 8   # The V-dimension ("view").
 
-        :returns: a tuple of (numpy.ndarray, a list of (Dimension, size)) the second element of the tuple is to make sure the numpy.ndarray
-            is interpretable. An example of the list is ::
+        :returns: a tuple of (numpy.ndarray, a list of (Dimension, size)) the second element of the tuple is to make
+            sure the numpy.ndarray is interpretable. An example of the list is ::
                 # [('S', 1), ('T', 1), ('C', 2), ('Z', 25), ('Y', 1024), ('X', 1024)]
             # so if you probed the numpy.ndarray with .shape you would get (1, 1, 2, 25, 1024, 1024).
         """
