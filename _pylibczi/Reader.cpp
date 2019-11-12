@@ -58,6 +58,19 @@ namespace pylibczi {
       return tbl;
   }
 
+  /// @brief get the Dimensions in the order they appear in
+  /// @return a string containing the Dimensions for the image data object
+  std::string
+  Reader::dimsString()
+  {
+      std::string ans;
+      m_statistics.dimBounds.EnumValidDimensions([&ans](libCZI::DimensionIndex di_, int start_, int size_) -> bool {
+          ans += libCZI::Utils::DimensionToChar(di_);
+          return true;
+      });
+      return ans;
+  }
+
   std::pair<ImageVector, Reader::Shape>
   Reader::readSelected(libCZI::CDimCoordinate& plane_coord_, bool flatten_, int mIndex_)
   {

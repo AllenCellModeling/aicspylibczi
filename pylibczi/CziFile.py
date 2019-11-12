@@ -90,8 +90,6 @@ class CziFile(object):
 
     @staticmethod
     def convert_to_buffer(file: types.FileLike) -> io.BufferedIOBase:
-        # Check path
-        print(file)
         if isinstance(file, (str, Path)):
             # This will both fully expand and enforce that the filepath exists
             f = Path(file).expanduser().resolve(strict=True)

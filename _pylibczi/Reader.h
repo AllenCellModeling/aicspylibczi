@@ -149,6 +149,12 @@ namespace pylibczi {
       Reader::MapDiP readDims();
 
       /*!
+       * @brief Get the Dimensions in the order that they appear.
+       * @return a string containing the dimensions
+       */
+      std::string dimsString();
+
+      /*!
        * @brief Get the metadata from the CZI file.
        * @return A string containing the xml metadata from the file
        */
