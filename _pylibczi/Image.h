@@ -1,5 +1,5 @@
-#ifndef _PYLIBCZI__PYLIBCZI_IMAGE_H
-#define _PYLIBCZI__PYLIBCZI_IMAGE_H
+#ifndef _PYLIBCZI_IMAGE_H
+#define _PYLIBCZI_IMAGE_H
 
 #include <array>
 #include <cstdio>
@@ -97,4 +97,4 @@ namespace pylibczi {
 
 } // namespace pylibczi
 
-#endif //_PYLIBCZI__PYLIBCZI_IMAGE_H
+#endif //_PYLIBCZI_IMAGE_H

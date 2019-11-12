@@ -65,7 +65,7 @@ namespace pylibczi {
   {
       std::string ans;
       m_statistics.dimBounds.EnumValidDimensions([&ans](libCZI::DimensionIndex di_, int start_, int size_) -> bool {
-          ans += libCZI::Utils::DimensionToChar(di_);
+          ans += Reader::dimToChar(di_);
           return true;
       });
       return ans;
@@ -148,10 +148,10 @@ namespace pylibczi {
   Reader::dimsMatch(const libCZI::CDimCoordinate& target_dims_, const libCZI::CDimCoordinate& czi_dims_)
   {
       bool ans = true;
-      target_dims_.EnumValidDimensions([&](libCZI::DimensionIndex dim, int value) -> bool {
+      target_dims_.EnumValidDimensions([&](libCZI::DimensionIndex dim_, int value_) -> bool {
           int cziDimValue = 0;
-          if (czi_dims_.TryGetPosition(dim, &cziDimValue)) {
-              ans = (cziDimValue==value);
+          if (czi_dims_.TryGetPosition(dim_, &cziDimValue)) {
+              ans = (cziDimValue==value_);
           }
           return ans;
       });
@@ -162,7 +162,7 @@ namespace pylibczi {
   Reader::addSortOrderIndex(vector<IndexMap>& vector_of_index_maps_)
   {
       int counter = 0;
-      std::sort(vector_of_index_maps_.begin(), vector_of_index_maps_.end(), [](IndexMap& a, IndexMap& b) -> bool { return (a<b); });
+      std::sort(vector_of_index_maps_.begin(), vector_of_index_maps_.end(), [](IndexMap& a_, IndexMap& b_) -> bool { return (a_<b_); });
       for (auto&& a : vector_of_index_maps_)
           a.position(counter++);
       std::sort(vector_of_index_maps_.begin(), vector_of_index_maps_.end(),

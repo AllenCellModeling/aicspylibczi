@@ -1,5 +1,5 @@
-#ifndef PYLIBCZI_AICS_ADDED_HPP
-#define PYLIBCZI_AICS_ADDED_HPP
+#ifndef _PYLIBCZI_READER_H
+#define _PYLIBCZI_READER_H
 
 #include <cstdio>
 #include <iostream>
@@ -70,7 +70,7 @@ namespace pylibczi {
       FILE* m_fp;
   public:
       FileHolder() { m_fp = nullptr; }
-      FileHolder(FILE* p_) { m_fp = p_; }
+      explicit FileHolder(FILE* p_) { m_fp = p_; }
       FILE* get() { return m_fp; }
       FileHolder& operator=(FILE* p_)
       {
@@ -208,7 +208,7 @@ namespace pylibczi {
        * @param di_, The libCZI::DimensionIndex to be converted
        * @return The character representing the DimensionIndex
        */
-      char dimToChar(libCZI::DimensionIndex di_) { return libCZI::Utils::DimensionToChar(di_); }
+      static char dimToChar(libCZI::DimensionIndex di_) { return libCZI::Utils::DimensionToChar(di_); }
 
       virtual ~Reader()
       {
@@ -239,4 +239,4 @@ namespace pylibczi {
 
 }
 
-#endif //PYLIBCZI_AICS_ADDED_HPP
+#endif //_PYLIBCZI_READER_H

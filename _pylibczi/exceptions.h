@@ -1,5 +1,5 @@
-#ifndef _PYLIBCZI__PYLIBCZI_EXCEPTIONS_H
-#define _PYLIBCZI__PYLIBCZI_EXCEPTIONS_H
+#ifndef _PYLIBCZI_EXCEPTIONS_H
+#define _PYLIBCZI_EXCEPTIONS_H
 
 #include <exception>
 #include <string>
@@ -83,7 +83,7 @@ namespace pylibczi {
   class ImageIteratorException: public std::exception {
       std::string m_message;
   public:
-      explicit ImageIteratorException(std::string message_)
+      explicit ImageIteratorException(const std::string &message_)
           :m_message("ImageIteratorException: "+message_) { }
 
       const char* what() const noexcept override
@@ -96,7 +96,7 @@ namespace pylibczi {
       std::string m_message;
       int m_channel;
   public:
-      ImageSplitChannelException(std::string message_, int channel_)
+      ImageSplitChannelException(const std::string &message_, int channel_)
           :m_message("ImageSplitChannelExcetion: "+message_), m_channel(channel_) { }
 
       const char* what() const noexcept override
@@ -119,7 +119,7 @@ namespace pylibczi {
       const char* what() const noexcept override
       {
           std::stringstream tmp;
-          float gbSize = m_size;
+          auto gbSize = static_cast<double>(m_size);
           gbSize /= 1073741824.0; // 1024 * 1024 * 1024
           tmp << "ImageCopyAllocFailed [" << std::setprecision(1) << gbSize << " GB requested]: " << m_message << std::endl;
           return tmp.str().c_str();
@@ -146,4 +146,4 @@ namespace pylibczi {
   };
 }
 
-#endif //_PYLIBCZI__PYLIBCZI_EXCEPTIONS_H
+#endif //_PYLIBCZI_EXCEPTIONS_H

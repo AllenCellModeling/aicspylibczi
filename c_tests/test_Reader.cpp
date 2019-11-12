@@ -1,7 +1,6 @@
 #include "catch.hpp"
 #include "../_pylibczi/Reader.h"
 #include <cstdio>
-#include "pb_helpers.h"
 
 class CziCreator {
     std::unique_ptr<pylibczi::Reader> m_czi;
@@ -18,15 +17,6 @@ public:
         :m_czi(new pylibczi::Reader(std::fopen("resources/s_3_t_1_c_3_z_5.czi", "rb"))) { }
     pylibczi::Reader* get() { return m_czi.get(); }
 };
-
-/* local test - file is 30gb
-class CziMCreator{
-	std::unique_ptr<pylibczi::Reader> m_czi;
-public:
-	CziMCreator(): m_czi(new pylibczi::Reader( std::fopen("/Users/jamies/Data/20190618_CL001_HB01_Rescan_002.czi", "rb" ))){}
-	pylibczi::Reader * get() { return m_czi.get(); }
-};
-*/
 
 TEST_CASE("test_reader_constructor", "[Reader]")
 {
@@ -53,7 +43,7 @@ TEST_CASE_METHOD(CziCreator, "test_reader_dims_2", "[Reader_Dims_String]")
 TEST_CASE_METHOD(CziCreator, "test_is_mosaic", "[Reader_Is_Mosaic]")
 {
     auto czi = get();
-    REQUIRE(czi->isMosaic()==false);
+    REQUIRE(!czi->isMosaic());
 }
 
 TEST_CASE_METHOD(CziCreator, "test_meta_reader", "[Reader_read_meta]")
@@ -71,9 +61,9 @@ TEST_CASE_METHOD(CziCreator, "test_meta_reader", "[Reader_read_meta]")
 TEST_CASE_METHOD(CziCreator, "test_read_selected", "[Reader_read_selected]")
 {
     auto czi = get();
-    auto c_dims = libCZI::CDimCoordinate{{libCZI::DimensionIndex::B, 0},
+    auto cDims = libCZI::CDimCoordinate{{libCZI::DimensionIndex::B, 0},
                                          {libCZI::DimensionIndex::C, 0}};
-    auto imvec = czi->readSelected(c_dims).first;
+    auto imvec = czi->readSelected(cDims).first;
     REQUIRE(imvec.size()==1);
     auto shape = imvec.front()->shape();
     REQUIRE(shape[0]==325); // height
@@ -83,9 +73,9 @@ TEST_CASE_METHOD(CziCreator, "test_read_selected", "[Reader_read_selected]")
 TEST_CASE_METHOD(CziCreator2, "test_read_selected2", "[Reader_read_selected]")
 {
     auto czi = get();
-    auto c_dims = libCZI::CDimCoordinate{{libCZI::DimensionIndex::B, 0},
-                                         {libCZI::DimensionIndex::C, 0}};
-    auto imvec = czi->readSelected(c_dims).first;
+    auto cDims = libCZI::CDimCoordinate{{libCZI::DimensionIndex::B, 0},
+                                        {libCZI::DimensionIndex::C, 0}};
+    auto imvec = czi->readSelected(cDims).first;
     REQUIRE(imvec.size()==15);
     auto shape = imvec.front()->shape();
     REQUIRE(shape[0]==325); // height

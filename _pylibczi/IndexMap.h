@@ -14,7 +14,6 @@ namespace pylibczi {
    * if the sort order is changed to be something other than the STCZYX. In normal sort order it has no real effect.
    */
   class IndexMap {
-      typedef std::pair<const libCZI::DimensionIndex, int> ValueType;
       typedef std::map<libCZI::DimensionIndex, int> MapType;
       int m_subBlockIndex; // the subBlock index from the file
       int m_index; // the mIndex

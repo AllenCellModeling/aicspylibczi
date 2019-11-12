@@ -35,10 +35,10 @@ namespace pylibczi {
   IndexMap::operator<(const IndexMap& other_)
   {
 
-      auto match = std::find_if(s_sortOrder.begin(), s_sortOrder.end(), [&](const libCZI::DimensionIndex& dim) {
+      auto match = std::find_if(s_sortOrder.begin(), s_sortOrder.end(), [&](const libCZI::DimensionIndex& dim_) {
 
-          auto matchDim = [dim](const MapType::value_type& p) -> bool {
-              return (p.first==dim);
+          auto matchDim = [dim_](const MapType::value_type& p_) -> bool {
+              return (p_.first==dim_);
           };
           auto thisMatchIterator = std::find_if(m_dims.begin(), m_dims.end(), matchDim);
           auto otherMatchIterator = std::find_if(other_.m_dims.begin(), other_.m_dims.end(), matchDim);

@@ -1,5 +1,5 @@
-#ifndef _PYLIBCZI__PYLIBCZI_PB_HELPERS_H
-#define _PYLIBCZI__PYLIBCZI_PB_HELPERS_H
+#ifndef _PYLIBCZI_PB_HELPERS_H
+#define _PYLIBCZI_PB_HELPERS_H
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
@@ -48,4 +48,4 @@ namespace pb_helpers {
 
 }
 
-#endif //_PYLIBCZI__PYLIBCZI_PB_HELPERS_H
+#endif //_PYLIBCZI_PB_HELPERS_H

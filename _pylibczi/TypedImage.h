@@ -113,9 +113,9 @@ namespace pylibczi {
           SourceRange<T> sourceRange(channels_, static_cast<T*>(lckScoped.ptrDataRoi), (T*) (sEnd), lckScoped.stride, size.w);
           TargetRange<T> targetRange(channels_, size.w, size.h, m_array.get(), m_array.get()+length());
           for (std::uint32_t h = 0; h<bitmap_ptr_->GetHeight(); ++h) {
-              paired_for_each(sourceRange.strideBegin(h), sourceRange.strideEnd(h), targetRange.strideBegin(h),
+              pairedForEach(sourceRange.strideBegin(h), sourceRange.strideEnd(h), targetRange.strideBegin(h),
                   [&](std::vector<T*> src_, std::vector<T*> tgt_) {
-                      paired_for_each(src_.begin(), src_.end(), tgt_.begin(), [&](T* s_, T* t_) {
+                      pairedForEach(src_.begin(), src_.end(), tgt_.begin(), [&](T* s_, T* t_) {
                           *t_ = *s_;
                       });
                   });

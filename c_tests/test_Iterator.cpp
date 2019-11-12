@@ -39,9 +39,9 @@ TEST_CASE("iterator_source_to_target", "[iterator_src_tgt]")
     TargetRange<uint16_t> targetRange(3, 5, 4, tgt, tgt+60);
 
     for (int i = 0; i<4; i++) { // images are apparently copied by stride due to possible padding so we follow that paradigm
-        paired_for_each(sourceRange.strideBegin(i), sourceRange.strideEnd(i), targetRange.strideBegin(i),
+        pairedForEach(sourceRange.strideBegin(i), sourceRange.strideEnd(i), targetRange.strideBegin(i),
             [&tgt](std::vector<uint16_t*> a, std::vector<uint16_t*> b) {
-                paired_for_each(a.begin(), a.end(), b.begin(), [&tgt](uint16_t* s, uint16_t* t) {
+                pairedForEach(a.begin(), a.end(), b.begin(), [&tgt](uint16_t* s, uint16_t* t) {
                     int val = tgt[0];
                     *t = *s;
                 });

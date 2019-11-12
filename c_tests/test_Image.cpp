@@ -79,9 +79,9 @@ TEST_CASE("test_image_accessors", "[Image_operator[]]")
     REQUIRE(sourceRange.strideBegin(3)==sourceRange.strideEnd(2));
 
     for (int i = 0; i<4; i++) { // copy stride by stride as you would with an actual image
-        paired_for_each(sourceRange.strideBegin(i), sourceRange.strideEnd(i), targetRange.strideBegin(i),
+        pairedForEach(sourceRange.strideBegin(i), sourceRange.strideEnd(i), targetRange.strideBegin(i),
             [](std::vector<uint16_t*> a, std::vector<uint16_t*> b) {
-                paired_for_each(a.begin(), a.end(), b.begin(), [](uint16_t* ai, uint16_t* bi) {
+                pairedForEach(a.begin(), a.end(), b.begin(), [](uint16_t* ai, uint16_t* bi) {
                     *bi = *ai;
                 });
             });
@@ -116,9 +116,9 @@ TEST_CASE("test_image_accessors_2d", "[Image_operator[2d]]")
     REQUIRE(sourceRange.strideBegin(3)==sourceRange.strideEnd(2));
 
     for (int i = 0; i<4; i++) { // copy stride by stride as you would with an actual image
-        paired_for_each(sourceRange.strideBegin(i), sourceRange.strideEnd(i), targetRange.strideBegin(i),
+        pairedForEach(sourceRange.strideBegin(i), sourceRange.strideEnd(i), targetRange.strideBegin(i),
             [](std::vector<uint16_t*> a, std::vector<uint16_t*> b) {
-                paired_for_each(a.begin(), a.end(), b.begin(), [](uint16_t* ai, uint16_t* bi) {
+                pairedForEach(a.begin(), a.end(), b.begin(), [](uint16_t* ai, uint16_t* bi) {
                     *bi = *ai;
                 });
             });

@@ -1,4 +1,3 @@
-#include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <memory>
 #include <vector>
@@ -17,8 +16,8 @@ namespace pb_helpers {
       auto charSizes = pylibczi::Reader::getShape(images_, images_.isMosaic());
       unsigned long newSize = images_.front()->length()*images_.size();
       std::vector<ssize_t> shape(charSizes.size(), 0);
-      std::transform(charSizes.begin(), charSizes.end(), shape.begin(), [](const std::pair<char, int>& a) {
-          return a.second;
+      std::transform(charSizes.begin(), charSizes.end(), shape.begin(), [](const std::pair<char, int>& a_) {
+          return a_.second;
       });
       py::array* arrP = nullptr;
       switch (images_.front()->pixelType()) {
