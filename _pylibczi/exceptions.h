@@ -83,7 +83,7 @@ namespace pylibczi {
   class ImageIteratorException: public std::exception {
       std::string m_message;
   public:
-      explicit ImageIteratorException(const std::string& message_)
+      explicit ImageIteratorException(const std::string &message_)
           :m_message("ImageIteratorException: "+message_) { }
 
       const char* what() const noexcept override
