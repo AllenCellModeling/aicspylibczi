@@ -34,10 +34,10 @@ find_library(libCZI REQUIRED PATHS ${CMAKE_SOURCE_DIR}/libCZI)
 
 set(PYLIBCZI_C_SRC_HEADERS _pylibczi/Reader.h _pylibczi/helper_algorithms.h _pylibczi/exceptions.h _pylibczi/inc_libCZI.h
         _pylibczi/IndexMap.h _pylibczi/Image.h _pylibczi/TypedImage.h _pylibczi/ImageFactory.h
-        _pylibczi/SourceRange.h _pylibczi/TargetRange.h _pylibczi/pylibczi_ostream.h)
+        _pylibczi/SourceRange.h _pylibczi/TargetRange.h _pylibczi/pylibczi_ostream.h _pylibczi/SubblockMetaVec.h)
 
 set(PYLIBCZI_C_SRC _pylibczi/Reader.cpp _pylibczi/IndexMap.cpp _pylibczi/Image.cpp _pylibczi/ImageFactory.cpp
-        _pylibczi/pylibczi_ostream.cpp _pylibczi/exceptions.cpp)
+        _pylibczi/pylibczi_ostream.cpp _pylibczi/exceptions.cpp _pylibczi/SubblockSorter.h _pylibczi/pb_caster_SubblockMetaVec.h)
 
 set(PYLIBCZI_PYBIND11 _pylibczi/pb_bindings.cpp _pylibczi/pb_helpers.h _pylibczi/pb_helpers.cpp _pylibczi/pb_caster_ImageVector.h
         _pylibczi/pb_caster_BytesIO.h _pylibczi/pb_caster_libCZI_DimensionIndex.h _pylibczi/CSimpleStreamImplFromFd.h

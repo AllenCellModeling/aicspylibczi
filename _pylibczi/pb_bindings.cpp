@@ -9,6 +9,7 @@
 // the below headers are crucial otherwise the custom casts aren't recognized
 #include "pb_caster_BytesIO.h"
 #include "pb_caster_ImageVector.h"
+#include "pb_caster_SubblockMetaVec.h"
 #include "pb_caster_libCZI_DimensionIndex.h"
 
 PYBIND11_MODULE(_pylibczi, m)
@@ -36,7 +37,8 @@ PYBIND11_MODULE(_pylibczi, m)
         .def("read_meta", &pylibczi::Reader::readMeta)
         .def("read_selected", &pylibczi::Reader::readSelected)
         .def("mosaic_shape", &pylibczi::Reader::mosaicShape)
-        .def("read_mosaic", &pylibczi::Reader::readMosaic);
+        .def("read_mosaic", &pylibczi::Reader::readMosaic)
+        .def("read_subblock_meta", &pylibczi::Reader::readSubblockMeta);
 
     py::class_<pylibczi::IndexMap>(m, "IndexMap")
         .def(py::init<>())

@@ -2,6 +2,7 @@
 #define _PYLIBCZI_IMAGE_H
 
 #include <array>
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <functional>
@@ -11,9 +12,11 @@
 #include <numeric>
 #include <utility>
 #include <vector>
+#include <set>
 
 #include "exceptions.h"
 #include "helper_algorithms.h"
+#include "SubblockSorter.h"
 
 namespace pylibczi {
 
@@ -23,7 +26,7 @@ namespace pylibczi {
    * one subblock which may be either 2D or 3D, in the case of 3D the data is then later split into multiple 2D Image<T> so that
    * the concept of a Channel isn't destroyed.
    */
-  class Image {
+  class Image : public SubblockSorter {
   protected:
       /*!
        * ImageBC holds the data describing the image (Image<T> inherits it). The m_matrixSizes can be 2D or 3D depending on
@@ -35,11 +38,7 @@ namespace pylibczi {
 
       std::vector<size_t> m_shape; // C Y X order or Y X  ( H, W )  The shape of the data being stored
       libCZI::PixelType m_pixelType;
-      libCZI::CDimCoordinate m_planeCoordinates;
       libCZI::IntRect m_xywh;  // (x0, y0, w, h) for image bounding box
-      int m_mIndex;  // mIndex is a concept from libCZI and is used for mosaic files
-
-
 
       static std::map<libCZI::PixelType, std::string> s_pixelToTypeName;
 
@@ -47,9 +46,9 @@ namespace pylibczi {
       using ImVec = std::vector<std::shared_ptr<Image> >;
 
       Image(std::vector<size_t> shape_, libCZI::PixelType pixel_type_, const libCZI::CDimCoordinate* plane_coordinates_,
-          libCZI::IntRect box_, int m_index_)
-          :m_shape(std::move(shape_)), m_pixelType(pixel_type_), m_planeCoordinates(*plane_coordinates_),
-           m_xywh(box_), m_mIndex(m_index_) { }
+          libCZI::IntRect box_, int index_m_)
+          : SubblockSorter(*plane_coordinates_, index_m_), m_shape(std::move(shape_)), m_pixelType(pixel_type_),
+           m_xywh(box_) { }
 
       size_t calculateIdx(const std::vector<size_t>& indexes_);
 
@@ -62,10 +61,6 @@ namespace pylibczi {
       {
           return std::accumulate(m_shape.begin(), m_shape.end(), (size_t) 1, std::multiplies<>());
       }
-
-      std::vector<std::pair<char, int> > getValidIndexes(bool is_mosaic_ = false);
-
-      bool operator<(Image& other_);
 
       libCZI::PixelType pixelType() { return m_pixelType; }
 
@@ -90,9 +85,36 @@ namespace pylibczi {
       bool m_isMosaic = false;
 
   public:
-      bool isMosaic() { return m_isMosaic; }
       void setMosaic(bool val_) { m_isMosaic = val_; }
+      void sort(){
+          std::sort(begin(), end(), [](const std::shared_ptr<Image> &a_, const std::shared_ptr<Image> &b_)->bool{
+              return *a_ < *b_;
+          });
+      }
 
+      std::vector<std::pair<char, int> >
+      getShape(){
+          std::vector<std::vector<std::pair<char, int> > > validIndexes;
+          for (const auto& image : *this) {
+              validIndexes.push_back(image->getValidIndexes(m_isMosaic)); // only add M if it's a mosaic file
+          }
+
+          std::vector<std::pair<char, int> > charSizes;
+          std::set<int> condensed;
+          for (int i = 0; !validIndexes.empty() && i<validIndexes.front().size(); i++) {
+              char c;
+              for (const auto& vi : validIndexes) {
+                  c = vi[i].first;
+                  condensed.insert(vi[i].second);
+              }
+              charSizes.emplace_back(c, condensed.size());
+              condensed.clear();
+          }
+          auto heightByWidth = front()->shape(); // assumption: images are the same shape, if not 🙃
+          charSizes.emplace_back('Y', heightByWidth[0]); // H
+          charSizes.emplace_back('X', heightByWidth[1]); // W
+          return charSizes;
+      }
   };
 
 } // namespace pylibczi

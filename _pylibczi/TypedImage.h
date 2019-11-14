@@ -131,13 +131,13 @@ namespace pylibczi {
           throw ImageSplitChannelException("TypedImage  only has 2 dimensions. No channels to split.", 0);
       int cStart = 0;
       // TODO figure out if C can have a nonzero value for a BGR image
-      if (m_planeCoordinates.TryGetPosition(libCZI::DimensionIndex::C, &cStart) && cStart!=0)
+      if (m_planeCoordinate.TryGetPosition(libCZI::DimensionIndex::C, &cStart) && cStart!=0)
           throw ImageSplitChannelException("attempting to split channels", cStart);
       for (int i = 0; i<m_shape[0]; i++) {
-          libCZI::CDimCoordinate tmp(m_planeCoordinates);
+          libCZI::CDimCoordinate tmp(m_planeCoordinate);
           tmp.Set(libCZI::DimensionIndex::C, i+start_from_); // assign the channel from the BGR
           // TODO should I change the pixel type from a BGRx to a Grayx/3
-          ivec.emplace_back(new TypedImage<T>({m_shape[1], m_shape[2]}, m_pixelType, &tmp, m_xywh, m_mIndex));
+          ivec.emplace_back(new TypedImage<T>({m_shape[1], m_shape[2]}, m_pixelType, &tmp, m_xywh, m_indexM));
       }
       return ivec;
   }

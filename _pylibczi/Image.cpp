@@ -22,31 +22,11 @@ namespace pylibczi {
       {libCZI::PixelType::Gray64Float, typeid(nullptr).name()}     // unsupported by libCZI
   };
 
-  std::vector<std::pair<char, int> > Image::getValidIndexes(bool is_mosaic_)
-  {
-      using CziDi = libCZI::DimensionIndex;
-      std::vector<CziDi> sortOrder{CziDi::S, CziDi::T, CziDi::C, CziDi::Z};
-      std::vector<std::pair<char, int> > ans;
-      for (auto di : sortOrder) {
-          int value;
-          if (m_planeCoordinates.TryGetPosition(di, &value)) ans.emplace_back(libCZI::Utils::DimensionToChar(di), value);
-      }
-      if (is_mosaic_) ans.emplace_back('M', m_mIndex);
-      return ans;
-  }
 
-  bool Image::operator<(Image& other_)
-  {
-      using CziDi = libCZI::DimensionIndex;
-      std::vector<CziDi> sortOrder{CziDi::S, CziDi::T, CziDi::C, CziDi::Z};
-      for (auto di : sortOrder) {
-          int diValue, otherValue;
-          if (m_planeCoordinates.TryGetPosition(di, &diValue) && other_.m_planeCoordinates.TryGetPosition(di, &otherValue)
-              && diValue!=otherValue)
-              return (diValue<otherValue);
-      }
-      return m_mIndex<other_.m_mIndex;
-  }
+
+  
+
+  
 
   size_t Image::calculateIdx(const std::vector<size_t>& indexes_)
   {

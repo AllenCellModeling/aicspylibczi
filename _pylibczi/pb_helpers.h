@@ -17,6 +17,8 @@ namespace py=pybind11;
 namespace pb_helpers {
 
   py::array packArray(pylibczi::ImageVector& images_);
+  py::array packStringArray(pylibczi::SubblockMetaVec& metadata_);
+  py::array makeStrArray(pylibczi::SubblockMetaVec& metadata_, std::vector<ssize_t>& shape_);
 
   template<typename T>
   py::array* makeArray(unsigned long size_, std::vector<ssize_t>& shape_, pylibczi::ImageVector& images_)

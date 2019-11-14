@@ -6,6 +6,7 @@
 #include "Reader.h"
 #include "ImageFactory.h"
 #include "exceptions.h"
+#include "SubblockMetaVec.h"
 
 namespace pylibczi {
 
@@ -141,6 +142,65 @@ namespace pylibczi {
       // return images;
   }
 
+  SubblockMetaVec
+  Reader::readSubblockMeta(libCZI::CDimCoordinate& plane_coord_, int index_m_){
+      ssize_t matchingSubblockCount = 0;
+      std::vector<IndexMap> orderMapping;
+      m_czireader->EnumerateSubBlocks([&](int index_, const libCZI::SubBlockInfo& info_) -> bool {
+          if (isPyramid0(info_) && dimsMatch(plane_coord_, info_.coordinate)) {
+              orderMapping.emplace_back(index_, info_);
+              matchingSubblockCount++;
+          }
+          return true;
+      });
+
+      addSortOrderIndex(orderMapping);
+
+      // get scene index if specified
+      int sceneIndex;
+      libCZI::IntRect sceneBox = {0, 0, -1, -1};
+      if (plane_coord_.TryGetPosition(libCZI::DimensionIndex::S, &sceneIndex)) {
+          auto itt = m_statistics.sceneBoundingBoxes.find(sceneIndex);
+          if (itt==m_statistics.sceneBoundingBoxes.end())
+              sceneBox = itt->second.boundingBoxLayer0; // layer0 specific
+          else
+              sceneBox.Invalidate();
+      }
+      else {
+          sceneIndex = -1;
+      }
+
+      SubblockMetaVec metaSubblocks;
+
+      m_czireader->EnumerateSubBlocks([&](int index_, const libCZI::SubBlockInfo& info_) {
+
+          if (!isPyramid0(info_)) {
+              return true;
+          }
+          if (sceneBox.IsValid() && !sceneBox.IntersectsWith(info_.logicalRect)) {
+              return true;
+          }
+          if (!dimsMatch(plane_coord_, info_.coordinate)) {
+              return true;
+          }
+          if (isMosaic() && index_m_!=-1 && info_.mIndex!=std::numeric_limits<int>::min() && index_m_!=info_.mIndex) {
+              return true;
+          }
+
+          size_t metaSize = 0;
+          auto subblock = m_czireader->ReadSubBlock(index_);
+          auto shared_ptr_string = subblock->GetRawData(libCZI::ISubBlock::Metadata, &metaSize);
+          auto subblockMetaData = std::static_pointer_cast<const std::string>(shared_ptr_string);
+
+
+          metaSubblocks.emplace_back(info_.coordinate, info_.mIndex, subblockMetaData.get());
+
+          return true;
+      });
+
+      metaSubblocks.setMosaic(isMosaic());
+      return metaSubblocks;
+  }
 
 // private methods
 

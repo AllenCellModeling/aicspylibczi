@@ -10,6 +10,7 @@
 #include "inc_libCZI.h"
 #include "IndexMap.h"
 #include "Image.h"
+#include "SubblockMetaVec.h"
 
 /*! \mainpage libCZI_c++_extension
  *
@@ -158,6 +159,14 @@ namespace pylibczi {
        * @param index_m_ Is only relevant for mosaic files, if you wish to select one frame.
        */
       std::pair<ImageVector, Shape> readSelected(libCZI::CDimCoordinate& plane_coord_, bool flatten_ = true, int index_m_ = -1);
+
+      /*!
+       * @brief provide the subblock metadata in index order consistent with readSelected.
+       * @param plane_coord_ A structure containing the Dimension constraints
+       * @param index_m_ Is only relevant for mosaic files, if you wish to select one frame.
+       * @return a vector of metadata string blocks
+       */
+      SubblockMetaVec readSubblockMeta(libCZI::CDimCoordinate& plane_coord_, int index_m_ = -1);
 
       /*!
        * @brief If the czi file is a mosaic tiled image this function can be used to reconstruct it into an image.

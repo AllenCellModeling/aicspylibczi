@@ -18,7 +18,7 @@
 
 import io
 from pathlib import Path
-from typing import Tuple, Union
+from typing import BinaryIO, Tuple, Union
 
 import numpy as np
 from lxml import etree
@@ -101,7 +101,7 @@ class CziFile(object):
         return self.reader.is_mosaic()
 
     @staticmethod
-    def convert_to_buffer(file: types.FileLike) -> Union[types.BufferLike, np.ndarray]:
+    def convert_to_buffer(file: types.FileLike) -> Union[BinaryIO, np.ndarray]:
         if isinstance(file, (str, Path)):
             # This will both fully expand and enforce that the filepath exists
             f = Path(file).expanduser().resolve(strict=True)
@@ -146,6 +146,11 @@ class CziFile(object):
             with open(self.metafile_out, 'w') as file:
                 file.write(metastr)
         return self.meta_root
+
+    def read_subblock_metadata(self, m_index: int = -1, **kwargs):
+        plane_constraints = self.czilib.DimCoord()
+        [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
+        return self.reader.read_subblock_meta(plane_constraints, m_index)
 
     def read_image(self, m_index: int = -1, **kwargs):
         """

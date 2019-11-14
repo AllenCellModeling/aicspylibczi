@@ -13,7 +13,9 @@ namespace pb_helpers {
   py::array packArray(pylibczi::ImageVector& images_)
   {
       // assumptions: The array contains images of the same size and the array is contiguous.
-      auto charSizes = pylibczi::Reader::getShape(images_, images_.isMosaic());
+      images_.sort();
+      auto charSizes = images_.getShape();
+
       unsigned long newSize = images_.front()->length()*images_.size();
       std::vector<ssize_t> shape(charSizes.size(), 0);
       std::transform(charSizes.begin(), charSizes.end(), shape.begin(), [](const std::pair<char, int>& a_) {
@@ -34,5 +36,25 @@ namespace pb_helpers {
       }
       return *arrP;
   }
+
+  py::array packStringArray(pylibczi::SubblockMetaVec& metadata_){
+      metadata_.sort();
+      auto charSizes = metadata_.getShape();
+
+      std::vector<ssize_t> shape(charSizes.size(), 0);
+      std::transform(charSizes.begin(), charSizes.end(), shape.begin(), [](const std::pair<char, int>& a_) {
+          return a_.second;
+      });
+      return makeStrArray(metadata_, shape);
+  }
+
+  py::array makeStrArray(pylibczi::SubblockMetaVec& metadata_, std::vector<ssize_t>& shape_){
+      std::vector<std::string> ans(metadata_.size());
+      std::transform(metadata_.begin(), metadata_.end(), ans.begin(), [](const pylibczi::SubblockString& a_){
+          return a_.getString();
+      });
+      return py::array(py::cast(ans), shape_);
+  }
+
 
 }
