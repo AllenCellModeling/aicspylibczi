@@ -111,6 +111,9 @@ venv.bak/
 # mkdocs documentation
 /site
 
+# my quick and dirty output test
+dummy_test.py
+
 # mypy
 .mypy_cache/
 
