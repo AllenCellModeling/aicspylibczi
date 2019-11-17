@@ -10,6 +10,7 @@
 #include "inc_libCZI.h"
 #include "IndexMap.h"
 #include "Image.h"
+#include "SubblockSorter.h"
 #include "SubblockMetaVec.h"
 
 /*! \mainpage libCZI_c++_extension
@@ -79,7 +80,10 @@ namespace pylibczi {
   class Reader {
       std::shared_ptr<CCZIReader> m_czireader; // required for cast in libCZI
       libCZI::SubBlockStatistics m_statistics;
+      std::vector< std::pair<SubblockSorter, int> > m_orderMapping;
+
   public:
+      using SubblockIndexVec = std::vector< std::pair<SubblockSorter, int> >;
       using MapDiP = std::map<libCZI::DimensionIndex, std::pair<int, int> >;
       using Shape = std::vector<std::pair<char, int> >;
       /*!
@@ -211,11 +215,11 @@ namespace pylibczi {
        */
       libCZI::IntRect mosaicShape() { return m_statistics.boundingBoxLayer0Only; }
 
-      static Shape getShape(pylibczi::ImageVector& images_, bool is_mosaic_);
+      static Shape getShape(pylibczi::ImageVector& images_, bool is_mosaic_) { return images_.getShape(); }
 
   private:
 
-      static bool dimsMatch(const libCZI::CDimCoordinate& target_dims_, const libCZI::CDimCoordinate& czi_dims_);
+      Reader::SubblockIndexVec getMatches( SubblockSorter &match_ );
 
       static void addSortOrderIndex(vector<IndexMap>& vector_of_index_maps_);
 

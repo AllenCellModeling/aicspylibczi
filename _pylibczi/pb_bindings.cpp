@@ -1,4 +1,4 @@
-#include <pybind11/pybind11.h>
+//#include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
 #include "inc_libCZI.h"
@@ -37,8 +37,9 @@ PYBIND11_MODULE(_pylibczi, m)
         .def("read_meta", &pylibczi::Reader::readMeta)
         .def("read_selected", &pylibczi::Reader::readSelected)
         .def("mosaic_shape", &pylibczi::Reader::mosaicShape)
-        .def("read_mosaic", &pylibczi::Reader::readMosaic)
-        .def("read_subblock_meta", &pylibczi::Reader::readSubblockMeta);
+        .def( "read_meta_from_subblock", &pylibczi::Reader::readSubblockMeta)
+        .def("read_mosaic", &pylibczi::Reader::readMosaic);
+   //     .def("read_subblock_meta", &pylibczi::Reader::readSubblockMeta);
 
     py::class_<pylibczi::IndexMap>(m, "IndexMap")
         .def(py::init<>())

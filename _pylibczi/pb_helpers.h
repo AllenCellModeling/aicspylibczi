@@ -3,6 +3,7 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
+#include <pybind11/stl.h>
 #include <memory>
 #include <vector>
 #include <set>
@@ -17,8 +18,7 @@ namespace py=pybind11;
 namespace pb_helpers {
 
   py::array packArray(pylibczi::ImageVector& images_);
-  py::array packStringArray(pylibczi::SubblockMetaVec& metadata_);
-  py::array makeStrArray(pylibczi::SubblockMetaVec& metadata_, std::vector<ssize_t>& shape_);
+  py::list *packStringArray(pylibczi::SubblockMetaVec& metadata_);
 
   template<typename T>
   py::array* makeArray(unsigned long size_, std::vector<ssize_t>& shape_, pylibczi::ImageVector& images_)

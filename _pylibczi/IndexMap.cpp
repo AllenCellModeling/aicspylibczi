@@ -22,13 +22,13 @@ namespace pylibczi {
           m_dims.emplace(dimension_, value_);
           return true;
       });
-      m_index = info_.mIndex;
+      m_indexM = info_.mIndex;
   }
 
   bool
   IndexMap::isMIndexValid() const
   {
-      return m_index!=(std::numeric_limits<int>::min)();
+      return m_indexM!=(std::numeric_limits<int>::min)();
   }
 
   bool
@@ -48,7 +48,7 @@ namespace pylibczi {
       });
 
       if (match==s_sortOrder.end() && isMIndexValid() && other_.isMIndexValid()) {
-          return (m_index<other_.m_index);
+          return (m_indexM<other_.m_indexM);
       }
       return false;
   }

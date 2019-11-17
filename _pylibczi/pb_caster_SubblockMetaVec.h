@@ -15,7 +15,7 @@ namespace pybind11 {
          * function signatures and declares a local variable
          * 'value' of type pylibczi::SubblockMetaVec
          */
-    PYBIND11_TYPE_CASTER(pylibczi::SubblockMetaVec, _("numpy.ndarray"));
+    PYBIND11_TYPE_CASTER(pylibczi::SubblockMetaVec, _("List"));
 
         /**
          * Conversion part 1 (Python->C++): convert a PyObject( numpy.ndarray ) into an SubblockMetaVec
@@ -40,7 +40,8 @@ namespace pybind11 {
          */
         static handle cast(pylibczi::SubblockMetaVec src_, return_value_policy /* policy */, handle /* parent */)
         {
-            return pb_helpers::packStringArray(src_);
+            py::list *l = pb_helpers::packStringArray(src_);
+            return *l;
         }
     };
   }

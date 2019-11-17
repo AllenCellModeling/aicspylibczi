@@ -2,6 +2,7 @@
 
 #include "catch.hpp"
 #include "../_pylibczi/Reader.h"
+#include "../_pylibczi/pb_helpers.h"
 
 class CziCreator {
     std::unique_ptr<pylibczi::Reader> m_czi;
@@ -85,6 +86,17 @@ TEST_CASE_METHOD(CziCreator2, "test_read_selected2", "[Reader_read_selected]")
     auto shape = imvec.front()->shape();
     REQUIRE(shape[0]==325); // height
     REQUIRE(shape[1]==475); // width
+}
+
+TEST_CASE_METHOD(CziCreator2, "test_read_subblock_meta", "[Reader_read_subblock_meta]")
+{
+    auto czi = get();
+    auto cDims = libCZI::CDimCoordinate{{libCZI::DimensionIndex::B, 0},
+                                        {libCZI::DimensionIndex::C, 0}};
+    auto metavec = czi->readSubblockMeta(cDims);
+    REQUIRE(metavec.size() == 15);
+    auto test = pb_helpers::packStringArray(metavec);
+    int x = 10;
 }
 
 // TODO I need a small file for testing mosaic functionality

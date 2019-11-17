@@ -150,7 +150,7 @@ class CziFile(object):
     def read_subblock_metadata(self, m_index: int = -1, **kwargs):
         plane_constraints = self.czilib.DimCoord()
         [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
-        return self.reader.read_subblock_meta(plane_constraints, m_index)
+        return self.reader.read_meta_from_subblock(plane_constraints, m_index)
 
     def read_image(self, m_index: int = -1, **kwargs):
         """

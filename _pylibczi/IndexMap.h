@@ -16,7 +16,7 @@ namespace pylibczi {
   class IndexMap {
       typedef std::map<libCZI::DimensionIndex, int> MapType;
       int m_subBlockIndex; // the subBlock index from the file
-      int m_index; // the mIndex
+      int m_indexM; // the mIndex
       int m_position; // the index of the subBlock in the file within the subset included
       MapType m_dims;
 
@@ -26,7 +26,7 @@ namespace pylibczi {
       IndexMap(int index_, const libCZI::SubBlockInfo& info_);
 
       IndexMap()
-          :m_subBlockIndex(), m_index(), m_position(), m_dims() { }
+          :m_subBlockIndex(), m_indexM(), m_position(), m_dims() { }
 
       bool operator<(const IndexMap& other_);
 
@@ -34,7 +34,7 @@ namespace pylibczi {
 
       bool isMIndexValid() const;
 
-      int mIndex() const { return m_index; }
+      int mIndex() const { return m_indexM; }
 
       void position(int x_) { m_position = x_; }
 

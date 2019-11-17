@@ -1,3 +1,4 @@
+#include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <memory>
 #include <vector>
@@ -37,23 +38,21 @@ namespace pb_helpers {
       return *arrP;
   }
 
-  py::array packStringArray(pylibczi::SubblockMetaVec& metadata_){
+  py::list* packStringArray(pylibczi::SubblockMetaVec& metadata_){
       metadata_.sort();
       auto charSizes = metadata_.getShape();
-
-      std::vector<ssize_t> shape(charSizes.size(), 0);
-      std::transform(charSizes.begin(), charSizes.end(), shape.begin(), [](const std::pair<char, int>& a_) {
-          return a_.second;
-      });
-      return makeStrArray(metadata_, shape);
-  }
-
-  py::array makeStrArray(pylibczi::SubblockMetaVec& metadata_, std::vector<ssize_t>& shape_){
-      std::vector<std::string> ans(metadata_.size());
-      std::transform(metadata_.begin(), metadata_.end(), ans.begin(), [](const pylibczi::SubblockString& a_){
-          return a_.getString();
-      });
-      return py::array(py::cast(ans), shape_);
+      auto mylist = new py::list();
+      std::vector< std::tuple<std::string, libCZI::CDimCoordinate, int> > ans;
+      try {
+          for (const auto& x : metadata_) {
+              //mylist.append(py::make_tuple(py::cast(x.getString()), x.getDimsAsChars(), x.mIndex()));
+              //ans.emplace_back(x.getString(), x.coordinatePtr(), x.mIndex());
+              mylist->append(py::make_tuple( x.getDimsAsChars(), py::cast(x.getString().c_str()) ) ); // PyUnicode_FromString(x.getString().c_str()) );
+          }
+      }catch(exception &e){
+          std::cout << e.what() << std::endl;
+      }
+      return mylist;
   }
 
 

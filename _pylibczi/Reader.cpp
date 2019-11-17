@@ -24,6 +24,18 @@ namespace pylibczi {
       sp = std::shared_ptr<libCZI::IStream>(new CSimpleStreamImplCppStreams(file_name_));
       m_czireader->Open(sp);
       m_statistics = m_czireader->GetStatistics();
+
+      // create a reference for finding one or more sublock indices from a CDimCoordinate
+      m_czireader->EnumerateSubBlocks([&](int index_, const libCZI::SubBlockInfo& info_) -> bool {
+          if (isPyramid0(info_)) {
+              m_orderMapping.emplace_back(std::piecewise_construct,
+                  std::make_tuple(&(info_.coordinate), info_.mIndex, isMosaic()),
+                  std::make_tuple(index_)
+              );
+          }
+          return true;
+      });
+
   }
 
   std::string
@@ -75,52 +87,16 @@ namespace pylibczi {
   std::pair<ImageVector, Reader::Shape>
   Reader::readSelected(libCZI::CDimCoordinate& plane_coord_, bool flatten_, int index_m_)
   {
-      size_t matchingSubblockCount = 0;
-      std::vector<IndexMap> orderMapping;
-      m_czireader->EnumerateSubBlocks([&](int index_, const libCZI::SubBlockInfo& info_) -> bool {
-          if (isPyramid0(info_) && dimsMatch(plane_coord_, info_.coordinate)) {
-              orderMapping.emplace_back(index_, info_);
-              matchingSubblockCount++;
-          }
-          return true;
-      });
-
-      addSortOrderIndex(orderMapping);
-
-      // get scene index if specified
-      int sceneIndex;
-      libCZI::IntRect sceneBox = {0, 0, -1, -1};
-      if (plane_coord_.TryGetPosition(libCZI::DimensionIndex::S, &sceneIndex)) {
-          auto itt = m_statistics.sceneBoundingBoxes.find(sceneIndex);
-          if (itt==m_statistics.sceneBoundingBoxes.end())
-              sceneBox = itt->second.boundingBoxLayer0; // layer0 specific
-          else
-              sceneBox.Invalidate();
-      }
-      else {
-          sceneIndex = -1;
-      }
-
+      SubblockSorter subblocksToFind(&plane_coord_, index_m_, isMosaic());
+      SubblockIndexVec matches = getMatches( subblocksToFind );
       ImageVector images;
-      images.reserve(matchingSubblockCount);
+      images.reserve(matches.size());
 
-      m_czireader->EnumerateSubBlocks([&](int index_, const libCZI::SubBlockInfo& info_) {
-
-          if (!isPyramid0(info_)) {
-              return true;
-          }
-          if (sceneBox.IsValid() && !sceneBox.IntersectsWith(info_.logicalRect)) {
-              return true;
-          }
-          if (!dimsMatch(plane_coord_, info_.coordinate)) {
-              return true;
-          }
-          if (isMosaic() && index_m_!=-1 && info_.mIndex!=std::numeric_limits<int>::min() && index_m_!=info_.mIndex) {
-              return true;
-          }
-          // add the sub-block image
-          auto image = ImageFactory::constructImage(m_czireader->ReadSubBlock(index_)->CreateBitmap(),
-              &info_.coordinate, info_.logicalRect, info_.mIndex);
+      for_each(matches.begin(), matches.end(), [&](const SubblockIndexVec::value_type &match_ ){
+          auto subblock = m_czireader->ReadSubBlock(match_.second);
+          const libCZI::SubBlockInfo &info = subblock->GetSubBlockInfo();
+          auto image = ImageFactory::constructImage(subblock->CreateBitmap(),
+              &info.coordinate, info.logicalRect, info.mIndex);
           if (flatten_ && ImageFactory::numberOfChannels(image->pixelType())>1) {
               int start(0), sze(0);
               if (m_statistics.dimBounds.TryGetInterval(libCZI::DimensionIndex::C, &start, &sze))
@@ -130,9 +106,8 @@ namespace pylibczi {
           }
           else
               images.push_back(image);
-
-          return true;
       });
+
       if (images.empty()) {
           throw pylibczi::CdimSelectionZeroImagesException(plane_coord_, m_statistics.dimBounds, "No pyramid0 selectable subblocks.");
       }
@@ -144,77 +119,31 @@ namespace pylibczi {
 
   SubblockMetaVec
   Reader::readSubblockMeta(libCZI::CDimCoordinate& plane_coord_, int index_m_){
-      ssize_t matchingSubblockCount = 0;
-      std::vector<IndexMap> orderMapping;
-      m_czireader->EnumerateSubBlocks([&](int index_, const libCZI::SubBlockInfo& info_) -> bool {
-          if (isPyramid0(info_) && dimsMatch(plane_coord_, info_.coordinate)) {
-              orderMapping.emplace_back(index_, info_);
-              matchingSubblockCount++;
-          }
-          return true;
-      });
-
-      addSortOrderIndex(orderMapping);
-
-      // get scene index if specified
-      int sceneIndex;
-      libCZI::IntRect sceneBox = {0, 0, -1, -1};
-      if (plane_coord_.TryGetPosition(libCZI::DimensionIndex::S, &sceneIndex)) {
-          auto itt = m_statistics.sceneBoundingBoxes.find(sceneIndex);
-          if (itt==m_statistics.sceneBoundingBoxes.end())
-              sceneBox = itt->second.boundingBoxLayer0; // layer0 specific
-          else
-              sceneBox.Invalidate();
-      }
-      else {
-          sceneIndex = -1;
-      }
 
       SubblockMetaVec metaSubblocks;
+      metaSubblocks.setMosaic(isMosaic());
 
-      m_czireader->EnumerateSubBlocks([&](int index_, const libCZI::SubBlockInfo& info_) {
+      SubblockSorter subBlockToFind(&plane_coord_, index_m_, isMosaic());
+      SubblockIndexVec matches = getMatches( subBlockToFind );
+      std::cout << "matched: " << matches.size() << std::endl;
 
-          if (!isPyramid0(info_)) {
-              return true;
-          }
-          if (sceneBox.IsValid() && !sceneBox.IntersectsWith(info_.logicalRect)) {
-              return true;
-          }
-          if (!dimsMatch(plane_coord_, info_.coordinate)) {
-              return true;
-          }
-          if (isMosaic() && index_m_!=-1 && info_.mIndex!=std::numeric_limits<int>::min() && index_m_!=info_.mIndex) {
-              return true;
-          }
-
+      for_each(matches.begin(), matches.end(), [&](SubblockIndexVec::value_type &match_){
           size_t metaSize = 0;
-          auto subblock = m_czireader->ReadSubBlock(index_);
-          auto shared_ptr_string = subblock->GetRawData(libCZI::ISubBlock::Metadata, &metaSize);
-          auto subblockMetaData = std::static_pointer_cast<const std::string>(shared_ptr_string);
-
-
-          metaSubblocks.emplace_back(info_.coordinate, info_.mIndex, subblockMetaData.get());
-
-          return true;
+          auto subblock = m_czireader->ReadSubBlock(match_.second);
+          auto sharedPtrString = subblock->GetRawData(libCZI::ISubBlock::Metadata, &metaSize);
+          metaSubblocks.emplace_back(match_.first.coordinatePtr(), match_.first.mIndex(), isMosaic(), (char *)(sharedPtrString.get()));
       });
 
-      metaSubblocks.setMosaic(isMosaic());
       return metaSubblocks;
   }
 
 // private methods
 
-  bool
-  Reader::dimsMatch(const libCZI::CDimCoordinate& target_dims_, const libCZI::CDimCoordinate& czi_dims_)
-  {
-      bool ans = true;
-      target_dims_.EnumValidDimensions([&](libCZI::DimensionIndex dim_, int value_) -> bool {
-          int cziDimValue = 0;
-          if (czi_dims_.TryGetPosition(dim_, &cziDimValue)) {
-              ans = (cziDimValue==value_);
-          }
-          return ans;
-      });
+  Reader::SubblockIndexVec
+  Reader::getMatches( SubblockSorter &match_ ){
+      SubblockIndexVec ans;
+      std::copy_if(m_orderMapping.begin(), m_orderMapping.end(), std::back_inserter(ans),
+          [&match_](const SubblockIndexVec::value_type &a_) { return match_ == a_.first; });
       return ans;
   }
 
@@ -289,35 +218,6 @@ namespace pylibczi {
 
       imageVector.setMosaic(isMosaic());
       return imageVector;
-  }
-
-  std::vector<std::pair<char, int> >
-  Reader::getShape(pylibczi::ImageVector& images_, bool is_mosaic_)
-  {
-      using ImVec = pylibczi::Image::ImVec;
-      std::sort(images_.begin(), images_.end(), [](ImVec::value_type& a_, ImVec::value_type& b_) {
-          return *a_<*b_;
-      });
-      std::vector<std::vector<std::pair<char, int> > > validIndexes;
-      for (const auto& image : images_) {
-          validIndexes.push_back(image->getValidIndexes(is_mosaic_)); // only add M if it's a mosaic file
-      }
-
-      std::vector<std::pair<char, int> > charSizes;
-      std::set<int> condensed;
-      for (int i = 0; !validIndexes.empty() && i<validIndexes.front().size(); i++) {
-          char c;
-          for (const auto& vi : validIndexes) {
-              c = vi[i].first;
-              condensed.insert(vi[i].second);
-          }
-          charSizes.emplace_back(c, condensed.size());
-          condensed.clear();
-      }
-      auto heightByWidth = images_.front()->shape(); // assumption: images are the same shape, if not 🙃
-      charSizes.emplace_back('Y', heightByWidth[0]); // H
-      charSizes.emplace_back('X', heightByWidth[1]); // W
-      return charSizes;
   }
 
 }
