@@ -45,9 +45,7 @@ namespace pb_helpers {
       std::vector< std::tuple<std::string, libCZI::CDimCoordinate, int> > ans;
       try {
           for (const auto& x : metadata_) {
-              //mylist.append(py::make_tuple(py::cast(x.getString()), x.getDimsAsChars(), x.mIndex()));
-              //ans.emplace_back(x.getString(), x.coordinatePtr(), x.mIndex());
-              mylist->append(py::make_tuple( x.getDimsAsChars(), py::cast(x.getString().c_str()) ) ); // PyUnicode_FromString(x.getString().c_str()) );
+              mylist->append(py::make_tuple( x.getDimsAsChars(), py::cast(x.getString().c_str()) ) );
           }
       }catch(exception &e){
           std::cout << e.what() << std::endl;

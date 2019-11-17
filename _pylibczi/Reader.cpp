@@ -125,7 +125,6 @@ namespace pylibczi {
 
       SubblockSorter subBlockToFind(&plane_coord_, index_m_, isMosaic());
       SubblockIndexVec matches = getMatches( subBlockToFind );
-      std::cout << "matched: " << matches.size() << std::endl;
 
       for_each(matches.begin(), matches.end(), [&](SubblockIndexVec::value_type &match_){
           size_t metaSize = 0;
