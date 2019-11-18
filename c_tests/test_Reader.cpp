@@ -26,6 +26,15 @@ TEST_CASE("test_reader_constructor", "[Reader]")
 
 }
 
+TEST_CASE("open two czis", "[Reader_Dup]")
+{
+    FILE* fp = std::fopen("resources/s_1_t_1_c_1_z_1.czi", "rb");
+    FILE* fp2 = std::fopen("resources/s_1_t_1_c_1_z_1.czi", "rb");
+    if (fp==nullptr || fp2==nullptr) std::cout << "failed to open file!" << std::endl;
+    REQUIRE_NOTHROW(pylibczi::Reader(fp));
+    REQUIRE_NOTHROW(pylibczi::Reader(fp2));
+}
+
 TEST_CASE_METHOD(CziCreator, "test_reader_dims_1", "[Reader_Dims]")
 {
     auto czi = get();
