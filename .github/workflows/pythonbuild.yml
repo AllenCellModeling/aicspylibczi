@@ -25,6 +25,11 @@ jobs:
         run: |
           pytest --cov-report xml --cov=pylibczi pylibczi/tests
           codecov -t ${{ secrets.CodeCovKey }}
+      - name: BruteForceTest
+        run: |
+          python test.py
+
+
   lint:
     runs-on: ubuntu-latest
 
