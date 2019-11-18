@@ -87,7 +87,7 @@ namespace pylibczi {
   public:
       CSimpleStreamImplFromFp() = delete;
       explicit CSimpleStreamImplFromFp(FILE* file_pointer_) { m_fp = file_pointer_; }
-      ~CSimpleStreamImplFromFp() override { fclose(m_fp); };
+      ~CSimpleStreamImplFromFp() override { if( m_fp!=nullptr ) fclose(m_fp); };
       void Read(std::uint64_t offset_, void* data_ptr_, std::uint64_t size_, std::uint64_t* bytes_read_ptr_) override;
   };
 
@@ -212,7 +212,6 @@ namespace pylibczi {
 
       virtual ~Reader()
       {
-          m_czireader->Close();
       }
 
       /*!
