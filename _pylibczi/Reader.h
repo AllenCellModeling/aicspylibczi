@@ -87,11 +87,7 @@ namespace pylibczi {
   public:
       CSimpleStreamImplFromFp() = delete;
       explicit CSimpleStreamImplFromFp(FILE* file_pointer_) { m_fp = file_pointer_; }
-      // https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/fdopen-wfdopen?view=vs-2019#remarks
-      // can't close the file pointer or MSVC will close the file descriptor which is owned by python in this case
-      // I'm hoping that python closing the file discriptor will close the file pointers
-      // TODO make this os conditional
-      ~CSimpleStreamImplFromFp()= default; // override { if( m_fp!=nullptr ) fclose(m_fp); };
+      ~CSimpleStreamImplFromFp() override { fclose(m_fp); };
       void Read(std::uint64_t offset_, void* data_ptr_, std::uint64_t size_, std::uint64_t* bytes_read_ptr_) override;
   };
 
@@ -216,6 +212,7 @@ namespace pylibczi {
 
       virtual ~Reader()
       {
+          m_czireader->Close();
       }
 
       /*!
