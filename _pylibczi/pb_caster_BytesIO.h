@@ -27,10 +27,19 @@ namespace pybind11 {
         {
             /* Extract PyObject from handle */
             PyObject* source = src_.ptr();
+
             /* Try converting into a Python integer value */
             int fDesc = PyObject_AsFileDescriptor(source);
             if (fDesc==-1) return false;
-            value = fdopen(fDesc, "r");
+
+#ifdef __WIN32__
+            int dupDesc = _dup(fDesc);
+            value = _fdopen(dupDesc, "r");
+#else
+            int dupDesc = dup(fDesc);
+            value = fdopen(dupDesc, "r");
+#endif
+
             return (value.get()!=nullptr && !PyErr_Occurred());
         }
 
