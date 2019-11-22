@@ -5,6 +5,8 @@
 #include "exceptions.h"
 #include "TargetRange.h"
 #include "helper_algorithms.h"
+#include "cTestHelpers.h"
+#include "libCZI/StreamImpl.h"
 
 using namespace pylibczi;
 
@@ -32,7 +34,7 @@ class CziImageCreator {
     std::unique_ptr<Reader> m_czi;
 public:
     CziImageCreator()
-        :m_czi(new Reader(std::fopen("resources/s_1_t_1_c_1_z_1.czi", "rb"))) { }
+        : m_czi(new pylibczi::Reader(L"resources/s_1_t_1_c_1_z_1.czi")) {}
     std::shared_ptr<Image> get()
     {
         auto cDims = libCZI::CDimCoordinate{{libCZI::DimensionIndex::B, 0},

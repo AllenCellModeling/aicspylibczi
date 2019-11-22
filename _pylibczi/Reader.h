@@ -66,31 +66,6 @@ using namespace std;
 
 namespace pylibczi {
 
-  class FileHolder {
-      FILE* m_fp;
-  public:
-      FileHolder() { m_fp = nullptr; }
-      FileHolder(FILE* p_) { m_fp = p_; }
-      FILE* get() { return m_fp; }
-      FileHolder& operator=(FILE* p_)
-      {
-          m_fp = p_;
-          return *this;
-      }
-  };
-
-/// <summary>	A wrapper that takes a FILE * and creates an libCZI::IStream object out of it
-
-  class CSimpleStreamImplFromFp: public libCZI::IStream {
-  private:
-      FILE* m_fp;
-  public:
-      CSimpleStreamImplFromFp() = delete;
-      explicit CSimpleStreamImplFromFp(FILE* file_pointer_) { m_fp = file_pointer_; }
-      ~CSimpleStreamImplFromFp() override { fclose(m_fp); };
-      void Read(std::uint64_t offset_, void* data_ptr_, std::uint64_t size_, std::uint64_t* bytes_read_ptr_) override;
-  };
-
   /*!
    * @brief Reader class for ZISRAW / CZI files
    *
@@ -117,7 +92,13 @@ namespace pylibczi {
        *
        * @param f_in_ A C-style FILE pointer to the CZI file
        */
-      explicit Reader(FileHolder f_in_);
+      explicit Reader(std::shared_ptr<libCZI::IStream> istream_);
+
+      /*!
+       * @brief A convienince function for testing or use by C++ developers
+       * @param file_name_ a wide character string such as L"myfilename.czi"
+       */
+      explicit Reader(const wchar_t * file_name_);
 
       /*!
        * @brief Check if the file is a mosaic file.

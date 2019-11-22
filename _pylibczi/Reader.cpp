@@ -1,31 +1,30 @@
 #include <tuple>
 #include <set>
+#include <utility>
 
 #include "Reader.h"
 #include "ImageFactory.h"
 #include "exceptions.h"
 #include "pylibczi_unistd.h"
+#include "libCZI/StreamImpl.h"
+
+
 
 namespace pylibczi {
 
-  void
-  CSimpleStreamImplFromFp::Read(std::uint64_t offset_, void* data_ptr_, std::uint64_t size_, std::uint64_t* bytes_read_ptr_)
-  {
-      fseeko(this->m_fp, offset_, SEEK_SET);
-
-      std::uint64_t bytesRead = fread(data_ptr_, 1, (size_t) size_, this->m_fp);
-      if (bytes_read_ptr_!=nullptr)
-          (*bytes_read_ptr_) = bytesRead;
-  }
-
-  Reader::Reader(FileHolder f_in_)
+  Reader::Reader(std::shared_ptr<libCZI::IStream> istream_)
       :m_czireader(new CCZIReader)
   {
-      if (!f_in_.get()) {
-          throw FilePtrException("Reader class received a bad FILE *!");
-      }
-      auto istr = std::make_shared<CSimpleStreamImplFromFp>(f_in_.get());
-      m_czireader->Open(istr);
+      m_czireader->Open(std::move(istream_));
+      m_statistics = m_czireader->GetStatistics();
+  }
+
+
+  Reader::Reader(const wchar_t* file_name_)
+    :m_czireader(new CCZIReader)
+  {
+      auto sp = std::shared_ptr<libCZI::IStream>(new CSimpleStreamImplCppStreams(file_name_));
+      m_czireader->Open(sp);
       m_statistics = m_czireader->GetStatistics();
   }
 
@@ -263,5 +262,6 @@ namespace pylibczi {
       charSizes.emplace_back('X', heightByWidth[1]); // W
       return charSizes;
   }
+
 
 }

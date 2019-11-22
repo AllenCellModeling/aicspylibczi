@@ -40,7 +40,8 @@ set(PYLIBCZI_C_SRC _pylibczi/Reader.cpp _pylibczi/IndexMap.cpp _pylibczi/Image.c
         _pylibczi/pylibczi_ostream.cpp _pylibczi/exceptions.cpp)
 
 set(PYLIBCZI_PYBIND11 _pylibczi/pb_bindings.cpp _pylibczi/pb_helpers.h _pylibczi/pb_helpers.cpp _pylibczi/pb_caster_ImageVector.h
-        _pylibczi/pb_caster_BytesIO.h _pylibczi/pb_caster_libCZI_DimensionIndex.h)
+        _pylibczi/pb_caster_BytesIO.h _pylibczi/pb_caster_libCZI_DimensionIndex.h _pylibczi/CSimpleStreamImplFromFd.h
+        _pylibczi/CSimpleStreamImplFromFd.cpp)
 
 set(TARGET_ONE libczi_c++_extension)
 set(TARGET_TWO _pylibczi)

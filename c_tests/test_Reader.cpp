@@ -6,7 +6,7 @@ class CziCreator {
     std::unique_ptr<pylibczi::Reader> m_czi;
 public:
     CziCreator()
-        :m_czi(new pylibczi::Reader(std::fopen("resources/s_1_t_1_c_1_z_1.czi", "rb"))) { }
+        : m_czi(new pylibczi::Reader(L"resources/s_1_t_1_c_1_z_1.czi")) { }
     pylibczi::Reader* get() { return m_czi.get(); }
 };
 
@@ -14,25 +14,20 @@ class CziCreator2 {
     std::unique_ptr<pylibczi::Reader> m_czi;
 public:
     CziCreator2()
-        :m_czi(new pylibczi::Reader(std::fopen("resources/s_3_t_1_c_3_z_5.czi", "rb"))) { }
+        : m_czi(new pylibczi::Reader(L"resources/s_3_t_1_c_3_z_5.czi")) {}
     pylibczi::Reader* get() { return m_czi.get(); }
 };
 
 TEST_CASE("test_reader_constructor", "[Reader]")
 {
-    FILE* fp = std::fopen("resources/s_1_t_1_c_1_z_1.czi", "rb");      // #include <cstdio>
-    if (fp==nullptr) std::cout << "failed to open file!" << std::endl;
+    auto fp = std::shared_ptr<libCZI::IStream>(new CSimpleStreamImplCppStreams(L"resources/s_1_t_1_c_1_z_1.czi"));      // #include <cstdio>
     REQUIRE_NOTHROW(pylibczi::Reader(fp));
-
 }
 
-TEST_CASE("open two czis", "[Reader_Dup]")
+TEST_CASE("open_two_czis", "[Reader_Dup]")
 {
-    FILE* fp = std::fopen("resources/s_1_t_1_c_1_z_1.czi", "rb");
-    FILE* fp2 = std::fopen("resources/s_1_t_1_c_1_z_1.czi", "rb");
-    if (fp==nullptr || fp2==nullptr) std::cout << "failed to open file!" << std::endl;
-    REQUIRE_NOTHROW(pylibczi::Reader(fp));
-    REQUIRE_NOTHROW(pylibczi::Reader(fp2));
+    REQUIRE_NOTHROW(pylibczi::Reader(L"resources/s_1_t_1_c_1_z_1.czi"));
+    REQUIRE_NOTHROW(pylibczi::Reader(L"resources/s_1_t_1_c_1_z_1.czi"));
 }
 
 TEST_CASE_METHOD(CziCreator, "test_reader_dims_1", "[Reader_Dims]")

@@ -40,6 +40,8 @@ test_requirements = [
     "pytest",
     "pytest-cov",
     "pytest-raises",
+    "Sphinx>=2.1.0b1",
+    "sphinx_rtd_theme>=0.1.2",
 ]
 
 dev_requirements = [

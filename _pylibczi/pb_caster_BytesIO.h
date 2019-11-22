@@ -5,18 +5,20 @@
 #include <cstdio>
 #include <iostream>
 #include "Reader.h"
+#include "CSimpleStreamImplFromFd.h"
+
 
 // TODO Make windows compatible (this is very unix centric)
 namespace pybind11 {
   namespace detail {
-    template<> struct type_caster<pylibczi::FileHolder> {
+    template<> struct type_caster< std::shared_ptr<libCZI::IStream> > {
     public:
         /**
          * This macro establishes the name 'FILE *' in
          * function signatures and declares a local variable
          * 'value' of type (FILE *)
          */
-    PYBIND11_TYPE_CASTER(pylibczi::FileHolder, _("IOBufferedReader"));
+    PYBIND11_TYPE_CASTER(std::shared_ptr<libCZI::IStream>, _("IOBufferedReader"));
 
         /**
          * Conversion part 1 (Python->C++): convert a PyObject into a inty
@@ -31,15 +33,7 @@ namespace pybind11 {
             /* Try converting into a Python integer value */
             int fDesc = PyObject_AsFileDescriptor(source);
             if (fDesc==-1) return false;
-
-#ifdef __WIN32__
-            int dupDesc = _dup(fDesc);
-            value = _fdopen(dupDesc, "r");
-#else
-            int dupDesc = dup(fDesc);
-            value = fdopen(dupDesc, "r");
-#endif
-
+            value = std::shared_ptr<libCZI::IStream>(new pb_helpers::CSimpleStreamImplFromFd(fDesc));
             return (value.get()!=nullptr && !PyErr_Occurred());
         }
 
@@ -50,14 +44,14 @@ namespace pybind11 {
          * ``return_value_policy::reference_internal``) and are generally
          * ignored by implicit casters.
          */
-        static handle cast(pylibczi::FileHolder src_, return_value_policy /* policy */, handle /* parent */)
+        static handle cast(std::shared_ptr<libCZI::IStream> src_, return_value_policy /* policy */, handle /* parent */)
         {
             /*
              * FROM Python docs https://docs.python.org/3/c-api/file.html
              * Warning Since Python streams have their own buffering layer, mixing them with OS-level file
              * descriptors can produce various issues (such as unexpected ordering of data).
              * */
-            int fDesc = fileno(src_.get());
+            int fDesc = -1; // this is not implemented
             return PyFile_FromFd(fDesc, nullptr, "r", -1, nullptr, nullptr, nullptr, true); //true close fd on failure
         }
     };

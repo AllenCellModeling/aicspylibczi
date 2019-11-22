@@ -8,10 +8,10 @@ from pathlib import Path
     pytest.param(False, marks=pytest.mark.raises(exception=IsADirectoryError))
 ])
 def test_is_a_directory(data_dir, as_string):
-    input = data_dir
+    infile = data_dir
     if as_string:
-        input = str(data_dir)
-    czi = CziFile(input)
+        infile = str(data_dir)
+    CziFile(infile)
 
 
 @pytest.mark.parametrize("fname, xp_query, expected", [

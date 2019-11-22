@@ -29,7 +29,7 @@ PYBIND11_MODULE(_pylibczi, m)
     py::register_exception<pylibczi::CdimSelectionZeroImagesException>(m, "PylibCZI_CDimSpecSelectedNoImagesException");
 
     py::class_<pylibczi::Reader>(m, "Reader")
-        .def(py::init<pylibczi::FileHolder>())
+        .def(py::init<std::shared_ptr<libCZI::IStream> >())
         .def("is_mosaic", &pylibczi::Reader::isMosaic)
         .def("read_dims", &pylibczi::Reader::readDims)
         .def("read_dims_string", &pylibczi::Reader::dimsString)

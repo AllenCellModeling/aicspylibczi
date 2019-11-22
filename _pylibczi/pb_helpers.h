@@ -27,6 +27,7 @@ namespace pb_helpers {
           ptr = new T[size_];
       }
       catch (std::bad_alloc& ba) {
+          std::cout << ba.what() << std::endl;
           throw pylibczi::ImageCopyAllocFailed("try using a more constraints (S=1, T=5, etc on the DimensionIndex).", size_);
       }
 
