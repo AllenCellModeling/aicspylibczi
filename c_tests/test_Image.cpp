@@ -1,5 +1,5 @@
 #include "catch.hpp"
-#include "libCZI/StreamImpl.h"
+#include "inc_libCZI.h"
 
 #include "exceptions.h"
 #include "helper_algorithms.h"

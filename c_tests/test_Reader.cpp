@@ -1,6 +1,7 @@
+#include <cstdio>
+
 #include "catch.hpp"
 #include "../_pylibczi/Reader.h"
-#include <cstdio>
 
 class CziCreator {
     std::unique_ptr<pylibczi::Reader> m_czi;
