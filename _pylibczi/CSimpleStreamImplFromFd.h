@@ -9,7 +9,6 @@
 #include <cstdint>
 #include "inc_libCZI.h"
 
-
 namespace pb_helpers {
 /*!
  * @brief This class takes a file descriptor and creates a new/duplicate file descriptor from it. The new

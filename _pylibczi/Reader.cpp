@@ -2,13 +2,10 @@
 #include <set>
 #include <utility>
 
+#include "inc_libCZI.h"
 #include "Reader.h"
 #include "ImageFactory.h"
 #include "exceptions.h"
-#include "pylibczi_unistd.h"
-#include "libCZI/StreamImpl.h"
-
-
 
 namespace pylibczi {
 
@@ -19,11 +16,11 @@ namespace pylibczi {
       m_statistics = m_czireader->GetStatistics();
   }
 
-
   Reader::Reader(const wchar_t* file_name_)
-    :m_czireader(new CCZIReader)
+      :m_czireader(new CCZIReader)
   {
-      auto sp = std::shared_ptr<libCZI::IStream>(new CSimpleStreamImplCppStreams(file_name_));
+      std::shared_ptr<libCZI::IStream> sp;
+      sp = std::shared_ptr<libCZI::IStream>(new CSimpleStreamImplCppStreams(file_name_));
       m_czireader->Open(sp);
       m_statistics = m_czireader->GetStatistics();
   }
@@ -75,9 +72,9 @@ namespace pylibczi {
   }
 
   std::pair<ImageVector, Reader::Shape>
-  Reader::readSelected(libCZI::CDimCoordinate& plane_coord_, bool flatten_, int mIndex_)
+  Reader::readSelected(libCZI::CDimCoordinate& plane_coord_, bool flatten_, int index_m_)
   {
-      ssize_t matchingSubblockCount = 0;
+      size_t matchingSubblockCount = 0;
       std::vector<IndexMap> orderMapping;
       m_czireader->EnumerateSubBlocks([&](int index_, const libCZI::SubBlockInfo& info_) -> bool {
           if (isPyramid0(info_) && dimsMatch(plane_coord_, info_.coordinate)) {
@@ -117,7 +114,7 @@ namespace pylibczi {
           if (!dimsMatch(plane_coord_, info_.coordinate)) {
               return true;
           }
-          if (isMosaic() && mIndex_!=-1 && info_.mIndex!=std::numeric_limits<int>::min() && mIndex_!=info_.mIndex) {
+          if (isMosaic() && index_m_!=-1 && info_.mIndex!=std::numeric_limits<int>::min() && index_m_!=info_.mIndex) {
               return true;
           }
           // add the sub-block image
@@ -262,6 +259,5 @@ namespace pylibczi {
       charSizes.emplace_back('X', heightByWidth[1]); // W
       return charSizes;
   }
-
 
 }

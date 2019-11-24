@@ -34,7 +34,7 @@ namespace pylibczi {
       static std::shared_ptr<Image>
       constructImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_ptr_, const libCZI::CDimCoordinate* plane_coordinate_,
           libCZI::IntRect box_,
-          int mIndex_);
+          int index_m_);
   };
 }
 

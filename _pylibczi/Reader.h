@@ -86,7 +86,7 @@ namespace pylibczi {
        *
        * Example:
        * @code
-       *    fp = std::fopen("myczifile.czi", "rb");      // #include <cstdio>
+       *    fp = std::fopen("my_czi_file.czi", "rb");      // #include <cstdio>
        *    czi = pylibczi::Reader(fp);
        * @endcode
        *
@@ -95,10 +95,10 @@ namespace pylibczi {
       explicit Reader(std::shared_ptr<libCZI::IStream> istream_);
 
       /*!
-       * @brief A convienince function for testing or use by C++ developers
-       * @param file_name_ a wide character string such as L"myfilename.czi"
+       * @brief A convenience function for testing or use by C++ developers
+       * @param file_name_ a wide character string such as L"my_filename.czi"
        */
-      explicit Reader(const wchar_t * file_name_);
+      explicit Reader(const wchar_t* file_name_);
 
       /*!
        * @brief Check if the file is a mosaic file.
@@ -147,7 +147,7 @@ namespace pylibczi {
        * The plane coordinate acts as a constraint, in the example below the dims are a set of constraints.
        * What this means is that every image taken that has Z=8, T=0, C=1 will be returned.
        * @code
-       *    FILE *fp = std::fopen("mosaicfile.czi", "rb");
+       *    FILE *fp = std::fopen("mosaic_file.czi", "rb");
        *    czi = pylibczi::Reader(fp);
        *    auto dims = CDimCoordinate{ { DimensionIndex::Z,8 } , { DimensionIndex::T,0 }, { DimensionIndex::C,1 } };
        *    auto img_coords_dims = czi.cziread_selected(dims)
@@ -155,9 +155,9 @@ namespace pylibczi {
        *
        * @param plane_coord_ A structure containing the Dimension constraints
        * @param flatten_ if false this won't flatten 3 channel images, from python this should always be true.
-       * @param mIndex_ Is only relevant for mosaic files, if you wish to select one frame.
+       * @param index_m_ Is only relevant for mosaic files, if you wish to select one frame.
        */
-      std::pair<ImageVector, Shape> readSelected(libCZI::CDimCoordinate& plane_coord_, bool flatten_ = true, int mIndex_ = -1);
+      std::pair<ImageVector, Shape> readSelected(libCZI::CDimCoordinate& plane_coord_, bool flatten_ = true, int index_m_ = -1);
 
       /*!
        * @brief If the czi file is a mosaic tiled image this function can be used to reconstruct it into an image.
@@ -197,7 +197,7 @@ namespace pylibczi {
       }
 
       /*!
-       * Get the full size of the mosaic image without scaling. If you're selecting a subregion it must be within the box returned.
+       * Get the full size of the mosaic image without scaling. If you're selecting a sub-region it must be within the box returned.
        * @return an IntRect {x, y, w, h}
        */
       libCZI::IntRect mosaicShape() { return m_statistics.boundingBoxLayer0Only; }

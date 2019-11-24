@@ -1,5 +1,5 @@
-#ifndef _PYLIBCZI__PYLIBCZI_PB_BYTESIO_CASTER_H
-#define _PYLIBCZI__PYLIBCZI_PB_BYTESIO_CASTER_H
+#ifndef _PYLIBCZI_PB_CASTER_BYTESIO_H
+#define _PYLIBCZI_PB_CASTER_BYTESIO_H
 
 #include <pybind11/pybind11.h>
 #include <cstdio>
@@ -11,7 +11,7 @@
 // TODO Make windows compatible (this is very unix centric)
 namespace pybind11 {
   namespace detail {
-    template<> struct type_caster< std::shared_ptr<libCZI::IStream> > {
+    template<> struct type_caster<std::shared_ptr<libCZI::IStream> > {
     public:
         /**
          * This macro establishes the name 'FILE *' in
@@ -34,7 +34,7 @@ namespace pybind11 {
             int fDesc = PyObject_AsFileDescriptor(source);
             if (fDesc==-1) return false;
             value = std::shared_ptr<libCZI::IStream>(new pb_helpers::CSimpleStreamImplFromFd(fDesc));
-            return (value.get()!=nullptr && !PyErr_Occurred());
+            return (value!=nullptr && !PyErr_Occurred());
         }
 
         /**
@@ -60,4 +60,4 @@ namespace pybind11 {
 
 
 
-#endif //_PYLIBCZI__PYLIBCZI_PB_BYTESIO_CASTER_H
+#endif //_PYLIBCZI_PB_CASTER_BYTESIO_H

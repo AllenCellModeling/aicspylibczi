@@ -1,12 +1,12 @@
 #include "catch.hpp"
-#include "TypedImage.h"
+#include "libCZI/StreamImpl.h"
+
+#include "exceptions.h"
+#include "helper_algorithms.h"
 #include "ImageFactory.h"
 #include "Reader.h"
-#include "exceptions.h"
 #include "TargetRange.h"
-#include "helper_algorithms.h"
-#include "cTestHelpers.h"
-#include "libCZI/StreamImpl.h"
+#include "TypedImage.h"
 
 using namespace pylibczi;
 
@@ -34,7 +34,7 @@ class CziImageCreator {
     std::unique_ptr<Reader> m_czi;
 public:
     CziImageCreator()
-        : m_czi(new pylibczi::Reader(L"resources/s_1_t_1_c_1_z_1.czi")) {}
+        :m_czi(new pylibczi::Reader(L"resources/s_1_t_1_c_1_z_1.czi")) { }
     std::shared_ptr<Image> get()
     {
         auto cDims = libCZI::CDimCoordinate{{libCZI::DimensionIndex::B, 0},
@@ -119,9 +119,9 @@ TEST_CASE("test_image_accessors_2d", "[Image_operator[2d]]")
 
     for (int i = 0; i<4; i++) { // copy stride by stride as you would with an actual image
         pairedForEach(sourceRange.strideBegin(i), sourceRange.strideEnd(i), targetRange.strideBegin(i),
-            [](std::vector<uint16_t*> a, std::vector<uint16_t*> b) {
-                pairedForEach(a.begin(), a.end(), b.begin(), [](uint16_t* ai, uint16_t* bi) {
-                    *bi = *ai;
+            [](std::vector<uint16_t*> a_, std::vector<uint16_t*> b_) {
+                pairedForEach(a_.begin(), a_.end(), b_.begin(), [](uint16_t* ai_, uint16_t* bi_) {
+                    *bi_ = *ai_;
                 });
             });
     }
