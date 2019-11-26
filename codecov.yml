@@ -5,6 +5,7 @@ ignore:
   - "pylibczi/docs"
   - "pylibczi/bin"
   - "pybind11"
+  - "_pylibczi/*"
   - "libCZI"
   - ".github"
   - "cmake-build-debug"
