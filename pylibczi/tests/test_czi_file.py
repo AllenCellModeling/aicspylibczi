@@ -35,6 +35,17 @@ def test_metadata(data_dir, fname, xp_query, expected):
 
 
 @pytest.mark.parametrize("fname, expected", [
+    ('s_1_t_1_c_1_z_1.czi', (1, 325, 475)),
+    ('s_3_t_1_c_3_z_5.czi', (3, 3, 5, 325, 475)),
+])
+def test_read_image_from_istream(data_dir, fname, expected):
+    with open(data_dir / fname, 'rb') as fp:
+        czi = CziFile(czi_filename=fp)
+        data = czi.read_image()
+        assert data[0].shape == expected
+
+
+@pytest.mark.parametrize("fname, expected", [
     ('s_1_t_1_c_1_z_1.czi', False),
     ('s_3_t_1_c_3_z_5.czi', False),
 ])
@@ -72,8 +83,6 @@ def test_mosaic_size(data_dir, fname, expected):
 ])
 def test_read_image(data_dir, fname, expected):
     czi = CziFile(str(data_dir / fname))
-    dims = czi.dims
-    assert dims == "CB"
     img, shp = czi.read_image(C=0, B=0)
     assert img.shape[-2] == expected[0]
     assert img.shape[-1] == expected[1]
@@ -83,7 +92,7 @@ def test_read_image(data_dir, fname, expected):
     ('s_1_t_1_c_1_z_1.czi', "BC", {'B': (0, 1), 'C': (0, 1)}),
     ('s_3_t_1_c_3_z_5.czi', "BSCZ", {'B': (0, 1), 'C': (0, 3), 'Z': (0, 5), 'S': (0, 3)}),
 ])
-def test_read_image(data_dir, fname, exp_str, exp_dict):
+def test_read_image_two(data_dir, fname, exp_str, exp_dict):
     czi = CziFile(str(data_dir / fname))
     dims = czi.dims
     dim_dict = czi.dims_shape()
@@ -92,14 +101,14 @@ def test_read_image(data_dir, fname, exp_str, exp_dict):
 
 
 @pytest.mark.parametrize("fname, expected", [
-    ('s_1_t_1_c_1_z_1.czi', (1, 325, 475)),
-    ('s_3_t_1_c_3_z_5.czi', (3, 3, 5, 325, 475)),
+    ('s_1_t_1_c_1_z_1.czi', "<METADATA><Tags><AcquisitionTime>2019-06-27T18:33:41.1154211Z</AcquisitionTime>"),
+    ('s_3_t_1_c_3_z_5.czi', "<METADATA><Tags><AcquisitionTime>2019-06-27T18:39:26.6459707Z</AcquisitionTime>"),
 ])
-def test_read_image_from_istream(data_dir, fname, expected):
+def test_read_subblock_meta(data_dir, fname, expected):
     with open(data_dir / fname, 'rb') as fp:
         czi = CziFile(czi_filename=fp)
-        img, shp = czi.read_image()
-    assert img.shape == expected
+        data = czi.read_subblock_metadata()
+        assert expected in data[0][1]
 
 
 @pytest.mark.parametrize("fname, expects", [
