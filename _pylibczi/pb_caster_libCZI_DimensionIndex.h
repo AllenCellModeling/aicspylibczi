@@ -1,10 +1,6 @@
 #ifndef _PYLIBCZI_PB_CASTER_LIBCZI_DIMENSIONINDEX_H
 #define _PYLIBCZI_PB_CASTER_LIBCZI_DIMENSIONINDEX_H
 
-#include <unistd.h>
-#include <thread>
-#include <chrono>
-
 #include <pybind11/pybind11.h>
 
 #include "inc_libCZI.h"
