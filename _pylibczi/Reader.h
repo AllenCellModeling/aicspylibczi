@@ -162,7 +162,7 @@ namespace pylibczi {
        * @param flatten_ if false this won't flatten 3 channel images, from python this should always be true.
        * @param index_m_ Is only relevant for mosaic files, if you wish to select one frame.
        */
-      std::pair<ImageVector, Shape> readSelected(libCZI::CDimCoordinate& plane_coord_, bool flatten_ = true, int index_m_ = -1);
+      std::pair<ImageVector, Shape> readSelected(libCZI::CDimCoordinate& plane_coord_, int index_m_ = -1, bool flatten_ = false);
 
       /*!
        * @brief provide the subblock metadata in index order consistent with readSelected.
@@ -221,7 +221,7 @@ namespace pylibczi {
 
       Reader::SubblockIndexVec getMatches( SubblockSorter &match_ );
 
-      static void addSortOrderIndex(vector<IndexMap>& vector_of_index_maps_);
+      void addOrderMapping();
 
       static bool isPyramid0(const libCZI::SubBlockInfo& info_)
       {

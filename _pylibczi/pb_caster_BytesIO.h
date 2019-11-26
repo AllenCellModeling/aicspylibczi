@@ -4,14 +4,12 @@
 #include <pybind11/pybind11.h>
 #include <cstdio>
 #include <iostream>
-#include "Reader.h"
 #include "CSimpleStreamImplFromFd.h"
 
 
-// TODO Make windows compatible (this is very unix centric)
 namespace pybind11 {
   namespace detail {
-    template<> struct type_caster<std::shared_ptr<libCZI::IStream> > {
+    template<> struct type_caster< std::shared_ptr<libCZI::IStream> > {
     public:
         /**
          * This macro establishes the name 'FILE *' in
@@ -51,6 +49,7 @@ namespace pybind11 {
              * Warning Since Python streams have their own buffering layer, mixing them with OS-level file
              * descriptors can produce various issues (such as unexpected ordering of data).
              * */
+            std::cerr << "Conversion from libCZI::IStream to python file stream not defined" << std::endl;
             int fDesc = -1; // this is not implemented
             return PyFile_FromFd(fDesc, nullptr, "r", -1, nullptr, nullptr, nullptr, true); //true close fd on failure
         }

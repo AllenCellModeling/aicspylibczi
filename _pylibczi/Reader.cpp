@@ -15,6 +15,8 @@ namespace pylibczi {
   {
       m_czireader->Open(std::move(istream_));
       m_statistics = m_czireader->GetStatistics();
+      // create a reference for finding one or more subblock indices from a CDimCoordinate
+      addOrderMapping(); // populate m_orderMapping
   }
 
   Reader::Reader(const wchar_t* file_name_)
@@ -24,18 +26,8 @@ namespace pylibczi {
       sp = std::shared_ptr<libCZI::IStream>(new CSimpleStreamImplCppStreams(file_name_));
       m_czireader->Open(sp);
       m_statistics = m_czireader->GetStatistics();
-
-      // create a reference for finding one or more sublock indices from a CDimCoordinate
-      m_czireader->EnumerateSubBlocks([&](int index_, const libCZI::SubBlockInfo& info_) -> bool {
-          if (isPyramid0(info_)) {
-              m_orderMapping.emplace_back(std::piecewise_construct,
-                  std::make_tuple(&(info_.coordinate), info_.mIndex, isMosaic()),
-                  std::make_tuple(index_)
-              );
-          }
-          return true;
-      });
-
+      // create a reference for finding one or more subblock indices from a CDimCoordinate
+      addOrderMapping();// populate m_orderMapping
   }
 
   std::string
@@ -78,23 +70,23 @@ namespace pylibczi {
           return true;
       });
 
-      std::sort( ans.begin(), ans.end(), [](const char a_, const char b_){
-          return libCZI::Utils::CharToDimension(a_) > libCZI::Utils::CharToDimension(b_);
+      std::sort(ans.begin(), ans.end(), [](const char a_, const char b_) {
+          return libCZI::Utils::CharToDimension(a_)>libCZI::Utils::CharToDimension(b_);
       });
       return ans;
   }
 
   std::pair<ImageVector, Reader::Shape>
-  Reader::readSelected(libCZI::CDimCoordinate& plane_coord_, bool flatten_, int index_m_)
+  Reader::readSelected(libCZI::CDimCoordinate& plane_coord_, int index_m_, bool flatten_)
   {
       SubblockSorter subblocksToFind(&plane_coord_, index_m_, isMosaic());
-      SubblockIndexVec matches = getMatches( subblocksToFind );
+      SubblockIndexVec matches = getMatches(subblocksToFind);
       ImageVector images;
       images.reserve(matches.size());
 
-      for_each(matches.begin(), matches.end(), [&](const SubblockIndexVec::value_type &match_ ){
+      for_each(matches.begin(), matches.end(), [&](const SubblockIndexVec::value_type& match_) {
           auto subblock = m_czireader->ReadSubBlock(match_.second);
-          const libCZI::SubBlockInfo &info = subblock->GetSubBlockInfo();
+          const libCZI::SubBlockInfo& info = subblock->GetSubBlockInfo();
           auto image = ImageFactory::constructImage(subblock->CreateBitmap(),
               &info.coordinate, info.logicalRect, info.mIndex);
           if (flatten_ && ImageFactory::numberOfChannels(image->pixelType())>1) {
@@ -118,19 +110,19 @@ namespace pylibczi {
   }
 
   SubblockMetaVec
-  Reader::readSubblockMeta(libCZI::CDimCoordinate& plane_coord_, int index_m_){
-
+  Reader::readSubblockMeta(libCZI::CDimCoordinate& plane_coord_, int index_m_)
+  {
       SubblockMetaVec metaSubblocks;
       metaSubblocks.setMosaic(isMosaic());
 
       SubblockSorter subBlockToFind(&plane_coord_, index_m_, isMosaic());
-      SubblockIndexVec matches = getMatches( subBlockToFind );
+      SubblockIndexVec matches = getMatches(subBlockToFind);
 
-      for_each(matches.begin(), matches.end(), [&](SubblockIndexVec::value_type &match_){
+      for_each(matches.begin(), matches.end(), [&](SubblockIndexVec::value_type& match_) {
           size_t metaSize = 0;
           auto subblock = m_czireader->ReadSubBlock(match_.second);
           auto sharedPtrString = subblock->GetRawData(libCZI::ISubBlock::Metadata, &metaSize);
-          metaSubblocks.emplace_back(match_.first.coordinatePtr(), match_.first.mIndex(), isMosaic(), (char *)(sharedPtrString.get()));
+          metaSubblocks.emplace_back(match_.first.coordinatePtr(), match_.first.mIndex(), isMosaic(), (char*) (sharedPtrString.get()));
       });
 
       return metaSubblocks;
@@ -139,22 +131,27 @@ namespace pylibczi {
 // private methods
 
   Reader::SubblockIndexVec
-  Reader::getMatches( SubblockSorter &match_ ){
+  Reader::getMatches(SubblockSorter& match_)
+  {
       SubblockIndexVec ans;
       std::copy_if(m_orderMapping.begin(), m_orderMapping.end(), std::back_inserter(ans),
-          [&match_](const SubblockIndexVec::value_type &a_) { return match_ == a_.first; });
+          [&match_](const SubblockIndexVec::value_type& a_) { return match_==a_.first; });
       return ans;
   }
 
   void
-  Reader::addSortOrderIndex(vector<IndexMap>& vector_of_index_maps_)
+  Reader::addOrderMapping()
   {
-      int counter = 0;
-      std::sort(vector_of_index_maps_.begin(), vector_of_index_maps_.end(), [](IndexMap& a_, IndexMap& b_) -> bool { return (a_<b_); });
-      for (auto&& a : vector_of_index_maps_)
-          a.position(counter++);
-      std::sort(vector_of_index_maps_.begin(), vector_of_index_maps_.end(),
-          [](IndexMap& a_, IndexMap& b_) -> bool { return a_.lessThanSubBlock(b_); });
+      // create a reference for finding one or more subblock indices from a CDimCoordinate
+      m_czireader->EnumerateSubBlocks([&](int index_, const libCZI::SubBlockInfo& info_) -> bool {
+          if (isPyramid0(info_)) {
+              m_orderMapping.emplace_back(std::piecewise_construct,
+                  std::make_tuple(&(info_.coordinate), info_.mIndex, isMosaic()),
+                  std::make_tuple(index_)
+              );
+          }
+          return true;
+      });
   }
 
   bool

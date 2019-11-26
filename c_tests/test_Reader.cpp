@@ -1,6 +1,7 @@
 #include <cstdio>
 
 #include "catch.hpp"
+
 #include "../_pylibczi/Reader.h"
 #include "../_pylibczi/pb_helpers.h"
 
@@ -20,10 +21,21 @@ public:
     pylibczi::Reader* get() { return m_czi.get(); }
 };
 
-TEST_CASE("test_reader_constructor", "[Reader]")
+class CziCreatorIStream {
+    std::unique_ptr<pylibczi::Reader> m_czi;
+public:
+    CziCreatorIStream()
+        :m_czi()
+    {
+        auto fp = std::shared_ptr<libCZI::IStream>(new CSimpleStreamImplCppStreams(L"resources/s_1_t_1_c_1_z_1.czi"));
+        m_czi = std::unique_ptr< pylibczi::Reader >( new pylibczi::Reader(fp) );
+    }
+    pylibczi::Reader* get() { return m_czi.get(); }
+};
+
+TEST_CASE_METHOD(CziCreatorIStream, "test_reader_constructor", "[Reader]")
 {
-    auto fp = std::shared_ptr<libCZI::IStream>(new CSimpleStreamImplCppStreams(L"resources/s_1_t_1_c_1_z_1.czi"));      // #include <cstdio>
-    REQUIRE_NOTHROW(pylibczi::Reader(fp));
+    REQUIRE_NOTHROW(get());
 }
 
 TEST_CASE("open_two_czis", "[Reader_Dup]")
@@ -83,6 +95,28 @@ TEST_CASE_METHOD(CziCreator2, "test_read_selected2", "[Reader_read_selected]")
                                         {libCZI::DimensionIndex::C, 0}};
     auto imvec = czi->readSelected(cDims).first;
     REQUIRE(imvec.size()==15);
+    auto shape = imvec.front()->shape();
+    REQUIRE(shape[0]==325); // height
+    REQUIRE(shape[1]==475); // width
+}
+
+TEST_CASE_METHOD(CziCreatorIStream, "test_read_selected3", "[Reader_read_selected]")
+{
+    auto czi = get();
+    auto cDims = libCZI::CDimCoordinate{ {libCZI::DimensionIndex::C, 0}};
+    auto imvec = czi->readSelected(cDims).first;
+    REQUIRE(imvec.size()==1);
+    auto shape = imvec.front()->shape();
+    REQUIRE(shape[0]==325); // height
+    REQUIRE(shape[1]==475); // width
+}
+
+TEST_CASE_METHOD(CziCreatorIStream, "test_read_selected4", "[Reader_read_selected]")
+{
+    auto czi = get();
+    auto cDims = libCZI::CDimCoordinate();
+    auto imvec = czi->readSelected(cDims).first;
+    REQUIRE(imvec.size()==1);
     auto shape = imvec.front()->shape();
     REQUIRE(shape[0]==325); // height
     REQUIRE(shape[1]==475); // width

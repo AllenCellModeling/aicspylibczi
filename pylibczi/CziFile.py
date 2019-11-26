@@ -177,7 +177,7 @@ class CziFile(object):
         """
         plane_constraints = self.czilib.DimCoord()
         [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
-        image, shape = self.reader.read_selected(plane_constraints, m_index, True)
+        image, shape = self.reader.read_selected(plane_constraints, m_index, False)
         return image, shape
 
     def read_mosaic_size(self):
