@@ -79,7 +79,7 @@ namespace pylibczi {
   std::pair<ImageVector, Reader::Shape>
   Reader::readSelected(libCZI::CDimCoordinate& plane_coord_, int index_m_, bool flatten_)
   {
-      SubblockSorter subblocksToFind(&plane_coord_, index_m_, isMosaic());
+      SubblockSortable subblocksToFind(&plane_coord_, index_m_, isMosaic());
       SubblockIndexVec matches = getMatches(subblocksToFind);
       ImageVector images;
       images.reserve(matches.size());
@@ -115,7 +115,7 @@ namespace pylibczi {
       SubblockMetaVec metaSubblocks;
       metaSubblocks.setMosaic(isMosaic());
 
-      SubblockSorter subBlockToFind(&plane_coord_, index_m_, isMosaic());
+      SubblockSortable subBlockToFind(&plane_coord_, index_m_, isMosaic());
       SubblockIndexVec matches = getMatches(subBlockToFind);
 
       for_each(matches.begin(), matches.end(), [&](SubblockIndexVec::value_type& match_) {
@@ -131,7 +131,7 @@ namespace pylibczi {
 // private methods
 
   Reader::SubblockIndexVec
-  Reader::getMatches(SubblockSorter& match_)
+  Reader::getMatches(SubblockSortable& match_)
   {
       SubblockIndexVec ans;
       std::copy_if(m_orderMapping.begin(), m_orderMapping.end(), std::back_inserter(ans),

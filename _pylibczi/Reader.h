@@ -10,7 +10,7 @@
 #include "inc_libCZI.h"
 #include "IndexMap.h"
 #include "Image.h"
-#include "SubblockSorter.h"
+#include "SubblockSortable.h"
 #include "SubblockMetaVec.h"
 
 /*! \mainpage libCZI_c++_extension
@@ -80,10 +80,10 @@ namespace pylibczi {
   class Reader {
       std::shared_ptr<CCZIReader> m_czireader; // required for cast in libCZI
       libCZI::SubBlockStatistics m_statistics;
-      std::vector< std::pair<SubblockSorter, int> > m_orderMapping;
+      std::vector< std::pair<SubblockSortable, int> > m_orderMapping;
 
   public:
-      using SubblockIndexVec = std::vector< std::pair<SubblockSorter, int> >;
+      using SubblockIndexVec = std::vector< std::pair<SubblockSortable, int> >;
       using MapDiP = std::map<libCZI::DimensionIndex, std::pair<int, int> >;
       using Shape = std::vector<std::pair<char, int> >;
       /*!
@@ -219,7 +219,7 @@ namespace pylibczi {
 
   private:
 
-      Reader::SubblockIndexVec getMatches( SubblockSorter &match_ );
+      Reader::SubblockIndexVec getMatches( SubblockSortable &match_ );
 
       void addOrderMapping();
 

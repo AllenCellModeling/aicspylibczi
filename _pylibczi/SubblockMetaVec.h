@@ -10,15 +10,15 @@
 
 #include "inc_libCZI.h"
 #include "Image.h"
-#include "SubblockSorter.h"
+#include "SubblockSortable.h"
 
 namespace pylibczi {
 
-  class SubblockString : public SubblockSorter {
+  class SubblockString : public SubblockSortable {
       std::string m_string;
   public:
       SubblockString(const libCZI::CDimCoordinate *plane_, int index_m_, bool is_mosaic_, char* str_p_)
-      : SubblockSorter(plane_, index_m_, is_mosaic_), m_string(str_p_) {
+      :SubblockSortable(plane_, index_m_, is_mosaic_), m_string(str_p_) {
           //clear string from garbage symbols
           std::regex lthan("&lt;"), gthan("&gt;"), spce("\\s*\\r\\n\\s*");
           std::regex metatag("</METADATA>.*"), quote("\\\"");

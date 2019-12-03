@@ -1,5 +1,5 @@
-#ifndef _PYLIBCZI_SUBBLOCKSORTER_H
-#define _PYLIBCZI_SUBBLOCKSORTER_H
+#ifndef _PYLIBCZI_SUBBLOCKSORTABLE_H
+#define _PYLIBCZI_SUBBLOCKSORTABLE_H
 
 #include <utility>
 #include <vector>
@@ -9,13 +9,13 @@
 
 namespace pylibczi{
 
-  class SubblockSorter{
+  class SubblockSortable{
   protected:
     libCZI::CDimCoordinate m_planeCoordinate;
     int m_indexM;
     bool m_isMosaic;
   public:
-      SubblockSorter(const libCZI::CDimCoordinate  *plane_, int index_m_, bool is_mosaic_=false)
+      SubblockSortable(const libCZI::CDimCoordinate  *plane_, int index_m_, bool is_mosaic_=false)
       : m_planeCoordinate(plane_), m_indexM(index_m_), m_isMosaic(is_mosaic_) {}
 
       const libCZI::CDimCoordinate* coordinatePtr() const { return &m_planeCoordinate; }
@@ -23,7 +23,7 @@ namespace pylibczi{
       int mIndex() const { return m_indexM; }
 
       std::map<char, int>  getDimsAsChars() const {
-          return SubblockSorter::getValidIndexes(m_planeCoordinate, m_indexM, m_isMosaic);
+          return SubblockSortable::getValidIndexes(m_planeCoordinate, m_indexM, m_isMosaic);
       }
 
       static std::map<char, int> getValidIndexes(const libCZI::CDimCoordinate& planecoord_, int index_m_, bool is_mosaic_=false)
@@ -38,15 +38,15 @@ namespace pylibczi{
       }
 
       std::map<char, int> getValidIndexes(bool is_mosaic_ = false) const {
-          return SubblockSorter::getValidIndexes(m_planeCoordinate, m_indexM, is_mosaic_);
+          return SubblockSortable::getValidIndexes(m_planeCoordinate, m_indexM, is_mosaic_);
       }
 
-      bool operator<(const SubblockSorter& other_) const {
-          if(!m_isMosaic) return SubblockSorter::aLessThanB(m_planeCoordinate, other_.m_planeCoordinate);
-          return SubblockSorter::aLessThanB(m_planeCoordinate, m_indexM, other_.m_planeCoordinate, other_.m_indexM);
+      bool operator<(const SubblockSortable& other_) const {
+          if(!m_isMosaic) return SubblockSortable::aLessThanB(m_planeCoordinate, other_.m_planeCoordinate);
+          return SubblockSortable::aLessThanB(m_planeCoordinate, m_indexM, other_.m_planeCoordinate, other_.m_indexM);
       }
 
-      bool operator==(const SubblockSorter &other_) const {
+      bool operator==(const SubblockSortable &other_) const {
           return !(*this < other_) && !(other_ < *this);
       }
 
@@ -67,4 +67,4 @@ namespace pylibczi{
   };
 }
 
-#endif //_PYLIBCZI_SUBBLOCKSORTER_H
+#endif //_PYLIBCZI_SUBBLOCKSORTABLE_H

@@ -16,7 +16,7 @@
 
 #include "exceptions.h"
 #include "helper_algorithms.h"
-#include "SubblockSorter.h"
+#include "SubblockSortable.h"
 
 namespace pylibczi {
 
@@ -26,7 +26,7 @@ namespace pylibczi {
    * one subblock which may be either 2D or 3D, in the case of 3D the data is then later split into multiple 2D Image<T> so that
    * the concept of a Channel isn't destroyed.
    */
-  class Image : public SubblockSorter {
+  class Image : public SubblockSortable {
   protected:
       /*!
        * ImageBC holds the data describing the image (Image<T> inherits it). The m_matrixSizes can be 2D or 3D depending on
@@ -47,7 +47,7 @@ namespace pylibczi {
 
       Image(std::vector<size_t> shape_, libCZI::PixelType pixel_type_, const libCZI::CDimCoordinate* plane_coordinates_,
           libCZI::IntRect box_, int index_m_)
-          : SubblockSorter(plane_coordinates_, index_m_), m_shape(std::move(shape_)), m_pixelType(pixel_type_),
+          :SubblockSortable(plane_coordinates_, index_m_), m_shape(std::move(shape_)), m_pixelType(pixel_type_),
            m_xywh(box_) { }
 
       size_t calculateIdx(const std::vector<size_t>& indexes_);

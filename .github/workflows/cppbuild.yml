@@ -11,8 +11,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
-        with:
-          submodules: true
       - name: llvm build and test
         if: matrix.compiler == 'llvm'
         env:
