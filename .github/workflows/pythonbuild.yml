@@ -23,12 +23,8 @@ jobs:
           pip install .[test]
       - name: Test with pytest
         run: |
-          pytest --cov-report xml --cov=pylibczi pylibczi/tests
+          pytest -n1 --cov-report xml --cov=pylibczi pylibczi/tests
           codecov -t ${{ secrets.CodeCovKey }}
-      - name: BruteForceTest
-        run: |
-          python test.py
-
 
   lint:
     runs-on: ubuntu-latest

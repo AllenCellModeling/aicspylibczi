@@ -40,6 +40,7 @@ test_requirements = [
     "pytest",
     "pytest-cov",
     "pytest-raises",
+    "pytest-xdist",
     "Sphinx>=2.1.0b1",
     "sphinx_rtd_theme>=0.1.2",
 ]
@@ -121,8 +122,6 @@ class CMakeBuild(build_ext):
 
         if platform.system() == "Windows":
             cmake_args += ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}'.format(cfg.upper(), extdir)]
-            # if sys.maxsize > 2**32:
-            #    cmake_args += ['-A', 'x64']
             build_args += ['--', '/m']
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
