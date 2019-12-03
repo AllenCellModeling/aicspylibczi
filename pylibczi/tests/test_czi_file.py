@@ -61,7 +61,6 @@ def test_is_mosaic(data_dir, fname, expected):
 def test_destructor(data_dir, fname, expected):
     czi = CziFile(str(data_dir / fname))
     czi = CziFile(str(data_dir / fname))
-    #this should segfault on windows
 
 
 @pytest.mark.parametrize("fname, expected", [
