@@ -52,12 +52,30 @@ namespace pylibczi {
   {
       MapDiP tbl;
       m_statistics.dimBounds.EnumValidDimensions([&tbl](libCZI::DimensionIndex di_, int start_, int size_) -> bool {
-          tbl.emplace(di_, std::make_pair(start_, size_));
+          tbl.emplace(di_, std::make_pair(start_, size_ + start_ - 1)); // changed from [start, end) to be [start, end]
           return true;
       });
 
       return tbl;
   }
+
+  /// @brief get the size of each dimension
+  /// @return vector of the integer sizes for each dimension
+  std::vector<int>
+  Reader::dimSizes() {
+      MapDiP tbl;
+      m_statistics.dimBounds.EnumValidDimensions([&tbl](libCZI::DimensionIndex di_, int start_, int size_) -> bool {
+          tbl.emplace(di_, std::make_pair(start_, size_)); // changed from [start, end) to be [start, end]
+          return true;
+      }); // sorts the letters into ascending order by default { Z, C, T, S }
+      std::vector<int> ans(tbl.size());
+      // use rbeing and rend to change it to ascending order.
+      transform(tbl.rbegin(), tbl.rend(), ans.begin(), [](const auto &pr_){
+          return pr_.second.second;
+      });
+      return ans;
+  }
+
 
   /// @brief get the Dimensions in the order they appear in
   /// @return a string containing the Dimensions for the image data object

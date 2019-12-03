@@ -24,6 +24,7 @@ jobs:
         env:
           CC: clang
           CXX: clang++
+          RUN_TESTS: true
         run: |
           mkdir ./cmake-build-debug
           cd cmake-build-debug
@@ -35,6 +36,7 @@ jobs:
         env:
           CC: gcc
           CXX: g++
+          RUN_TESTS: true
         run: |
           mkdir ./cmake-build-debug
           cd cmake-build-debug

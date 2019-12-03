@@ -20,8 +20,10 @@ add_custom_command(TARGET ${TARGET_NAME} PRE_BUILD
         ${CMAKE_SOURCE_DIR}/c_tests/resources $<TARGET_FILE_DIR:${TARGET_NAME}>/resources
         COMMENT "Copying C++ test resources")
 
-add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-        COMMAND ${TARGET_NAME}
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/c_tests
-        COMMENT "Running tests..."
-        )
+if(DEFINED ENV{RUN_TESTS})
+    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+            COMMAND ${TARGET_NAME}
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/c_tests
+            COMMENT "Running tests..."
+            )
+endif()

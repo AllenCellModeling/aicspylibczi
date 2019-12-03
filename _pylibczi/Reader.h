@@ -130,7 +130,7 @@ namespace pylibczi {
        * The internal structure suggests that a given dimension could start at a value other than zero.
        * Although I have yet to observe this we return a pair containing both the start and the size for the index.
        *
-       * @return A map< DimensionIndex, pair<int(start), int(size)> >
+       * @return A map< DimensionIndex, pair<int(start), int(end)> > which conforms to [start, end] (inclusive)
        */
       Reader::MapDiP readDims();
 
@@ -139,6 +139,12 @@ namespace pylibczi {
        * @return a string containing the dimensions
        */
       std::string dimsString();
+
+      /*!
+       * @brief Get the size of the dimensions in the same order as dimsString()
+       * @return a vector containing the dimension sizes
+       */
+      std::vector<int> dimSizes();
 
       /*!
        * @brief Get the metadata from the CZI file.
