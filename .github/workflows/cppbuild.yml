@@ -10,7 +10,9 @@ jobs:
         compiler: [llvm, gnu]
 
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v1
+        with:
+          submodules: true
       - name: llvm build and test
         if: matrix.compiler == 'llvm'
         env:

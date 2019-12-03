@@ -15,7 +15,9 @@ jobs:
         python-version: [3.6, 3.7]
         os: [ubuntu-latest, windows-latest, macOS-latest]
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v1
+        with:
+          submodules: true
       - name: setup python
         uses: actions/setup-python@v1
         with:
