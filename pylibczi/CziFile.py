@@ -76,10 +76,10 @@ class CziFile(object):
     def dims(self):
         """
         Get the dimensions present the binary data (not the metadata)
-        Y and X are not included as the dims as they are required for any image block.
+        Y and X are included for completeness but can not be used as constraints.
         :return: A string containing Dimensions letters present
         ::
-            "STZ"
+            "STZYX"
         """
         return self.reader.read_dims_string()
 
@@ -87,11 +87,15 @@ class CziFile(object):
         """
         Get the dimensions for the opened file from the binary data (not the metadata)
         :return: A dictionary containing Dimension / depth, a file with 3 scenes, 7 time-points
-        and 4 Z slices would have
+        and 4 Z slices containing images of (h,w) = (325, 475) would return
         ::
-            {'S': 3, 'T': 7, 'Z':4}
+            {'S': 3, 'T': 7, 'X':475, 'Y':325, 'Z':4}
         """
         return self.reader.read_dims()
+
+    @property
+    def size(self):
+        return tuple(self.reader.read_dims_sizes())
 
     def is_mosaic(self):
         """

@@ -4,7 +4,8 @@
 namespace pylibczi {
 
   const std::initializer_list<Constants::CziDi>
-  Constants::s_sortOrder{Constants::CziDi::V,
+  Constants::s_sortOrder{Constants::CziDi::B,
+                         Constants::CziDi::V,
                          Constants::CziDi::H,
                          Constants::CziDi::I,
                          Constants::CziDi::S,

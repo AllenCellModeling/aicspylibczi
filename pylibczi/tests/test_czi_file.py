@@ -35,14 +35,25 @@ def test_metadata(data_dir, fname, xp_query, expected):
 
 
 @pytest.mark.parametrize("fname, expected", [
-    ('s_1_t_1_c_1_z_1.czi', (1, 325, 475)),
-    ('s_3_t_1_c_3_z_5.czi', (3, 3, 5, 325, 475)),
+    ('s_1_t_1_c_1_z_1.czi', (1, 1, 325, 475)),
+    ('s_3_t_1_c_3_z_5.czi', (1, 3, 3, 5, 325, 475)),
 ])
 def test_read_image_from_istream(data_dir, fname, expected):
     with open(data_dir / fname, 'rb') as fp:
         czi = CziFile(czi_filename=fp)
         data = czi.read_image()
         assert data[0].shape == expected
+
+
+@pytest.mark.parametrize("fname, expected", [
+    ('s_1_t_1_c_1_z_1.czi', (1, 1, 325, 475)),
+    ('s_3_t_1_c_3_z_5.czi', (1, 3, 3, 5, 325, 475)),
+])
+def test_read_dims_sizes(data_dir, fname, expected):
+    with open(data_dir / fname, 'rb') as fp:
+        czi = CziFile(czi_filename=fp)
+        data = czi.size
+        assert data == expected
 
 
 @pytest.mark.parametrize("fname, expected", [
@@ -88,8 +99,8 @@ def test_read_image(data_dir, fname, expected):
 
 
 @pytest.mark.parametrize("fname, exp_str, exp_dict", [
-    ('s_1_t_1_c_1_z_1.czi', "BC", {'B': (0, 1), 'C': (0, 1)}),
-    ('s_3_t_1_c_3_z_5.czi', "BSCZ", {'B': (0, 1), 'C': (0, 3), 'Z': (0, 5), 'S': (0, 3)}),
+    ('s_1_t_1_c_1_z_1.czi', "BCYX", {'B': (0, 0), 'C': (0, 0), 'X': (0, 474), 'Y': (0, 324)}),
+    ('s_3_t_1_c_3_z_5.czi', "BSCZYX", {'B': (0, 0), 'C': (0, 2), 'X': (0, 474), 'Y': (0, 324), 'S': (0, 2), 'Z': (0, 4)}),
 ])
 def test_read_image_two(data_dir, fname, exp_str, exp_dict):
     czi = CziFile(str(data_dir / fname))
@@ -111,8 +122,8 @@ def test_read_subblock_meta(data_dir, fname, expected):
 
 
 @pytest.mark.parametrize("fname, expects", [
-    ('s_1_t_1_c_1_z_1.czi', {'B': (0, 1), 'C': (0, 1)}),  # single dims except for C are dropped (S/T dropped) B is always used
-    ('s_3_t_1_c_3_z_5.czi', {'B': (0, 1), 'S': (0, 3), 'C': (0, 3), 'Z': (0, 5)}),
+    ('s_1_t_1_c_1_z_1.czi', {'B': (0, 0), 'C': (0, 0), 'X': (0, 474), 'Y': (0, 324)}),  # single dims except for C are dropped (S/T dropped) B is always used
+    ('s_3_t_1_c_3_z_5.czi', {'B': (0, 0), 'C': (0, 2), 'X': (0, 474), 'Y': (0, 324), 'S': (0, 2), 'Z': (0, 4)}),
 ])
 def test_image_shape(data_dir, fname, expects):
     with open(data_dir / fname, 'rb') as fp:

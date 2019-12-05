@@ -80,11 +80,13 @@ namespace pylibczi {
   class Reader {
       std::shared_ptr<CCZIReader> m_czireader; // required for cast in libCZI
       libCZI::SubBlockStatistics m_statistics;
-      std::vector< std::pair<SubblockSortable, int> > m_orderMapping;
+      std::vector<std::pair<SubblockSortable, int> > m_orderMapping;
+      bool m_specifyScene;
 
   public:
-      using SubblockIndexVec = std::vector< std::pair<SubblockSortable, int> >;
+      using SubblockIndexVec = std::vector<std::pair<SubblockSortable, int> >;
       using MapDiP = std::map<libCZI::DimensionIndex, std::pair<int, int> >;
+      using MapCDiP = std::map<char, std::pair<int, int> >;
       using Shape = std::vector<std::pair<char, int> >;
       /*!
        * @brief Construct the Reader and load the file statistics (dimensions etc)
@@ -132,23 +134,23 @@ namespace pylibczi {
        *
        * @return A map< DimensionIndex, pair<int(start), int(end)> > which conforms to [start, end] (inclusive)
        */
-      Reader::MapDiP readDims();
+      Reader::MapCDiP readDims();
 
       /*!
        * @brief Get the Dimensions in the order that they appear.
-       * @return a string containing the dimensions
+       * @return a string containing the dimensions. Y & X are included for completeness despite not being DimensionIndexes.
        */
       std::string dimsString();
 
       /*!
        * @brief Get the size of the dimensions in the same order as dimsString()
-       * @return a vector containing the dimension sizes
+       * @return a vector containing the dimension sizes. Y & X are included for completeness despite not being DimensionIndexes.
        */
       std::vector<int> dimSizes();
 
       /*!
        * @brief Get the metadata from the CZI file.
-       * @return A string containing the xml metadata from the file
+       * @return A string containing the xml metadata from the file. Y & X are included for completeness despite not being DimensionIndexes.
        */
       std::string readMeta();
 
@@ -223,9 +225,11 @@ namespace pylibczi {
 
       static Shape getShape(pylibczi::ImageVector& images_, bool is_mosaic_) { return images_.getShape(); }
 
+      libCZI::IntRect getSceneSize(int scene_index_ = -1);
+
   private:
 
-      Reader::SubblockIndexVec getMatches( SubblockSortable &match_ );
+      Reader::SubblockIndexVec getMatches(SubblockSortable& match_);
 
       void addOrderMapping();
 
@@ -235,6 +239,8 @@ namespace pylibczi {
       }
 
       static bool isValidRegion(const libCZI::IntRect& in_box_, const libCZI::IntRect& czi_box_);
+
+      void checkSceneShapes(void);
   };
 
 }

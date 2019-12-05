@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <algorithm>
 
 #include "catch.hpp"
 
@@ -48,15 +49,16 @@ TEST_CASE_METHOD(CziCreator, "test_reader_dims_1", "[Reader_Dims]")
 {
     auto czi = get();
     auto dims = czi->readDims();
-    REQUIRE(dims[libCZI::DimensionIndex::C] == std::pair<int, int>(0, 0));
-    REQUIRE(dims.size()==2); // B=0, C=0 for this file
+    auto cDim = find_if(dims.begin(), dims.end(),[](const auto &pr_){ return pr_.first == 'C'; });
+    REQUIRE(cDim->second == std::pair<int, int>(0, 0));
+    REQUIRE(dims.size()==4); // B=0, C=0, Y, X for this file
 }
 
 TEST_CASE_METHOD(CziCreator, "test_reader_dims_2", "[Reader_Dims_String]")
 {
     auto czi = get();
     auto dims = czi->dimsString();
-    REQUIRE(dims == std::string("BC")); // B=0, C=0 for this file
+    REQUIRE(dims == std::string("BCYX")); // B=0, C=0 for this file
 }
 
 TEST_CASE_METHOD(CziCreator2, "test_reader_dims_3", "[Reader_Dims_Size]")
@@ -65,11 +67,11 @@ TEST_CASE_METHOD(CziCreator2, "test_reader_dims_3", "[Reader_Dims_Size]")
     std::string dstr = czi->dimsString();
     auto dims = czi->dimSizes();
     //                                  B  S  C  Z
-    std::initializer_list<int> shape = {1, 3, 3, 5};
+    std::initializer_list<int> shape = {1, 3, 3, 5, 325, 475};
     pairedForEach(dims.begin(), dims.end(), shape.begin(), [](int a_, int b_){
         REQUIRE( a_ == b_);
     });
-    REQUIRE( dstr == "BSCZ");
+    REQUIRE( dstr == "BSCZYX");
 }
 
 TEST_CASE_METHOD(CziCreator, "test_is_mosaic", "[Reader_Is_Mosaic]")
