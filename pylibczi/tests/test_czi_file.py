@@ -56,6 +56,36 @@ def test_read_dims_sizes(data_dir, fname, expected):
         assert data == expected
 
 
+@pytest.mark.parametrize("fname, idx, expected", [
+    ('s_1_t_1_c_1_z_1.czi', -1, (325, 475)),
+    ('s_1_t_1_c_1_z_1.czi', 0, (325, 475)),
+    ('s_3_t_1_c_3_z_5.czi', -1, (325, 475)),
+    ('s_3_t_1_c_3_z_5.czi', 0, (325, 475)),
+    ('s_3_t_1_c_3_z_5.czi', 1, (325, 475)),
+    ('s_3_t_1_c_3_z_5.czi', 2, (325, 475)),
+])
+def test_scene_height_width(data_dir, fname, idx, expected):
+    with open(data_dir / fname, 'rb') as fp:
+        czi = CziFile(czi_filename=fp)
+        data = czi.scene_height_by_width(idx)
+        assert data == expected
+
+
+@pytest.mark.parametrize("fname, idx, expected", [
+    ('s_1_t_1_c_1_z_1.czi', -1, (39856, 39272, 475, 325)),
+    ('s_1_t_1_c_1_z_1.czi', 0, (39856, 39272,  475, 325)),
+    ('s_3_t_1_c_3_z_5.czi', -1, (39850, 35568, 475, 325)),
+    ('s_3_t_1_c_3_z_5.czi', 0, (39850, 35568, 475, 325)),
+    ('s_3_t_1_c_3_z_5.czi', 1, (39850, 35568, 475, 325)),
+    ('s_3_t_1_c_3_z_5.czi', 2, (39850, 39272, 475, 325)),
+])
+def test_scene_bbox(data_dir, fname, idx, expected):
+    with open(data_dir / fname, 'rb') as fp:
+        czi = CziFile(czi_filename=fp)
+        data = czi.scene_bounding_box(idx)
+        assert data == expected
+
+
 @pytest.mark.parametrize("fname, expected", [
     ('s_1_t_1_c_1_z_1.czi', False),
     ('s_3_t_1_c_3_z_5.czi', False),

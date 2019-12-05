@@ -89,9 +89,31 @@ class CziFile(object):
         :return: A dictionary containing Dimension / depth, a file with 3 scenes, 7 time-points
         and 4 Z slices containing images of (h,w) = (325, 475) would return
         ::
-            {'S': 3, 'T': 7, 'X':475, 'Y':325, 'Z':4}
+            {'S': 3, 'T': 7, 'X': 475, 'Y': 325, 'Z': 4}
         """
         return self.reader.read_dims()
+
+    def scene_bounding_box(self, index: int = -1):
+        """
+        Get the bounding box of the raw collected data (pyramid 0) from the czifile. if not specified it defaults to
+        the first scene
+        :param index: the scene index, omit and it defaults to the first one
+        :return: (x0, y0, w, h) for the specified scene
+        """
+        bbox = self.reader.read_scene_wh(index)
+        ans = (bbox.x, bbox.y, bbox.w, bbox.h)
+        return ans
+
+    def scene_height_by_width(self, index: int = -1):
+        """
+        Get the size of the scene (Y, X) / (height, width) for the specified Scene. The default is to return
+        the size of the first Scene but Zeiss allows scenes to be different sizes thought it is unlikely to encounter.
+        This module will warn you on instantiation if the scenes have inconsistent width and height.
+        :param index: specifies the index of the Scene to get the height and width of
+        :return: (height, width) tuple of the Specified scene.
+        """
+        box = self.reader.read_scene_wh(index)
+        return (box.h, box.w)
 
     @property
     def size(self):

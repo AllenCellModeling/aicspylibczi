@@ -79,7 +79,7 @@ namespace pylibczi {
           ans.emplace(dimToChar(pr_.first), pr_.second);
       });
 
-      libCZI::IntRect sbsize = getSceneSize();
+      libCZI::IntRect sbsize = getSceneYXSize();
 
       ans.emplace('Y', std::make_pair(0, sbsize.h-1));
       ans.emplace('X', std::make_pair(0, sbsize.w-1));
@@ -107,7 +107,7 @@ namespace pylibczi {
           return pr_.second.second;
       });
 
-      libCZI::IntRect sbsize = getSceneSize();
+      libCZI::IntRect sbsize = getSceneYXSize();
 
       ans.push_back(sbsize.h);
       ans.push_back(sbsize.w);
@@ -116,7 +116,7 @@ namespace pylibczi {
   }
 
   libCZI::IntRect
-  Reader::getSceneSize(int scene_index_)
+  Reader::getSceneYXSize(int scene_index_)
   {
       if (m_statistics.dimBounds.IsValid(libCZI::DimensionIndex::S)) {
           int sStart(0), sSize(0);
@@ -214,6 +214,27 @@ namespace pylibczi {
       SubblockIndexVec ans;
       std::copy_if(m_orderMapping.begin(), m_orderMapping.end(), std::back_inserter(ans),
           [&match_](const SubblockIndexVec::value_type& a_) { return match_==a_.first; });
+      if(ans.empty()){
+          // check for invalid Dimension specification
+          match_.coordinatePtr()->EnumValidDimensions([&](libCZI::DimensionIndex di_, int value_){
+              bool keepGoing = true;
+              if(!m_statistics.dimBounds.IsValid(di_)){
+                  std::stringstream tmp;
+                  tmp << dimToChar(di_) << " Not present in defined file Coordinates!";
+                  throw CDimCoordinatesOverspecifiedException(tmp.str());
+              }
+
+              int start(0), size(0);
+              m_statistics.dimBounds.TryGetInterval(di_, &start, &size);
+              if( value_ < start || value_ >= (start + size)){
+                  std::stringstream tmp;
+                  tmp << dimToChar(di_) << " value " << value_ << "invalid, ∉ [" << start << ", "
+                    << start + size << ")" << std::endl;
+                  throw CDimCoordinatesOverspecifiedException(tmp.str());
+              }
+              return true;
+          });
+      }
       return ans;
   }
 

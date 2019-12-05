@@ -36,7 +36,7 @@ namespace pb_helpers {
       T* position = ptr;
       for (const auto& image : images_) {
           auto typedImage = pylibczi::ImageFactory::getDerived<T>(image);
-          int length = typedImage->length();
+          size_t length = typedImage->length();
           std::copy(typedImage->getRawPtr(), typedImage->getRawPtr()+length, position);
           position += length;
       }

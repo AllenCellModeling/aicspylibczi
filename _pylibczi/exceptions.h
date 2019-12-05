@@ -126,6 +126,20 @@ namespace pylibczi {
       }
   };
 
+  class CDimCoordinatesOverspecifiedException: public std::exception {
+      std::string m_message;
+  public:
+      explicit CDimCoordinatesOverspecifiedException(std::string message_): m_message(std::move(message_)) {}
+
+      const char* what() const noexcept override
+      {
+          std::stringstream tmp;
+          tmp << "The coordinates are overspecified = you have specified a Dimension or Dimension value that is not valid. "
+          << m_message << std::endl;
+          return tmp.str().c_str();
+      }
+  };
+
   class CdimSelectionZeroImagesException: public std::exception {
       libCZI::CDimCoordinate m_requestedPlaneCoordinate; // requested
       libCZI::CDimBounds m_planeCoordinateBounds; // image file

@@ -28,6 +28,7 @@ PYBIND11_MODULE(_pylibczi, m)
     py::register_exception<pylibczi::ImageSplitChannelException>(m, "PylibCZI_ImageSplitChannelException");
     py::register_exception<pylibczi::ImageCopyAllocFailed>(m, "PylibCZI_ImageCopyAllocFailed");
     py::register_exception<pylibczi::CdimSelectionZeroImagesException>(m, "PylibCZI_CDimSpecSelectedNoImagesException");
+    py::register_exception<pylibczi::CDimCoordinatesOverspecifiedException>(m, "PylibCZI_CDimCoordinatesOverspecifiedException");
 
     py::class_<pylibczi::Reader>(m, "Reader")
         .def(py::init<std::shared_ptr<libCZI::IStream> >())
@@ -35,6 +36,7 @@ PYBIND11_MODULE(_pylibczi, m)
         .def("read_dims", &pylibczi::Reader::readDims)
         .def("read_dims_string", &pylibczi::Reader::dimsString)
         .def("read_dims_sizes", &pylibczi::Reader::dimSizes)
+        .def("read_scene_wh", &pylibczi::Reader::getSceneYXSize)
         .def("read_meta", &pylibczi::Reader::readMeta)
         .def("read_selected", &pylibczi::Reader::readSelected)
         .def("mosaic_shape", &pylibczi::Reader::mosaicShape)

@@ -3,6 +3,7 @@
 
 #include "catch.hpp"
 
+#include "../_pylibczi/exceptions.h"
 #include "../_pylibczi/Reader.h"
 #include "../_pylibczi/pb_helpers.h"
 
@@ -137,6 +138,16 @@ TEST_CASE_METHOD(CziCreatorIStream, "test_read_selected4", "[Reader_read_selecte
     REQUIRE(shape[0]==325); // height
     REQUIRE(shape[1]==475); // width
 }
+
+TEST_CASE_METHOD(CziCreator2, "test_bad_scene", "[Reader_read_bad_scene]")
+{
+    auto czi = get();
+    auto cDims = libCZI::CDimCoordinate{{libCZI::DimensionIndex::B, 0},
+                                        {libCZI::DimensionIndex::C, 0},
+                                        { libCZI::DimensionIndex::S, 4}};
+    REQUIRE_THROWS_AS(czi->readSelected(cDims), pylibczi::CDimCoordinatesOverspecifiedException);
+}
+
 
 TEST_CASE_METHOD(CziCreator2, "test_read_subblock_meta", "[Reader_read_subblock_meta]")
 {

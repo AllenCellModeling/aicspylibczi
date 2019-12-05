@@ -223,9 +223,20 @@ namespace pylibczi {
        */
       libCZI::IntRect mosaicShape() { return m_statistics.boundingBoxLayer0Only; }
 
+      /*!
+       * @brief get the shape of the loaded images
+       * @param images_ the ImageVector of images to get the shape of
+       * @param is_mosaic_ a boolean telling the function if it's a mosaic file
+       * @return a vector of (Dimension letter, Dimension size)
+       */
       static Shape getShape(pylibczi::ImageVector& images_, bool is_mosaic_) { return images_.getShape(); }
 
-      libCZI::IntRect getSceneSize(int scene_index_ = -1);
+      /*!
+       * @brief get the pyramid 0 (acquired data) shape
+       * @param scene_index_ specifies scene but defaults to the first scene, Scenes can have different sizes
+       * @return libCZI::IntRect containing (x0, y0, w, h)
+       */
+      libCZI::IntRect getSceneYXSize(int scene_index_ = -1);
 
   private:
 
