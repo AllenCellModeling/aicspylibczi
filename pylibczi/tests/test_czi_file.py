@@ -1,6 +1,5 @@
 import pytest
 from pylibczi import CziFile
-from pathlib import Path
 
 
 @pytest.mark.parametrize("as_string", [
@@ -101,7 +100,7 @@ def test_is_mosaic(data_dir, fname, expected):
 ])
 def test_destructor(data_dir, fname, expected):
     czi = CziFile(str(data_dir / fname))
-    czi = CziFile(str(data_dir / fname))
+    czi = CziFile(str(data_dir / fname))  # NOQA F841
 
 
 @pytest.mark.parametrize("fname, expected", [
@@ -152,7 +151,7 @@ def test_read_subblock_meta(data_dir, fname, expected):
 
 
 @pytest.mark.parametrize("fname, expects", [
-    ('s_1_t_1_c_1_z_1.czi', {'B': (0, 0), 'C': (0, 0), 'X': (0, 474), 'Y': (0, 324)}),  # single dims except for C are dropped (S/T dropped) B is always used
+    ('s_1_t_1_c_1_z_1.czi', {'B': (0, 0), 'C': (0, 0), 'X': (0, 474), 'Y': (0, 324)}),
     ('s_3_t_1_c_3_z_5.czi', {'B': (0, 0), 'C': (0, 2), 'X': (0, 474), 'Y': (0, 324), 'S': (0, 2), 'Z': (0, 4)}),
 ])
 def test_image_shape(data_dir, fname, expects):

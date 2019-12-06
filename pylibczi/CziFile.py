@@ -77,19 +77,26 @@ class CziFile(object):
         """
         Get the dimensions present the binary data (not the metadata)
         Y and X are included for completeness but can not be used as constraints.
-        :return: A string containing Dimensions letters present
-        ::
-            "STZYX"
+
+        Returns
+        -------
+        str
+            A string containing Dimensions letters present, ie "BSTZYX"
+
         """
         return self.reader.read_dims_string()
 
     def dims_shape(self):
         """
         Get the dimensions for the opened file from the binary data (not the metadata)
-        :return: A dictionary containing Dimension / depth, a file with 3 scenes, 7 time-points
-        and 4 Z slices containing images of (h,w) = (325, 475) would return
-        ::
+
+        Returns
+        -------
+        dict
+            A dictionary containing Dimension / depth, a file with 3 scenes, 7 time-points
+            and 4 Z slices containing images of (h,w) = (325, 475) would return
             {'S': 3, 'T': 7, 'X': 475, 'Y': 325, 'Z': 4}
+
         """
         return self.reader.read_dims()
 
@@ -97,8 +104,17 @@ class CziFile(object):
         """
         Get the bounding box of the raw collected data (pyramid 0) from the czifile. if not specified it defaults to
         the first scene
-        :param index: the scene index, omit and it defaults to the first one
-        :return: (x0, y0, w, h) for the specified scene
+
+        Parameters
+        ----------
+        index
+             the scene index, omit and it defaults to the first one
+
+        Returns
+        -------
+        tuple
+            (x0, y0, w, h) for the specified scene
+
         """
         bbox = self.reader.read_scene_wh(index)
         ans = (bbox.x, bbox.y, bbox.w, bbox.h)
@@ -109,20 +125,43 @@ class CziFile(object):
         Get the size of the scene (Y, X) / (height, width) for the specified Scene. The default is to return
         the size of the first Scene but Zeiss allows scenes to be different sizes thought it is unlikely to encounter.
         This module will warn you on instantiation if the scenes have inconsistent width and height.
-        :param index: specifies the index of the Scene to get the height and width of
-        :return: (height, width) tuple of the Specified scene.
+
+        Parameters
+        ----------
+        index
+            specifies the index of the Scene to get the height and width of
+
+        Returns
+        -------
+        tuple
+            (height, width) tuple of the Specified scene.
+
         """
         box = self.reader.read_scene_wh(index)
         return (box.h, box.w)
 
     @property
     def size(self):
+        """
+        This returns the Size of each dimension in the dims string. So if S had valid indexes of [0, 1, 2, 3, 4]
+        the returned tuple would have a value of 5 in the same position as the S occurs in the dims string.
+
+        Returns
+        -------
+        tuple
+            a tuple of dimension sizes
+
+        """
         return tuple(self.reader.read_dims_sizes())
 
     def is_mosaic(self):
         """
         Test if the loaded file is a mosaic file
-        :returns: True | False
+
+        Returns
+        -------
+        bool
+            True | False ie is this a mosaic file
         """
         return self.reader.is_mosaic()
 
@@ -160,9 +199,14 @@ class CziFile(object):
             )
 
     def read_meta(self):
-        """Extract all metadata from czifile.
+        """
+        Extract all metadata from czifile.
 
-        :returns: metadata as an xml etree
+        Returns
+        -------
+        lxml.etree
+            metadata as an xml etree
+
         """
         meta_str = self.reader.read_meta()
         self.meta_root = etree.fromstring(meta_str)
@@ -176,10 +220,14 @@ class CziFile(object):
     def read_subblock_metadata(self, m_index: int = -1, **kwargs):
         """
         Read the subblock specific metadata, ie time subblock was aquired / position at aquisition time etc.
-        :param m_index: If it's a mosaic file and you wish to select specific M-indexs then use this otherwise ignore
-        it.
-        :param kwargs: The keywords below allow you to specify the dimensions that you wish to match. If you
-            under-specify the constraints you can easily end up with a massive image stack. ::
+
+        Parameters
+        ----------
+        m_index
+            If it's a mosaic file and you wish to select specific M-index then use this otherwise ignore it.
+        kwargs
+            The keywords below allow you to specify the dimensions that you wish to match. If you
+            under-specify the constraints you can easily end up with a massive image stack.
                        Z = 1   # The Z-dimension.
                        C = 2   # The C-dimension ("channel").
                        T = 3   # The T-dimension ("time").
@@ -188,7 +236,12 @@ class CziFile(object):
                        I = 6   # The I-dimension ("illumination").
                        H = 7   # The H-dimension ("phase").
                        V = 8   # The V-dimension ("view").
-        :return: str containing the metadata
+
+        Returns
+        -------
+        [str]
+            an array of stings containing the specified subblock metadata
+
         """
         plane_constraints = self.czilib.DimCoord()
         [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
@@ -199,10 +252,13 @@ class CziFile(object):
         Read the subblocks in the CZI file and for any subblocks that match all the constraints in kwargs return
         that data. This allows you to select channels/scenes/time-points/Z-slices etc.
 
-        :param m_index: If it's a mosaic file and you wish to select specific M-indexs then use this otherwise ignore
-        it.
-        :param kwargs: The keywords below allow you to specify the dimensions that you wish to match. If you
-            under-specify the constraints you can easily end up with a massive image stack. ::
+        Parameters
+        ----------
+        m_index
+            If it's a mosaic file and you wish to select specific M-indexs then use this otherwise ignore it.
+        kwargs
+            The keywords below allow you to specify the dimensions that you wish to match. If you
+            under-specify the constraints you can easily end up with a massive image stack.
                        Z = 1   # The Z-dimension.
                        C = 2   # The C-dimension ("channel").
                        T = 3   # The T-dimension ("time").
@@ -212,10 +268,13 @@ class CziFile(object):
                        H = 7   # The H-dimension ("phase").
                        V = 8   # The V-dimension ("view").
 
-        :returns: a tuple of (numpy.ndarray, a list of (Dimension, size)) the second element of the tuple is to make
+        Returns
+        -------
+        (numpy.ndarray, [Dimension, Size])
+            a tuple of (numpy.ndarray, a list of (Dimension, size)) the second element of the tuple is to make
             sure the numpy.ndarray is interpretable. An example of the list is ::
-                # [('S', 1), ('T', 1), ('C', 2), ('Z', 25), ('Y', 1024), ('X', 1024)]
-            # so if you probed the numpy.ndarray with .shape you would get (1, 1, 2, 25, 1024, 1024).
+                    [('S', 1), ('T', 1), ('C', 2), ('Z', 25), ('Y', 1024), ('X', 1024)]
+                 so if you probed the numpy.ndarray with .shape you would get (1, 1, 2, 25, 1024, 1024).
         """
         plane_constraints = self.czilib.DimCoord()
         [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
@@ -226,7 +285,10 @@ class CziFile(object):
         """
         Get the size of the entire mosaic image, if it's not a mosaic image return (0, 0, -1, -1)
 
-        :returns: (x, y, w, h)
+        Returns
+        -------
+        (int, int, int, int)
+            (x, y, w, h) the bounding box of the mosaic image
         """
         if not self.reader.is_mosaic():
             ans = self.czilib.IntRect()
@@ -238,18 +300,23 @@ class CziFile(object):
 
     def read_mosaic(self, region: Tuple = None, scale_factor: float = 0.1, **kwargs):
         """
-        reads a mosaic file and returns an image corresponding to the specified dimensions. If the file is more than
+        Reads a mosaic file and returns an image corresponding to the specified dimensions. If the file is more than
         a 2D sheet of pixels, meaning only one channel, z-slice, time-index, etc then the kwargs must specify the
         dimension with more than one possible value.
 
         **Example:** Read in the C=1 channel of a mosaic file at 1/10th the size
-        ::
+
             czi = CziFile(filename)
             img = czi.read_mosaic(scale_factor=0.1, C=1)
 
-        :param region: a rectangle specifying the extraction box (x, y, width, height) specified in pixels
-        :param scale_factor: amount to scale the data by, 0.1 would mean an image 1/10 the height and width of native
-        :param kwargs: The keywords below allow you to specify the dimension plane that constrains the 2D data. If the
+        Parameters
+        ----------
+        region
+            A rectangle specifying the extraction box (x, y, width, height) specified in pixels
+        scale_factor
+            The amount to scale the data by, 0.1 would mean an image 1/10 the height and width of native
+        kwargs
+            The keywords below allow you to specify the dimension plane that constrains the 2D data. If the
             constraints are underspecified the function will fail. ::
                     Z = 1   # The Z-dimension.
                     C = 2   # The C-dimension ("channel").
@@ -259,7 +326,11 @@ class CziFile(object):
                     I = 6   # The I-dimension ("illumination").
                     H = 7   # The H-dimension ("phase").
                     V = 8   # The V-dimension ("view").
-        :returns: numpy.ndarray (1, height, width)
+
+        Returns
+        -------
+        numpy.ndarray
+            (1, height, width)
         """
         plane_constraints = self.czilib.DimCoord()
         [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
