@@ -148,6 +148,22 @@ class CziFile(object):
         return self.meta_root
 
     def read_subblock_metadata(self, m_index: int = -1, **kwargs):
+        """
+        Read the subblock specific metadata, ie time subblock was aquired / position at aquisition time etc.
+        :param m_index: If it's a mosaic file and you wish to select specific M-indexs then use this otherwise ignore
+        it.
+        :param kwargs: The keywords below allow you to specify the dimensions that you wish to match. If you
+            under-specify the constraints you can easily end up with a massive image stack. ::
+                       Z = 1   # The Z-dimension.
+                       C = 2   # The C-dimension ("channel").
+                       T = 3   # The T-dimension ("time").
+                       R = 4   # The R-dimension ("rotation").
+                       S = 5   # The S-dimension ("scene").
+                       I = 6   # The I-dimension ("illumination").
+                       H = 7   # The H-dimension ("phase").
+                       V = 8   # The V-dimension ("view").
+        :return: str containing the metadata
+        """
         plane_constraints = self.czilib.DimCoord()
         [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
         return self.reader.read_meta_from_subblock(plane_constraints, m_index)
