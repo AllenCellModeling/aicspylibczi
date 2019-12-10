@@ -27,8 +27,7 @@ def test_is_a_directory(data_dir, as_string):
 ])
 def test_metadata(data_dir, fname, xp_query, expected):
     czi = CziFile(str(data_dir / fname))
-    czi.read_meta()
-    meta = czi.meta_root
+    meta = czi.read_meta
     vs = meta.find(xp_query)
     assert int(vs.text) == expected
 
@@ -127,7 +126,7 @@ def test_mosaic_size(data_dir, fname, expected):
 ])
 def test_read_image(data_dir, fname, flatten, expected):
     czi = CziFile(str(data_dir / fname))
-    img, shp = czi.read_image(flatten=flatten)
+    img, shp = czi.read_image(split_bgr=flatten)
     assert img.shape == expected
 
 

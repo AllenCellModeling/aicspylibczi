@@ -65,16 +65,16 @@ namespace pylibczi {
   /// @brief get_shape_from_fp returns the Dimensions of a ZISRAW/CZI when provided a ICZIReader object
   /// @param czi: a shared_ptr to an initialized CziReader object
   /// @return A Python Dictionary as a PyObject*
-  Reader::MapCDiP
+  Reader::DimensionRangeMap
   Reader::readDims()
   {
-      MapDiP tbl;
+      DimensionIndexRangeMap tbl;
       m_statistics.dimBounds.EnumValidDimensions([&tbl](libCZI::DimensionIndex di_, int start_, int size_) -> bool {
           tbl.emplace(di_, std::make_pair(start_, size_+start_-1)); // changed from [start, end) to be [start, end]
           return true;
       });
 
-      MapCDiP ans;
+      DimensionRangeMap ans;
       for_each(tbl.begin(), tbl.end(), [&](const auto& pr_) {
           ans.emplace(dimToChar(pr_.first), pr_.second);
       });
@@ -98,7 +98,7 @@ namespace pylibczi {
                     << " File has " << m_statistics.sceneBoundingBoxes.size() << " Scenes." << std::endl;
           return std::vector<int>();
       }
-      MapDiP tbl;
+      DimensionIndexRangeMap tbl;
       m_statistics.dimBounds.EnumValidDimensions([&](libCZI::DimensionIndex di_, int start_, int size_) -> bool {
           tbl.emplace(di_, std::make_pair(start_, size_)); // changed from [start, end) to be [start, end]
           return true;
@@ -159,7 +159,7 @@ namespace pylibczi {
   }
 
   std::pair<ImageVector, Reader::Shape>
-  Reader::readSelected(libCZI::CDimCoordinate& plane_coord_, int index_m_, bool flatten_)
+  Reader::readSelected(libCZI::CDimCoordinate& plane_coord_, int index_m_, bool split_bgr_)
   {
       int pos;
       if (m_specifyScene && !plane_coord_.TryGetPosition(libCZI::DimensionIndex::S, &pos)) {
@@ -176,7 +176,7 @@ namespace pylibczi {
           const libCZI::SubBlockInfo& info = subblock->GetSubBlockInfo();
           auto image = ImageFactory::constructImage(subblock->CreateBitmap(),
               &info.coordinate, info.logicalRect, info.mIndex);
-          if (flatten_ && ImageFactory::numberOfChannels(image->pixelType())>1) {
+          if (split_bgr_ && ImageFactory::numberOfChannels(image->pixelType())>1) {
               int start(0), sze(0);
               if (m_statistics.dimBounds.TryGetInterval(libCZI::DimensionIndex::C, &start, &sze))
                   std::cerr << "Warning image has C: start(" << start << ") : size(" << sze << ") - how to handle channels?" << std::endl;

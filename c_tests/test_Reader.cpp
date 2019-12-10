@@ -191,20 +191,16 @@ TEST_CASE_METHOD(CziMCreator, "test_mosaic_dimsSize", "[Reader_mosaic_dimsSize]"
 TEST_CASE_METHOD(CziMCreator, "test_mosaic_readdims", "[Reader_mosaic_readdims]")
 {
     auto czi = get();
-    pylibczi::Reader::MapCDiP ans{{'S', {0, 0}}, {'T', {0, 0}}, {'C', {0, 0}},
-                                  {'Z', {0, 0}}, {'M', {0, 1}},
-                                  {'Y', {0, 623}}, {'X', {0, 923}} };
+    pylibczi::Reader::DimensionRangeMap ans{{'S', {0, 0}}, {'T', {0, 0}}, {'C', {0, 0}},
+                                            {'Z', {0, 0}}, {'M', {0, 1}},
+                                            {'Y', {0, 623}}, {'X', {0, 923}} };
     auto val = czi->readDims();
-    for( auto x : val){
-        std::cout << x.first << " : " << "(" << x.second.first << ", " << x.second.second << ")" << std::endl;
-    }
     auto vitt = val.begin();
     auto aitt = ans.begin();
     for(; aitt != ans.end() && vitt != val.end(); aitt++, vitt++) {
         REQUIRE(vitt->first == aitt->first);
         REQUIRE(vitt->second.first == aitt->second.first);
         REQUIRE(vitt->second.second == aitt->second.second);
-
     }
     REQUIRE(val == ans);
 }
@@ -264,7 +260,7 @@ TEST_CASE_METHOD(CziBgrCreator, "test_bgr_read", "[Reader_read_bgr]")
     REQUIRE(czi->dimSizes()==ansSize);
 
     auto dims = czi->readDims();
-    pylibczi::Reader::MapCDiP ansDims{{'T', {0, 0}}, {'Y', {0, 623}}, {'X', {0, 923}}};
+    pylibczi::Reader::DimensionRangeMap ansDims{{'T', {0, 0}}, {'Y', {0, 623}}, {'X', {0, 923}}};
     REQUIRE(!ansDims.empty());
     REQUIRE(!dims.empty());
     REQUIRE(dims==ansDims);

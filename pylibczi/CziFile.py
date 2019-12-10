@@ -72,6 +72,8 @@ class CziFile(object):
         self.czilib = _pylibczi
         self.reader = self.czilib.Reader(self._bytes)
 
+        self.meta_root = None
+
     @property
     def dims(self):
         """
@@ -198,6 +200,7 @@ class CziFile(object):
                 f"Reader only accepts types: [str, pathlib.Path, bytes, io.BytesIO], received: {type(file)}"
             )
 
+    @property
     def read_meta(self):
         """
         Extract all metadata from czifile.
@@ -208,8 +211,9 @@ class CziFile(object):
             metadata as an xml etree
 
         """
-        meta_str = self.reader.read_meta()
-        self.meta_root = etree.fromstring(meta_str)
+        if not self.meta_root:
+            meta_str = self.reader.read_meta()
+            self.meta_root = etree.fromstring(meta_str)
 
         if self.metafile_out:
             metastr = etree.tostring(self.meta_root, pretty_print=True).decode('utf-8')
@@ -251,7 +255,7 @@ class CziFile(object):
         """
         Read the subblocks in the CZI file and for any subblocks that match all the constraints in kwargs return
         that data. This allows you to select channels/scenes/time-points/Z-slices etc. Note if the optional
-        flatten=True is passed for a BGR image then the dims of the object will returned by this function
+        split_bgr=True is passed for a BGR image then the dims of the object will returned by this function
         and the implicit BGR channel will be expanded into 3 channels. This shape differ from the values of
         dims(), size(), and dims_shape() as these are returning the native shape without changing from
         BGR_3X to Gray_X.
@@ -272,22 +276,22 @@ class CziFile(object):
                        H = 7   # The H-dimension ("phase").
                        V = 8   # The V-dimension ("view").
 
-                       flatten = True
+                       split_bgr = True | False
 
         Returns
         -------
         (numpy.ndarray, [Dimension, Size])
             a tuple of (numpy.ndarray, a list of (Dimension, size)) the second element of the tuple is to make
-            sure the numpy.ndarray is interpretable. An example of the list is ::
+            sure the numpy.ndarray is interpretable. An example of the list is
                     [('S', 1), ('T', 1), ('C', 2), ('Z', 25), ('Y', 1024), ('X', 1024)]
                  so if you probed the numpy.ndarray with .shape you would get (1, 1, 2, 25, 1024, 1024).
         """
         plane_constraints = self.czilib.DimCoord()
         [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
-        flatten = False
-        if 'flatten' in kwargs:
-            flatten = kwargs.get('flatten')
-        image, shape = self.reader.read_selected(plane_constraints, m_index, flatten)
+        split_bgr = False
+        if 'split_bgr' in kwargs:
+            split_bgr = kwargs.get('split_bgr')
+        image, shape = self.reader.read_selected(plane_constraints, m_index, split_bgr)
         return image, shape
 
     def read_mosaic_size(self):

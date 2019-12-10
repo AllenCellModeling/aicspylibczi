@@ -85,8 +85,8 @@ namespace pylibczi {
 
   public:
       using SubblockIndexVec = std::vector<std::pair<SubblockSortable, int> >;
-      using MapDiP = std::map<libCZI::DimensionIndex, std::pair<int, int> >;
-      using MapCDiP = std::map<char, std::pair<int, int> >;
+      using DimensionIndexRangeMap = std::map<libCZI::DimensionIndex, std::pair<int, int> >;
+      using DimensionRangeMap = std::map<char, std::pair<int, int> >;
       using Shape = std::vector<std::pair<char, int> >;
       /*!
        * @brief Construct the Reader and load the file statistics (dimensions etc)
@@ -134,7 +134,7 @@ namespace pylibczi {
        *
        * @return A map< DimensionIndex, pair<int(start), int(end)> > which conforms to [start, end] (inclusive)
        */
-      Reader::MapCDiP readDims();
+      Reader::DimensionRangeMap readDims();
 
       /*!
        * @brief Get the Dimensions in the order that they appear.
@@ -167,10 +167,10 @@ namespace pylibczi {
        * @endcode
        *
        * @param plane_coord_ A structure containing the Dimension constraints
-       * @param flatten_ if false this won't flatten 3 channel images, from python this should always be true.
+       * @param split_bgr_ if false this won't flatten 3 channel images, from python this should always be true.
        * @param index_m_ Is only relevant for mosaic files, if you wish to select one frame.
        */
-      std::pair<ImageVector, Shape> readSelected(libCZI::CDimCoordinate& plane_coord_, int index_m_ = -1, bool flatten_ = false);
+      std::pair<ImageVector, Shape> readSelected(libCZI::CDimCoordinate& plane_coord_, int index_m_ = -1, bool split_bgr_ = false);
 
       /*!
        * @brief provide the subblock metadata in index order consistent with readSelected.
