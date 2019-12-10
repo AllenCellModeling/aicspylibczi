@@ -41,6 +41,7 @@ namespace pylibczi {
       libCZI::IntRect m_xywh;  // (x0, y0, w, h) for image bounding box
 
       static std::map<libCZI::PixelType, std::string> s_pixelToTypeName;
+      static std::map<libCZI::PixelType, libCZI::PixelType> s_pixelSplitMap;
 
   public:
       using ImVec = std::vector<std::shared_ptr<Image> >;

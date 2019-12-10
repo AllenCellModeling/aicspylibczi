@@ -97,7 +97,7 @@ namespace pylibczi {
           return std::vector<int>();
       }
       MapDiP tbl;
-      m_statistics.dimBounds.EnumValidDimensions([&tbl](libCZI::DimensionIndex di_, int start_, int size_) -> bool {
+      m_statistics.dimBounds.EnumValidDimensions([&](libCZI::DimensionIndex di_, int start_, int size_) -> bool {
           tbl.emplace(di_, std::make_pair(start_, size_)); // changed from [start, end) to be [start, end]
           return true;
       }); // sorts the letters into ascending order by default { Z, C, T, S }
@@ -106,6 +106,10 @@ namespace pylibczi {
       transform(tbl.rbegin(), tbl.rend(), ans.begin(), [](const auto& pr_) {
           return pr_.second.second;
       });
+
+      if( isMosaic() ){
+          ans.push_back(m_statistics.maxMindex + 1); // The M-index is zero based
+      }
 
       libCZI::IntRect sbsize = getSceneYXSize();
 
@@ -145,6 +149,9 @@ namespace pylibczi {
       std::sort(ans.begin(), ans.end(), [](const char a_, const char b_) {
           return libCZI::Utils::CharToDimension(a_)>libCZI::Utils::CharToDimension(b_);
       });
+
+      if( isMosaic() ) ans += "M";
+
       ans += "YX";
       return ans;
   }
@@ -181,8 +188,8 @@ namespace pylibczi {
       if (images.empty()) {
           throw pylibczi::CdimSelectionZeroImagesException(plane_coord_, m_statistics.dimBounds, "No pyramid0 selectable subblocks.");
       }
-      auto shape = getShape(images, isMosaic());
       images.setMosaic(isMosaic());
+      auto shape = getShape(images, isMosaic());
       return std::make_pair(images, shape);
       // return images;
   }
@@ -213,7 +220,9 @@ namespace pylibczi {
   {
       SubblockIndexVec ans;
       std::copy_if(m_orderMapping.begin(), m_orderMapping.end(), std::back_inserter(ans),
-          [&match_](const SubblockIndexVec::value_type& a_) { return match_==a_.first; });
+          [&match_](const SubblockIndexVec::value_type& a_) {
+          return match_==a_.first;
+      });
       if(ans.empty()){
           // check for invalid Dimension specification
           match_.coordinatePtr()->EnumValidDimensions([&](libCZI::DimensionIndex di_, int value_){
@@ -281,11 +290,15 @@ namespace pylibczi {
       if (im_box_.w==-1 && im_box_.h==-1) im_box_ = m_statistics.boundingBox;
       isValidRegion(im_box_, m_statistics.boundingBox); // if not throws RegionSelectionException
 
-      std::map<libCZI::DimensionIndex, std::pair<int, int> > limitTbl;
-      m_statistics.dimBounds.EnumValidDimensions([&limitTbl](libCZI::DimensionIndex di_, int start_, int size_) -> bool {
-          limitTbl.emplace(di_, std::make_pair(start_, size_));
-          return true;
-      });
+      if( plane_coord_.IsValid(libCZI::DimensionIndex::S) ){
+          throw CDimCoordinatesOverspecifiedException("Do not set S when reading mosaic files!");
+      }
+
+      if( !plane_coord_.IsValid(libCZI::DimensionIndex::C) ){
+          throw CDimCoordinatesUnderspecifiedException( "C is not set, to read mosaic files you must specify C.");
+      }
+      SubblockSortable subBlockToFind(&plane_coord_, -1); // just check that the dims match something ignore that it's a mosaic file
+      getMatches(subBlockToFind); // this does the checking
 
       auto accessor = m_czireader->CreateSingleChannelScalingTileAccessor();
 

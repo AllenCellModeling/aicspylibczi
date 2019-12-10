@@ -42,7 +42,10 @@ namespace pylibczi{
       }
 
       bool operator<(const SubblockSortable& other_) const {
-          if(!m_isMosaic) return SubblockSortable::aLessThanB(m_planeCoordinate, other_.m_planeCoordinate);
+          if(!m_isMosaic)
+              return SubblockSortable::aLessThanB(m_planeCoordinate, other_.m_planeCoordinate);
+          if( m_indexM != -1 || other_.m_indexM != -1)
+              return SubblockSortable::aLessThanB(m_planeCoordinate, other_.m_planeCoordinate);
           return SubblockSortable::aLessThanB(m_planeCoordinate, m_indexM, other_.m_planeCoordinate, other_.m_indexM);
       }
 

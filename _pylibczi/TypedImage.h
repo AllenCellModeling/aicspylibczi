@@ -137,7 +137,12 @@ namespace pylibczi {
           libCZI::CDimCoordinate tmp(m_planeCoordinate);
           tmp.Set(libCZI::DimensionIndex::C, i+start_from_); // assign the channel from the BGR
           // TODO should I change the pixel type from a BGRx to a Grayx/3
-          ivec.emplace_back(new TypedImage<T>({m_shape[1], m_shape[2]}, m_pixelType, &tmp, m_xywh, m_indexM));
+          libCZI::PixelType pt = s_pixelSplitMap[m_pixelType];
+          if(pt == libCZI::PixelType::Invalid){
+              throw ImageSplitChannelException("Only PixelTypes Bgr24, Bgr48, and Bgr96Float can be split! "
+                                               "You have attempted to split an invalid PixelType", cStart);
+          }
+          ivec.emplace_back(new TypedImage<T>({m_shape[1], m_shape[2]}, pt, &tmp, m_xywh, m_indexM));
       }
       return ivec;
   }

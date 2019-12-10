@@ -22,11 +22,23 @@ namespace pylibczi {
       {libCZI::PixelType::Gray64Float, typeid(nullptr).name()}     // unsupported by libCZI
   };
 
+std::map<libCZI::PixelType, libCZI::PixelType> Image::s_pixelSplitMap{
+    {libCZI::PixelType::Gray8, libCZI::PixelType::Invalid},
+    {libCZI::PixelType::Gray16, libCZI::PixelType::Invalid},
+    {libCZI::PixelType::Gray32Float, libCZI::PixelType::Invalid},
+    {libCZI::PixelType::Bgr24, libCZI::PixelType::Gray8},
+    {libCZI::PixelType::Bgr48, libCZI::PixelType::Gray16},
+    {libCZI::PixelType::Bgr96Float, libCZI::PixelType::Gray32Float},
+    {libCZI::PixelType::Bgra32, libCZI::PixelType::Invalid},
+    {libCZI::PixelType::Gray64ComplexFloat, libCZI::PixelType::Invalid},
+    {libCZI::PixelType::Bgr192ComplexFloat, libCZI::PixelType::Invalid},
+    {libCZI::PixelType::Gray32, libCZI::PixelType::Invalid},
+    {libCZI::PixelType::Gray64Float, libCZI::PixelType::Invalid}
+};
 
 
-  
 
-  
+
 
   size_t Image::calculateIdx(const std::vector<size_t>& indexes_)
   {

@@ -140,6 +140,20 @@ namespace pylibczi {
       }
   };
 
+  class CDimCoordinatesUnderspecifiedException: public std::exception {
+      std::string m_message;
+  public:
+      explicit CDimCoordinatesUnderspecifiedException(std::string message_): m_message(std::move(message_)) {}
+
+      const char* what() const noexcept override
+      {
+          std::stringstream tmp;
+          tmp << "The coordinates are underspecified = you have not specified a Dimension that is required. "
+              << m_message << std::endl;
+          return tmp.str().c_str();
+      }
+  };
+
   class CdimSelectionZeroImagesException: public std::exception {
       libCZI::CDimCoordinate m_requestedPlaneCoordinate; // requested
       libCZI::CDimBounds m_planeCoordinateBounds; // image file
