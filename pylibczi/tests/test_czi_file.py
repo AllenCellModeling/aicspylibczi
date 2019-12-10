@@ -47,6 +47,7 @@ def test_read_image_from_istream(data_dir, fname, expected):
 @pytest.mark.parametrize("fname, expected", [
     ('s_1_t_1_c_1_z_1.czi', (1, 1, 325, 475)),
     ('s_3_t_1_c_3_z_5.czi', (1, 3, 3, 5, 325, 475)),
+    ('mosaic_test.czi', (1, 1, 1, 1, 2, 624, 924)),  # S T C Z M Y X
 ])
 def test_read_dims_sizes(data_dir, fname, expected):
     with open(data_dir / fname, 'rb') as fp:
@@ -106,6 +107,7 @@ def test_destructor(data_dir, fname, expected):
 @pytest.mark.parametrize("fname, expected", [
     ('s_1_t_1_c_1_z_1.czi', [0, 0, -1, -1]),
     ('s_3_t_1_c_3_z_5.czi', [0, 0, -1, -1]),
+    ('mosaic_test.czi', [0, 0, 1756, 624]),  # it's not 2*X because they overlap
 ])
 def test_mosaic_size(data_dir, fname, expected):
     czi = CziFile(str(data_dir / fname))
@@ -116,20 +118,25 @@ def test_mosaic_size(data_dir, fname, expected):
     assert ans.h == expected[3]
 
 
-@pytest.mark.parametrize("fname, expected", [
-    ('s_1_t_1_c_1_z_1.czi', (325, 475)),
-    ('s_3_t_1_c_3_z_5.czi', (325, 475)),
+@pytest.mark.parametrize("fname, flatten, expected", [
+    ('s_1_t_1_c_1_z_1.czi', False, (1, 1, 325, 475)),  # B C Y X
+    ('s_3_t_1_c_3_z_5.czi', False, (1, 3, 3, 5, 325, 475)),  # B S C Z Y X
+    ('mosaic_test.czi', False, (1, 1, 1, 1, 2, 624, 924)),  # S T C Z M Y X
+    ('RGB-8bit.czi', False, (1, 624, 924)),  # T Y X (but each pixel is RGB 8bits each
+    ('RGB-8bit.czi', True, (1, 1, 3, 624, 924)),  # B T C Y X
 ])
-def test_read_image(data_dir, fname, expected):
+def test_read_image(data_dir, fname, flatten, expected):
     czi = CziFile(str(data_dir / fname))
-    img, shp = czi.read_image(C=0, B=0)
-    assert img.shape[-2] == expected[0]
-    assert img.shape[-1] == expected[1]
+    img, shp = czi.read_image(flatten=flatten)
+    assert img.shape == expected
 
 
 @pytest.mark.parametrize("fname, exp_str, exp_dict", [
     ('s_1_t_1_c_1_z_1.czi', "BCYX", {'B': (0, 0), 'C': (0, 0), 'X': (0, 474), 'Y': (0, 324)}),
-    ('s_3_t_1_c_3_z_5.czi', "BSCZYX", {'B': (0, 0), 'C': (0, 2), 'X': (0, 474), 'Y': (0, 324), 'S': (0, 2), 'Z': (0, 4)}),
+    ('s_3_t_1_c_3_z_5.czi', "BSCZYX", {'B': (0, 0), 'C': (0, 2), 'X': (0, 474), 'Y': (0, 324),
+                                       'S': (0, 2), 'Z': (0, 4)}),
+    ('mosaic_test.czi', "STCZMYX", {'S': (0, 0), 'T': (0, 0), 'C': (0, 0), 'Z': (0, 0),
+                                    'M': (0, 1), 'Y': (0, 623), 'X': (0, 923)}),
 ])
 def test_read_image_two(data_dir, fname, exp_str, exp_dict):
     czi = CziFile(str(data_dir / fname))
@@ -161,12 +168,15 @@ def test_image_shape(data_dir, fname, expects):
     for key in expects.keys():
         assert shape[key] == expects[key]
 
-# I'm waiting for a small mosaic file then I can add an equivalent test back in
-# def test_mosaic_image():
-#     pTwo = Path('~/Data/20190618_CL001_HB01_Rescan_002.czi').expanduser()
-#     czi = CziFile(str(pTwo))
-#     sze = czi.read_mosaic_size()
-#     assert sze.w == 69986
-#     assert sze.h == 62649
-#     img = czi.read_mosaic(scale_factor=0.1, C=1)
-#     assert img.shape[0] == 1
+
+@pytest.mark.parametrize("fname, expects", [
+    ('mosaic_test.czi', {'B': (0, 0), 'C': (0, 0), 'X': (0, 474), 'Y': (0, 324)}),
+])
+def test_mosaic_image(data_dir, fname, expects):
+    with open(data_dir / fname, 'rb') as fp:
+        czi = CziFile(czi_filename=fp)
+        sze = czi.read_mosaic_size()
+        assert sze.w == 1756
+        assert sze.h == 624
+        img = czi.read_mosaic(scale_factor=0.1, C=0)
+    assert img.shape[0] == 1

@@ -135,6 +135,7 @@ namespace pylibczi {
           throw ImageSplitChannelException("attempting to split channels", cStart);
       for (int i = 0; i<m_shape[0]; i++) {
           libCZI::CDimCoordinate tmp(m_planeCoordinate);
+          tmp.Set(libCZI::DimensionIndex::B, 0);  // to be consistent with other types
           tmp.Set(libCZI::DimensionIndex::C, i+start_from_); // assign the channel from the BGR
           // TODO should I change the pixel type from a BGRx to a Grayx/3
           libCZI::PixelType pt = s_pixelSplitMap[m_pixelType];

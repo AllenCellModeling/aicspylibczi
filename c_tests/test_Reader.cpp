@@ -175,13 +175,47 @@ TEST_CASE_METHOD(CziMCreator, "test_mosaic_is_mosaic", "[Reader_mosaic_is_mosaic
     REQUIRE(czi->isMosaic());
 }
 
+TEST_CASE_METHOD(CziMCreator, "test_mosaic_dims", "[Reader_mosaic_dims]")
+{
+    auto czi = get();
+    REQUIRE(czi->dimsString() == std::string("STCZMYX"));
+}
+
+TEST_CASE_METHOD(CziMCreator, "test_mosaic_dimsSize", "[Reader_mosaic_dimsSize]")
+{
+    auto czi = get();
+    std::vector<int> ans{1, 1, 1, 1, 2, 624, 924};
+    REQUIRE(czi->dimSizes() == ans);
+}
+
+TEST_CASE_METHOD(CziMCreator, "test_mosaic_readdims", "[Reader_mosaic_readdims]")
+{
+    auto czi = get();
+    pylibczi::Reader::MapCDiP ans{{'S', {0, 0}}, {'T', {0, 0}}, {'C', {0, 0}},
+                                  {'Z', {0, 0}}, {'M', {0, 1}},
+                                  {'Y', {0, 623}}, {'X', {0, 923}} };
+    auto val = czi->readDims();
+    for( auto x : val){
+        std::cout << x.first << " : " << "(" << x.second.first << ", " << x.second.second << ")" << std::endl;
+    }
+    auto vitt = val.begin();
+    auto aitt = ans.begin();
+    for(; aitt != ans.end() && vitt != val.end(); aitt++, vitt++) {
+        REQUIRE(vitt->first == aitt->first);
+        REQUIRE(vitt->second.first == aitt->second.first);
+        REQUIRE(vitt->second.second == aitt->second.second);
+
+    }
+    REQUIRE(val == ans);
+}
+
 TEST_CASE_METHOD(CziMCreator, "test_mosaic_readSelected", "[Reader_mosaic_readSelected]")
 {
     auto czi = get();
-    REQUIRE( czi->dimsString() == std::string("STCZMYX"));
+    REQUIRE(czi->dimsString()==std::string("STCZMYX"));
     auto sze = czi->dimSizes();
     std::vector<int> szeAns{1, 1, 1, 1, 2, 624, 924};
-    REQUIRE( sze == szeAns );
+    REQUIRE(sze==szeAns);
     libCZI::CDimCoordinate c_dims;
     auto imvec = czi->readSelected(c_dims);
     REQUIRE(imvec.first.size()==2);
@@ -207,9 +241,8 @@ TEST_CASE_METHOD(CziMCreator, "test_mosaic_throw", "[Reader_mosaic_throw]")
 {
     auto czi = get();
     libCZI::CDimCoordinate c_dims;
-    REQUIRE_THROWS_AS( czi->readMosaic(c_dims), pylibczi::CDimCoordinatesUnderspecifiedException );
+    REQUIRE_THROWS_AS(czi->readMosaic(c_dims), pylibczi::CDimCoordinatesUnderspecifiedException);
 }
-
 
 class CziBgrCreator {
     std::unique_ptr<pylibczi::Reader> m_czi;
@@ -226,10 +259,20 @@ TEST_CASE_METHOD(CziBgrCreator, "test_bgr_read", "[Reader_read_bgr]")
     libCZI::CDimCoordinate dm;
     auto pr = czi->readSelected(dm);
 
-    REQUIRE(pr.first.size() == 1);
-    REQUIRE(pr.first.front()->shape()[1] == 624);
-    REQUIRE(pr.first.front()->shape()[2] == 924);
-    REQUIRE(pr.first.front()->pixelType() == libCZI::PixelType::Bgr24);
+    REQUIRE(czi->dimsString()==std::string("TYX"));
+    std::vector<int> ansSize{1, 624, 924};
+    REQUIRE(czi->dimSizes()==ansSize);
+
+    auto dims = czi->readDims();
+    pylibczi::Reader::MapCDiP ansDims{{'T', {0, 0}}, {'Y', {0, 623}}, {'X', {0, 923}}};
+    REQUIRE(!ansDims.empty());
+    REQUIRE(!dims.empty());
+    REQUIRE(dims==ansDims);
+
+    REQUIRE(pr.first.size()==1);
+    REQUIRE(pr.first.front()->shape()[1]==624);
+    REQUIRE(pr.first.front()->shape()[2]==924);
+    REQUIRE(pr.first.front()->pixelType()==libCZI::PixelType::Bgr24);
 }
 
 TEST_CASE_METHOD(CziBgrCreator, "test_bgr_flatten", "[Reader_read_flatten_bgr]")
@@ -240,12 +283,15 @@ TEST_CASE_METHOD(CziBgrCreator, "test_bgr_flatten", "[Reader_read_flatten_bgr]")
 
     libCZI::CDimCoordinate dm;
     auto pr = czi->readSelected(dm, -1, true);
-    REQUIRE(pr.first.size() == 3);
+    REQUIRE(pr.first.size()==3);
 
-    for( auto x : pr.first) {
+    for (auto x : pr.first) {
         REQUIRE(x->shape()[0]==624);
         REQUIRE(x->shape()[1]==924);
     }
 
-    REQUIRE(pr.first.front()->pixelType() == libCZI::PixelType::Gray8);
+    pylibczi::Reader::Shape shapeAns{{'B', 1}, {'T', 1}, {'C', 3}, {'Y', 624}, {'X', 924}};
+    REQUIRE(pr.second==shapeAns);
+    REQUIRE(pr.first.front()->pixelType()==libCZI::PixelType::Gray8);
+    // pb_helpers::packArray(pr.first);
 }

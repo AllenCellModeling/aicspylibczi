@@ -40,7 +40,7 @@ namespace pylibczi {
       for_each(m_statistics.sceneBoundingBoxes.begin(),
           m_statistics.sceneBoundingBoxes.end(),
           [&](const auto& bbox_) {
-              if (bbox_.second.boundingBoxLayer0.w!=kept.w || bbox_.second.boundingBoxLayer0.h!=kept.h) {
+              if (!m_specifyScene && (bbox_.second.boundingBoxLayer0.w!=kept.w || bbox_.second.boundingBoxLayer0.h!=kept.h)) {
                   std::cout << "WARNING: Scene must be specified for this file!" << std::endl;
                   m_specifyScene = true;
               }
@@ -78,6 +78,8 @@ namespace pylibczi {
       for_each(tbl.begin(), tbl.end(), [&](const auto& pr_) {
           ans.emplace(dimToChar(pr_.first), pr_.second);
       });
+
+      if( isMosaic() ) ans.emplace('M', std::make_pair(m_statistics.minMindex, m_statistics.maxMindex));
 
       libCZI::IntRect sbsize = getSceneYXSize();
 

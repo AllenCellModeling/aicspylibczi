@@ -250,7 +250,11 @@ class CziFile(object):
     def read_image(self, m_index: int = -1, **kwargs):
         """
         Read the subblocks in the CZI file and for any subblocks that match all the constraints in kwargs return
-        that data. This allows you to select channels/scenes/time-points/Z-slices etc.
+        that data. This allows you to select channels/scenes/time-points/Z-slices etc. Note if the optional
+        flatten=True is passed for a BGR image then the dims of the object will returned by this function
+        and the implicit BGR channel will be expanded into 3 channels. This shape differ from the values of
+        dims(), size(), and dims_shape() as these are returning the native shape without changing from
+        BGR_3X to Gray_X.
 
         Parameters
         ----------
@@ -268,6 +272,8 @@ class CziFile(object):
                        H = 7   # The H-dimension ("phase").
                        V = 8   # The V-dimension ("view").
 
+                       flatten = True
+
         Returns
         -------
         (numpy.ndarray, [Dimension, Size])
@@ -278,7 +284,10 @@ class CziFile(object):
         """
         plane_constraints = self.czilib.DimCoord()
         [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
-        image, shape = self.reader.read_selected(plane_constraints, m_index, False)
+        flatten = False
+        if 'flatten' in kwargs:
+            flatten = kwargs.get('flatten')
+        image, shape = self.reader.read_selected(plane_constraints, m_index, flatten)
         return image, shape
 
     def read_mosaic_size(self):
