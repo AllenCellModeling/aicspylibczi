@@ -201,7 +201,7 @@ class CziFile(object):
             )
 
     @property
-    def read_meta(self):
+    def meta(self):
         """
         Extract all metadata from czifile.
 

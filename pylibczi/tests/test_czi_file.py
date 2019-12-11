@@ -27,7 +27,7 @@ def test_is_a_directory(data_dir, as_string):
 ])
 def test_metadata(data_dir, fname, xp_query, expected):
     czi = CziFile(str(data_dir / fname))
-    meta = czi.read_meta
+    meta = czi.meta
     vs = meta.find(xp_query)
     assert int(vs.text) == expected
 

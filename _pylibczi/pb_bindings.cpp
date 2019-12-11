@@ -29,6 +29,7 @@ PYBIND11_MODULE(_pylibczi, m)
     py::register_exception<pylibczi::ImageCopyAllocFailed>(m, "PylibCZI_ImageCopyAllocFailed");
     py::register_exception<pylibczi::CdimSelectionZeroImagesException>(m, "PylibCZI_CDimSpecSelectedNoImagesException");
     py::register_exception<pylibczi::CDimCoordinatesOverspecifiedException>(m, "PylibCZI_CDimCoordinatesOverspecifiedException");
+    py::register_exception<pylibczi::CDimCoordinatesUnderspecifiedException>(m, "PylibCZI_CDimCoordinatesUnderspecifiedException");
 
     py::class_<pylibczi::Reader>(m, "Reader")
         .def(py::init<std::shared_ptr<libCZI::IStream> >())
