@@ -227,8 +227,6 @@ class CziFile(object):
 
         Parameters
         ----------
-        m_index
-            If it's a mosaic file and you wish to select specific M-index then use this otherwise ignore it.
         kwargs
             The keywords below allow you to specify the dimensions that you wish to match. If you
             under-specify the constraints you can easily end up with a massive image stack.

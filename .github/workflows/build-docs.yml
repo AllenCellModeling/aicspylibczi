@@ -3,9 +3,8 @@ name: Docs
 on:
   push:
     branches:
+      - master
       - release/aicspylibczi
-    tags:
-      - 'docs'
 
 jobs:
   docs:
@@ -30,8 +29,6 @@ jobs:
           cd cmake_build_debug
           cmake ..
           cmake --build . --target docs
-          cd docs/html
-          pwd
         shell: bash
       - name: Publish Docs
         uses: JamesIves/github-pages-deploy-action@releases/v3

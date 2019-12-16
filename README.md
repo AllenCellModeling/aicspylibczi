@@ -35,10 +35,9 @@ img, shp = czi.read_image(S=13, Z=16)
 # img.shape = (1, 1, 4, 1, 1300, 1900)   # numpy.ndarray
 
 # define helper functions
-def norm_by(x, min, max):
-    norms = np.percentile(x, [min, max])
+def norm_by(x, min_, max_):
+    norms = np.percentile(x, [min_, max_])
     i2 = np.clip((x - norms[0])/(norms[1]-norms[0]), 0, 1)
-    i2
     return i2
 
 def recolor(im): # transform from rgb to cyan-magenta-yellow
@@ -72,7 +71,7 @@ import pathlib
 from PIL import Image
 
 
-mosaic_file = pathlib.Path('20190618_CL001_HB01_Rescan_002.czi').expanduser()
+mosaic_file = pathlib.Path('20190618_CL001_HB01_Rescan_002.czi')
 czi = aicspylibczi.CziFile(mosaic_file)
 
 # Get the shape of the data
