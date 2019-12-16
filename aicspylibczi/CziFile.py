@@ -254,16 +254,13 @@ class CziFile(object):
     def read_image(self, **kwargs):
         """
         Read the subblocks in the CZI file and for any subblocks that match all the constraints in kwargs return
-        that data. This allows you to select channels/scenes/time-points/Z-slices etc. Note if the optional
-        split_bgr=True is passed for a BGR image then the dims of the object will returned by this function
-        and the implicit BGR channel will be expanded into 3 channels. This shape differ from the values of
-        dims(), size(), and dims_shape() as these are returning the native shape without changing from
-        BGR_3X to Gray_X.
+        that data. This allows you to select channels/scenes/time-points/Z-slices etc. Note if passed a BGR image
+        then the dims of the object will returned by this function and the implicit BGR channel will be expanded
+        into 3 channels. This shape differ from the values of dims(), size(), and dims_shape() as these are returning
+        the native shape without changing from BGR_3X to Gray_X.
 
         Parameters
         ----------
-        m_index : int (optional)
-            If it's a mosaic file and you wish to select specific M-indexs then use this otherwise ignore it.
         **kwargs
             The keywords below allow you to specify the dimensions that you wish to match. If you
             under-specify the constraints you can easily end up with a massive image stack.
@@ -276,8 +273,6 @@ class CziFile(object):
                  H = 7   # The H-dimension ("phase").
                  V = 8   # The V-dimension ("view").
                  M = 10  # The M_index, this is only valid for Mosaic files!
-
-                 split_bgr = True | False
 
         Returns
         -------
@@ -297,10 +292,7 @@ class CziFile(object):
                     "M Dimension is specified but the file is not a mosaic file!"
                 )
             m_index = kwargs.get('M')
-        split_bgr = False
-        if 'split_bgr' in kwargs:
-            split_bgr = kwargs.get('split_bgr')
-        image, shape = self.reader.read_selected(plane_constraints, m_index, split_bgr)
+        image, shape = self.reader.read_selected(plane_constraints, m_index)
         return image, shape
 
     def read_mosaic_size(self):

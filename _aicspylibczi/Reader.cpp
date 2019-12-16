@@ -159,7 +159,7 @@ namespace pylibczi {
   }
 
   std::pair<ImageVector, Reader::Shape>
-  Reader::readSelected(libCZI::CDimCoordinate& plane_coord_, int index_m_, bool split_bgr_)
+  Reader::readSelected(libCZI::CDimCoordinate& plane_coord_, int index_m_)
   {
       int pos;
       if (m_specifyScene && !plane_coord_.TryGetPosition(libCZI::DimensionIndex::S, &pos)) {
@@ -176,11 +176,13 @@ namespace pylibczi {
           const libCZI::SubBlockInfo& info = subblock->GetSubBlockInfo();
           auto image = ImageFactory::constructImage(subblock->CreateBitmap(),
               &info.coordinate, info.logicalRect, info.mIndex);
-          if (split_bgr_ && ImageFactory::numberOfChannels(image->pixelType())>1) {
+          // This was conditional on split_bgr_ but that's a bad idea so I'm removing it.
+          // bgr images will always be split into their base single channel types brg24 => uint8_t
+          if (ImageFactory::numberOfChannels(image->pixelType())>1) {
               int start(0), sze(0);
               if (m_statistics.dimBounds.TryGetInterval(libCZI::DimensionIndex::C, &start, &sze))
                   std::cerr << "Warning image has C: start(" << start << ") : size(" << sze << ") - how to handle channels?" << std::endl;
-              auto splitImages = image->splitChannels(start+sze);
+              auto splitImages = ImageFactory::splitToChannels(image);
               for_each(splitImages.begin(), splitImages.end(), [&images](Image::ImVec::value_type& image_) { images.push_back(image_); });
           }
           else
@@ -319,9 +321,10 @@ namespace pylibczi {
           int start(0), sze(0);
           if (m_statistics.dimBounds.TryGetInterval(libCZI::DimensionIndex::C, &start, &sze))
               std::cerr << "Warning image has C: start(" << start << ") : size(" << sze << ") - how to handle channels?" << std::endl;
-          auto splitImages = image->splitChannels(start+sze);
-          for_each(splitImages.begin(), splitImages.end(),
-              [&imageVector](Image::ImVec::value_type& image_) { imageVector.push_back(image_); });
+          auto splitImages = ImageFactory::splitToChannels(image);
+          for_each(splitImages.begin(), splitImages.end(), [&imageVector](Image::ImVec::value_type& image_) {
+              imageVector.push_back(image_);
+          });
       }
       else
           imageVector.push_back(image);

@@ -167,10 +167,9 @@ namespace pylibczi {
        * @endcode
        *
        * @param plane_coord_ A structure containing the Dimension constraints
-       * @param split_bgr_ if false this won't flatten 3 channel images, from python this should always be true.
        * @param index_m_ Is only relevant for mosaic files, if you wish to select one frame.
        */
-      std::pair<ImageVector, Shape> readSelected(libCZI::CDimCoordinate& plane_coord_, int index_m_ = -1, bool split_bgr_ = false);
+      std::pair<ImageVector, Shape> readSelected(libCZI::CDimCoordinate& plane_coord_, int index_m_ = -1);
 
       /*!
        * @brief provide the subblock metadata in index order consistent with readSelected.
@@ -237,6 +236,8 @@ namespace pylibczi {
        * @return libCZI::IntRect containing (x0, y0, w, h)
        */
       libCZI::IntRect getSceneYXSize(int scene_index_ = -1);
+
+      // libCZI::PixelType pixelType() const { auto ans = libCZI::Utils::PixelTypeToInformalString( )}
 
   private:
 

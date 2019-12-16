@@ -58,6 +58,9 @@ namespace pylibczi {
 
       std::vector<size_t> shape() { return m_shape; }
 
+      libCZI::IntRect bBox() const { return m_xywh; }
+
+
       size_t length()
       {
           return std::accumulate(m_shape.begin(), m_shape.end(), (size_t) 1, std::multiplies<>());
@@ -67,7 +70,6 @@ namespace pylibczi {
 
       virtual void loadImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_ptr_, size_t channels_) = 0;
 
-      virtual ImVec splitChannels(int start_from_) = 0;
   };
 
   template<typename T>

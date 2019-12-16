@@ -1,9 +1,12 @@
 #ifndef _PYLIBCZI_TYPEDIMAGE_H
 #define _PYLIBCZI_TYPEDIMAGE_H
 
+#include <functional>
+
 #include "Image.h"
 #include "SourceRange.h"
 #include "TargetRange.h"
+#include "ImageFactory.h"
 
 namespace pylibczi {
 
@@ -28,6 +31,20 @@ namespace pylibczi {
       {
           if (!isTypeMatch<T>())
               throw PixelTypeException(m_pixelType, "TypedImage asked to create a container for PixelType with inconsitent type.");
+      }
+
+      /*!
+       * @brief This constructor is strictly for splitting out a {H, W} Image from a {3, H, W} Image
+       * @param img_ a std::shared_ptr<Image> with shape {3, H, W}
+       * @param channel_ which of the 3 channels {0, 1, or 2} to copy out of Image
+       */
+      TypedImage( std::shared_ptr< TypedImage > img_, libCZI::PixelType pt_, int channel_):
+            TypedImage({img_->shape()[1], img_->shape()[2]}, pt_, img_->coordinatePtr(), img_->bBox(), img_->mIndex())
+      {
+          m_planeCoordinate.Set(libCZI::DimensionIndex::B, 0);  // to be consistent with other types
+          m_planeCoordinate.Set(libCZI::DimensionIndex::C, channel_);
+          auto ptrPair = img_->channelPtrs(channel_); // BGR24 has type uint8_t so the ptr's should be of the right type
+          std::copy( ptrPair.first, ptrPair.second, m_array.get() );
       }
 
       /*!
@@ -78,11 +95,12 @@ namespace pylibczi {
       void loadImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_ptr_, size_t channels_) override;
 
       /*!
-       * @brief If this container is a 3channel BGR image split it into single channel images so they can be merged into an data matrix
-       * @param start_from_ is an integer offset to start assigning the new channels from.
-       * @return a vector of smart pointers wrapping Images (2D)
+       * @brief return pointers to begin, end for the specific channel in a 3 channel image
+       * @param channel_ to select from the image {0, 1, or 2}
+       * @return a pair of pointers corresponding to begin and end for the channel specified
        */
-      ImVec splitChannels(int start_from_) override;
+      std::pair<T*, T*> channelPtrs(int channel_);
+
 // TODO Implement set_sort_order() and operator()<
   };
 
@@ -124,28 +142,13 @@ namespace pylibczi {
   }
 
   template<typename T>
-  inline Image::ImVec TypedImage<T>::splitChannels(int start_from_)
-  {
-      ImVec ivec;
-      if (m_shape.size()<3)
-          throw ImageSplitChannelException("TypedImage  only has 2 dimensions. No channels to split.", 0);
-      int cStart = 0;
-      // TODO figure out if C can have a nonzero value for a BGR image
-      if (m_planeCoordinate.TryGetPosition(libCZI::DimensionIndex::C, &cStart) && cStart!=0)
-          throw ImageSplitChannelException("attempting to split channels", cStart);
-      for (int i = 0; i<m_shape[0]; i++) {
-          libCZI::CDimCoordinate tmp(m_planeCoordinate);
-          tmp.Set(libCZI::DimensionIndex::B, 0);  // to be consistent with other types
-          tmp.Set(libCZI::DimensionIndex::C, i+start_from_); // assign the channel from the BGR
-          // TODO should I change the pixel type from a BGRx to a Grayx/3
-          libCZI::PixelType pt = s_pixelSplitMap[m_pixelType];
-          if(pt == libCZI::PixelType::Invalid){
-              throw ImageSplitChannelException("Only PixelTypes Bgr24, Bgr48, and Bgr96Float can be split! "
-                                               "You have attempted to split an invalid PixelType", cStart);
-          }
-          ivec.emplace_back(new TypedImage<T>({m_shape[1], m_shape[2]}, pt, &tmp, m_xywh, m_indexM));
-      }
-      return ivec;
+  inline std::pair<T*, T*>
+  TypedImage<T>::channelPtrs(int channel_){
+      std::pair<T*, T*> ans;
+      size_t planeSize = std::accumulate(m_shape.rbegin(), --(m_shape.rend()), 1, std::multiplies<size_t>() );
+      ans.first = m_array.get() + channel_ * planeSize;
+      ans.second = ans.first + planeSize;
+      return ans;
   }
 
 }

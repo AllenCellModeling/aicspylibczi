@@ -265,10 +265,10 @@ TEST_CASE_METHOD(CziBgrCreator, "test_bgr_read", "[Reader_read_bgr]")
     REQUIRE(!dims.empty());
     REQUIRE(dims==ansDims);
 
-    REQUIRE(pr.first.size()==1);
-    REQUIRE(pr.first.front()->shape()[1]==624);
-    REQUIRE(pr.first.front()->shape()[2]==924);
-    REQUIRE(pr.first.front()->pixelType()==libCZI::PixelType::Bgr24);
+    REQUIRE(pr.first.size()==3);
+    REQUIRE(pr.first.front()->shape()[0]==624);
+    REQUIRE(pr.first.front()->shape()[1]==924);
+    REQUIRE(pr.first.front()->pixelType()==libCZI::PixelType::Gray8);
 }
 
 TEST_CASE_METHOD(CziBgrCreator, "test_bgr_flatten", "[Reader_read_flatten_bgr]")
@@ -278,7 +278,7 @@ TEST_CASE_METHOD(CziBgrCreator, "test_bgr_flatten", "[Reader_read_flatten_bgr]")
     auto dims = czi->readDims();
 
     libCZI::CDimCoordinate dm;
-    auto pr = czi->readSelected(dm, -1, true);
+    auto pr = czi->readSelected(dm, -1);
     REQUIRE(pr.first.size()==3);
 
     for (auto x : pr.first) {

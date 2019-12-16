@@ -14,8 +14,10 @@ namespace pylibczi {
                                    std::vector<size_t>, libCZI::PixelType pixel_type_, const libCZI::CDimCoordinate* plane_coordinate_,
                                    libCZI::IntRect box_, int mIndex_)
                                > >;
+      using SplitCtorMap = std::map<libCZI::PixelType, std::function<std::shared_ptr<Image>( std::shared_ptr<Image> img_, int channel_) > >;
 
       static CtorMap s_pixelToImage;
+      static SplitCtorMap s_pixelToSplit;
 
   public:
       static size_t sizeOfPixelType(PixelType pixel_type_);
@@ -35,6 +37,9 @@ namespace pylibczi {
       constructImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_ptr_, const libCZI::CDimCoordinate* plane_coordinate_,
           libCZI::IntRect box_,
           int index_m_);
+
+      static Image::ImVec splitToChannels(std::shared_ptr<Image> img_in_);
+
   };
 }
 
