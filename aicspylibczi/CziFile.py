@@ -207,7 +207,7 @@ class CziFile(object):
 
     def read_subblock_metadata(self, **kwargs):
         """
-        Read the subblock specific metadata, ie time subblock was aquired / position at aquisition time etc.
+        Read the subblock specific metadata, ie time subblock was acquired / position at acquisition time etc.
 
         Parameters
         ----------
