@@ -2,8 +2,7 @@
 [![C++ Build & Test](https://github.com/AllenCellModeling/aicspylibczi/workflows/C%2B%2B%20Master%20Build/badge.svg)](https://github.com/AllenCellModeling/aicspylibczi/actions)
 [![Python Build & Test](https://github.com/AllenCellModeling/aicspylibczi/workflows/Python%20Master%20Build/badge.svg)](https://github.com/AllenCellModeling/aicspylibczi/actions)
 [![codecov](https://codecov.io/gh/AllenCellModeling/aicspylibczi/branch/feature/pybind11/graph/badge.svg)](https://codecov.io/gh/AllenCellModeling/aicspylibczi)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-
+[![License: BSD3/GPLv3](https://img.shields.io/badge/License-BSD3/GPLv3-blue.svg)](https://github.com/AllenCellModeling/aicspylibczi/blob/master/LICENSE)
 
 Python module to expose [libCZI](https://github.com/zeiss-microscopy/libCZI) functionality for reading (subset of) Zeiss CZI files and meta-data.
 
@@ -129,11 +128,6 @@ EXEC : Fatal Python error : initfsencoding: unable to load the file system codec
 ModuleNotFoundError: No module named 'encodings'
 ``` 
 
-## License
-
-The GPLv3 license is a consequence of libCZI which imposes GPLv3. If you wish to use libCZI or this derivative in
-a commercial product you'll need to talk to Zeiss.
-
 ## History
 
 aicspylibczi was originally a fork of [pylibczi](https:://github.com/elhuhdron/pylibczi) that was developed by 
@@ -144,4 +138,23 @@ Metadata reading, including specific subblock metadata reading has also been add
 
 We intend for this work to be merged back into the original project once we have the new work integrated with
 the original work.
+
+
+## Licenses & Acknowledgements
+
+The code directly in this repo implemented in C++ and Python is covered by BSD-3 license by the [Allen Institute for 
+Cell Science](https://www.allencell.org/what-we-do.html) at the [Allen Institute](https://alleninstitute.org/). 
+
+This project however was created from a fork of pylibczi as explained above in the history section and Paul Watkins 
+is a developer on our repo as well. Pylibczi, from 
+the [Center of Advanced European Studies And Research](https://www.caesar.de/en/about-caesar/) 
+and the core dependency libCZI, are covered by the GPLv3 license. 
+
+The [GPLv3 license](https://www.gnu.org/licenses/gpl-3.0.en.html) is a consequence of libCZI which imposes GPLv3. If 
+you wish to use libCZI or this derivative in a commercial product you may need to talk to 
+Zeiss and CAESAR. [A discussion about GPLv3](https://choosealicense.com/licenses/gpl-3.0/). 
+
+
+
+
 
