@@ -2,7 +2,7 @@ name: Wheel Publish
 on:
   push:
     branches:
-      - 'rename/aicspylibczi'
+      - 'release/aicspylibczi'
 
 jobs:
   wheel-setup:
