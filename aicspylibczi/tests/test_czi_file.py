@@ -119,16 +119,15 @@ def test_mosaic_size(data_dir, fname, expected):
     assert ans.h == expected[3]
 
 
-@pytest.mark.parametrize("fname, flatten, expected", [
-    ('s_1_t_1_c_1_z_1.czi', False, (1, 1, 325, 475)),  # B C Y X
-    ('s_3_t_1_c_3_z_5.czi', False, (1, 3, 3, 5, 325, 475)),  # B S C Z Y X
-    ('mosaic_test.czi', False, (1, 1, 1, 1, 2, 624, 924)),  # S T C Z M Y X
-    ('RGB-8bit.czi', False, (1, 624, 924)),  # T Y X (but each pixel is RGB 8bits each
-    ('RGB-8bit.czi', True, (1, 1, 3, 624, 924)),  # B T C Y X
+@pytest.mark.parametrize("fname, expected", [
+    ('s_1_t_1_c_1_z_1.czi', (1, 1, 325, 475)),  # B C Y X
+    ('s_3_t_1_c_3_z_5.czi', (1, 3, 3, 5, 325, 475)),  # B S C Z Y X
+    ('mosaic_test.czi', (1, 1, 1, 1, 2, 624, 924)),  # S T C Z M Y X
+    ('RGB-8bit.czi', (1, 1, 3, 624, 924)),  # B T C Y X
 ])
-def test_read_image(data_dir, fname, flatten, expected):
+def test_read_image(data_dir, fname, expected):
     czi = CziFile(str(data_dir / fname))
-    img, shp = czi.read_image(split_bgr=flatten)
+    img, shp = czi.read_image()
     assert img.shape == expected
 
 

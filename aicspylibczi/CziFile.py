@@ -221,7 +221,7 @@ class CziFile(object):
                 file.write(metastr)
         return self.meta_root
 
-    def read_subblock_metadata(self, m_index: int = -1, **kwargs):
+    def read_subblock_metadata(self, **kwargs):
         """
         Read the subblock specific metadata, ie time subblock was aquired / position at aquisition time etc.
 
@@ -240,6 +240,7 @@ class CziFile(object):
                        I = 6   # The I-dimension ("illumination").
                        H = 7   # The H-dimension ("phase").
                        V = 8   # The V-dimension ("view").
+                       M = 10  # The M_index, this is only valid for Mosaic files!
 
         Returns
         -------
@@ -249,6 +250,8 @@ class CziFile(object):
         """
         plane_constraints = self.czilib.DimCoord()
         [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
+        m_index = self._get_m_index_from_kwargs(kwargs)
+
         return self.reader.read_meta_from_subblock(plane_constraints, m_index)
 
     def read_image(self, **kwargs):
@@ -285,13 +288,8 @@ class CziFile(object):
         """
         plane_constraints = self.czilib.DimCoord()
         [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
-        m_index = -1
-        if 'M' in kwargs:
-            if not self.is_mosaic():
-                raise self.czilib.PylibCZI_CDimCoordinatesOverspecifiedException(
-                    "M Dimension is specified but the file is not a mosaic file!"
-                )
-            m_index = kwargs.get('M')
+        m_index = self._get_m_index_from_kwargs(kwargs)
+
         image, shape = self.reader.read_selected(plane_constraints, m_index)
         return image, shape
 
@@ -365,3 +363,13 @@ class CziFile(object):
         img = self.reader.read_mosaic(plane_constraints, scale_factor, region)
 
         return img
+
+    def _get_m_index_from_kwargs(self, kwargs):
+        m_index = -1
+        if 'M' in kwargs:
+            if not self.is_mosaic():
+                raise self.czilib.PylibCZI_CDimCoordinatesOverspecifiedException(
+                    "M Dimension is specified but the file is not a mosaic file!"
+                )
+            m_index = kwargs.get('M')
+        return m_index
