@@ -280,8 +280,8 @@ class CziFile(object):
         (numpy.ndarray, [Dimension, Size])
             a tuple of (numpy.ndarray, a list of (Dimension, size)) the second element of the tuple is to make
             sure the numpy.ndarray is interpretable. An example of the list is
-                    [('S', 1), ('T', 1), ('C', 2), ('Z', 25), ('Y', 1024), ('X', 1024)]
-                 so if you probed the numpy.ndarray with .shape you would get (1, 1, 2, 25, 1024, 1024).
+            [('S', 1), ('T', 1), ('C', 2), ('Z', 25), ('Y', 1024), ('X', 1024)]
+            so if you probed the numpy.ndarray with .shape you would get (1, 1, 2, 25, 1024, 1024).
 
         """
         plane_constraints = self.czilib.DimCoord()
