@@ -118,7 +118,7 @@ namespace pylibczi {
               charSizes.emplace_back(keySet.first, keySet.second.size());
           }
           auto heightByWidth = front()->shape(); // assumption: images are the same shape, if not 🙃
-          int hByWsize = heightByWidth.size();
+          size_t hByWsize = heightByWidth.size();
           charSizes.emplace_back('Y', heightByWidth[hByWsize - 2]); // H: 2 - 2 = 0 | 3 - 2 = 1
           charSizes.emplace_back('X', heightByWidth[hByWsize - 1]); // W: 2 - 1 = 1 | 3 - 1 = 2
           // sort them into decending DimensionIndex Order

@@ -65,10 +65,10 @@ namespace pylibczi {
   };
 
   class ImageAccessUnderspecifiedException: public std::exception {
-      int m_given, m_required;
+      size_t m_given, m_required;
       std::string m_message;
   public:
-      ImageAccessUnderspecifiedException(int given_, int required_, std::string message_)
+      ImageAccessUnderspecifiedException(size_t given_, size_t required_, std::string message_)
           :m_given(given_), m_required(required_), m_message(std::move(message_)) { }
 
       const char* what() const noexcept override
