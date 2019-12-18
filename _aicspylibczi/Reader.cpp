@@ -92,11 +92,6 @@ namespace pylibczi {
   std::vector<int>
   Reader::dimSizes()
   {
-      if (m_specifyScene) {
-          std::cout << "Shape of data is inconsistent between Scenes and must be read individually. "
-                    << " File has " << m_statistics.sceneBoundingBoxes.size() << " Scenes." << std::endl;
-          return std::vector<int>();
-      }
       DimensionIndexRangeMap tbl;
       m_statistics.dimBounds.EnumValidDimensions([&](libCZI::DimensionIndex di_, int start_, int size_) -> bool {
           tbl.emplace(di_, std::make_pair(start_, size_)); // changed from [start, end) to be [start, end]
