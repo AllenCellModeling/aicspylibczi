@@ -21,7 +21,7 @@ namespace pb_helpers {
   py::list *packStringArray(pylibczi::SubblockMetaVec& metadata_);
 
   template<typename T>
-  py::array* makeArray(unsigned long size_, std::vector<ssize_t>& shape_, pylibczi::ImageVector& images_)
+  py::array* makeArray(size_t size_, std::vector<ssize_t>& shape_, pylibczi::ImageVector& images_)
   {
       if (size_==0) return new py::array_t<T>({1}, new T);
       T* ptr;
