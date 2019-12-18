@@ -17,9 +17,9 @@ namespace pb_helpers {
       images_.sort();
       auto charSizes = images_.getShape();
 
-      unsigned long newSize = images_.front()->length()*images_.size();
+      size_t newSize = images_.front()->length()*images_.size();
       std::vector<ssize_t> shape(charSizes.size(), 0);
-      std::transform(charSizes.begin(), charSizes.end(), shape.begin(), [](const std::pair<char, int>& a_) {
+      std::transform(charSizes.begin(), charSizes.end(), shape.begin(), [](const std::pair<char, size_t>& a_) {
           return a_.second;
       });
       py::array* arrP = nullptr;
@@ -42,7 +42,6 @@ namespace pb_helpers {
       metadata_.sort();
       auto charSizes = metadata_.getShape();
       auto mylist = new py::list();
-      std::vector< std::tuple<std::string, libCZI::CDimCoordinate, int> > ans;
       try {
           for (const auto& x : metadata_) {
               mylist->append(py::make_tuple( x.getDimsAsChars(), py::cast(x.getString().c_str()) ) );

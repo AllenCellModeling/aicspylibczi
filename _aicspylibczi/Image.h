@@ -96,7 +96,7 @@ namespace pylibczi {
       }
 
 
-      std::vector<std::pair<char, int> >
+      std::vector<std::pair<char, size_t> >
       getShape(){
           std::vector< std::map<char, int> > validIndexes;
           for (const auto& image : *this) {
@@ -105,12 +105,12 @@ namespace pylibczi {
 
           // TODO This code assumes the data is a matrix, meaning for example scene's have the same number of Z-slices
           // TODO is there another way to do this that could cope with variable data sizes within the matrix?
-          std::vector<std::pair<char, int> > charSizes;
-          std::map<char, std::set<int> > charSetSize;
-          std::map<char, std::set<int> >::iterator found;
+          std::vector<std::pair<char, size_t> > charSizes;
+          std::map<char, std::set<size_t> > charSetSize;
+          std::map<char, std::set<size_t> >::iterator found;
           for( const auto& validMap : validIndexes){
               for( auto keySet : validMap) {
-                  found = charSetSize.emplace(keySet.first, std::set<int>()).first;
+                  found = charSetSize.emplace(keySet.first, std::set<size_t>()).first;
                   found->second.insert(keySet.second);
               }
           }

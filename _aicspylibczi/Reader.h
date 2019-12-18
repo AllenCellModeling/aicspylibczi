@@ -87,7 +87,7 @@ namespace pylibczi {
       using SubblockIndexVec = std::vector<std::pair<SubblockSortable, int> >;
       using DimensionIndexRangeMap = std::map<libCZI::DimensionIndex, std::pair<int, int> >;
       using DimensionRangeMap = std::map<char, std::pair<int, int> >;
-      using Shape = std::vector<std::pair<char, int> >;
+      using Shape = std::vector<std::pair<char, size_t> >;
       /*!
        * @brief Construct the Reader and load the file statistics (dimensions etc)
        *
@@ -201,7 +201,7 @@ namespace pylibczi {
        * @endcode
        */
       ImageVector
-      readMosaic(libCZI::CDimCoordinate plane_coord_, float scale_factor_ = 0.1, libCZI::IntRect im_box_ = {0, 0, -1, -1});
+      readMosaic(libCZI::CDimCoordinate plane_coord_, float scale_factor_ = 1.0, libCZI::IntRect im_box_ = {0, 0, -1, -1});
       // changed from {.w=-1, .h=-1} to above to support MSVC and GCC - lagging on C++14 std
 
       /*!
