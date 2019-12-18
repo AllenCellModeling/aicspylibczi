@@ -293,7 +293,7 @@ class CziFile(object):
 
         return self.reader.mosaic_shape()
 
-    def read_mosaic(self, region: Tuple = None, scale_factor: float = 0.1, **kwargs):
+    def read_mosaic(self, region: Tuple = None, scale_factor: float = 1.0, **kwargs):
         """
         Reads a mosaic file and returns an image corresponding to the specified dimensions. If the file is more than
         a 2D sheet of pixels, meaning only one channel, z-slice, time-index, etc then the kwargs must specify the
@@ -309,7 +309,9 @@ class CziFile(object):
         region
             A rectangle specifying the extraction box (x, y, width, height) specified in pixels
         scale_factor
-            The amount to scale the data by, 0.1 would mean an image 1/10 the height and width of native
+            The amount to scale the data by, 0.1 would mean an image 1/10 the height and width of native, if you
+            get distortions it seems to be due to a bug in Zeiss's libCZI I'm trying to track it down but for now
+            if you use scale_factor=1.0 it should work properly.
         kwargs
             The keywords below allow you to specify the dimension plane that constrains the 2D data. If the
             constraints are underspecified the function will fail. ::
