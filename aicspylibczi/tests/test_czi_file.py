@@ -201,7 +201,7 @@ def test_mosaic_image(data_dir, fname, expects):
         sze = czi.read_mosaic_size()
         assert sze[2] == 1756
         assert sze[3] == 624
-        img = czi.read_mosaic(scale_factor=0.1, C=0, M=0)
+        img = czi.read_mosaic(scale_factor=0.1, C=0)
     assert img.shape[0] == 1
 
 
