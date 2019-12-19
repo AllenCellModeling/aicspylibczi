@@ -195,7 +195,7 @@ class CziFile(object):
             metadata as an xml etree
 
         """
-        if not self.meta_root:
+        if self.meta_root is None:
             meta_str = self.reader.read_meta()
             self.meta_root = etree.fromstring(meta_str)
 

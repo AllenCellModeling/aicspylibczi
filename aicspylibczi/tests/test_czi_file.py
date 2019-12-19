@@ -1,3 +1,5 @@
+import io
+import numpy as np
 import pytest
 
 from aicspylibczi import CziFile
@@ -15,6 +17,17 @@ def test_is_a_directory(data_dir, as_string):
     CziFile(infile)
 
 
+@pytest.mark.parametrize("in_, out_", [
+    pytest.param(float(10), False, marks=pytest.mark.raises(exception=TypeError)),
+    (io.BytesIO(b"thisisatestletsseewhathappens"), io.BytesIO(b"thisisatestletsseewhathappens")),
+    (b"thisisatestletsseewhathappens", io.BytesIO(b"thisisatestletsseewhathappens")),
+    (np.zeros(5), np.zeros(5))
+])
+def test_conversion_types(in_, out_):
+    ans = CziFile.convert_to_buffer(in_)
+    assert ans.__class__ == out_.__class__
+
+
 @pytest.mark.parametrize("fname, xp_query, expected", [
     pytest.param('s_1_t_1_c_1_z_1.czi', ".//SizeS", 1, marks=pytest.mark.raises(exception=AttributeError)),
     pytest.param('s_1_t_1_c_1_z_1.czi', ".//SizeZ", 1, marks=pytest.mark.raises(exception=AttributeError)),
@@ -29,6 +42,9 @@ def test_is_a_directory(data_dir, as_string):
 ])
 def test_metadata(data_dir, fname, xp_query, expected):
     czi = CziFile(str(data_dir / fname))
+    meta = czi.meta
+    vs = meta.find(xp_query)
+    assert int(vs.text) == expected
     meta = czi.meta
     vs = meta.find(xp_query)
     assert int(vs.text) == expected
@@ -106,17 +122,14 @@ def test_destructor(data_dir, fname, expected):
 
 
 @pytest.mark.parametrize("fname, expected", [
-    ('s_1_t_1_c_1_z_1.czi', [0, 0, -1, -1]),
-    ('s_3_t_1_c_3_z_5.czi', [0, 0, -1, -1]),
-    ('mosaic_test.czi', [0, 0, 1756, 624]),  # it's not 2*X because they overlap
+    ('s_1_t_1_c_1_z_1.czi', (0, 0, -1, -1)),
+    ('s_3_t_1_c_3_z_5.czi', (0, 0, -1, -1)),
+    ('mosaic_test.czi', (0, 0, 1756, 624)),  # it's not 2*X because they overlap
 ])
 def test_mosaic_size(data_dir, fname, expected):
     czi = CziFile(str(data_dir / fname))
     ans = czi.read_mosaic_size()
-    assert ans.x == expected[0]
-    assert ans.y == expected[1]
-    assert ans.w == expected[2]
-    assert ans.h == expected[3]
+    assert ans == expected
 
 
 @pytest.mark.parametrize("fname, expected", [
@@ -186,7 +199,27 @@ def test_mosaic_image(data_dir, fname, expects):
     with open(data_dir / fname, 'rb') as fp:
         czi = CziFile(czi_filename=fp)
         sze = czi.read_mosaic_size()
-        assert sze.w == 1756
-        assert sze.h == 624
-        img = czi.read_mosaic(scale_factor=0.1, C=0)
+        assert sze[2] == 1756
+        assert sze[3] == 624
+        img = czi.read_mosaic(scale_factor=0.1, C=0, M=0)
     assert img.shape[0] == 1
+
+
+@pytest.mark.parametrize("fname, expects", [
+    ('mosaic_test.czi', (1756, 624)),
+])
+def test_mosaic_image_two(data_dir, fname, expects):
+    with open(data_dir / fname, 'rb') as fp:
+        czi = CziFile(czi_filename=fp)
+        sze = czi.read_mosaic_size()
+        box = czi.czilib.IntRect()
+        box.x = sze[0]
+        box.y = sze[1]
+        box.w = int(sze[2]/2)
+        box.h = int(sze[3]/2)
+        img = czi.read_mosaic(C=0, M=0)
+    print(img.shape)
+    assert img.shape[0] == 1
+    assert img.shape[1] == 1
+    assert img.shape[3] == expects[0]
+    assert img.shape[2] == expects[1]
