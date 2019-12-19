@@ -41,7 +41,7 @@ def test_conversion_types(in_, out_):
     ('s_3_t_1_c_3_z_5.czi', ".//SizeZ", 5),
 ])
 def test_metadata(data_dir, fname, xp_query, expected):
-    czi = CziFile(str(data_dir / fname))
+    czi = CziFile(str(data_dir / fname), metafile_out="tmp.txt")
     meta = czi.meta
     vs = meta.find(xp_query)
     assert int(vs.text) == expected
@@ -206,20 +206,12 @@ def test_mosaic_image(data_dir, fname, expects):
 
 
 @pytest.mark.parametrize("fname, expects", [
-    ('mosaic_test.czi', (1756, 624)),
+    ('mosaic_test.czi', (1, 1, int(624/2), int(1756/2))),
 ])
 def test_mosaic_image_two(data_dir, fname, expects):
     with open(data_dir / fname, 'rb') as fp:
         czi = CziFile(czi_filename=fp)
         sze = czi.read_mosaic_size()
-        box = czi.czilib.IntRect()
-        box.x = sze[0]
-        box.y = sze[1]
-        box.w = int(sze[2]/2)
-        box.h = int(sze[3]/2)
-        img = czi.read_mosaic(C=0, M=0)
-    print(img.shape)
-    assert img.shape[0] == 1
-    assert img.shape[1] == 1
-    assert img.shape[3] == expects[0]
-    assert img.shape[2] == expects[1]
+        rgion = (sze[0], sze[1], int(sze[2]/2), int(sze[3]/2))
+        img = czi.read_mosaic(region=rgion, C=0, M=0)
+    assert img.shape == expects
