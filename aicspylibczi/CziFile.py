@@ -289,9 +289,9 @@ class CziFile(object):
             ans = self.czilib.IntRect()
             ans.x = ans.y = 0
             ans.w = ans.h = -1
-            return ans
-
-        return self.reader.mosaic_shape()
+        else:
+            ans = self.reader.mosaic_shape()
+        return (ans.x, ans.y, ans.w, ans.h)
 
     def read_mosaic(self, region: Tuple = None, scale_factor: float = 1.0, **kwargs):
         """

@@ -17,8 +17,8 @@ namespace pylibczi {
   class SubblockString : public SubblockSortable {
       std::string m_string;
   public:
-      SubblockString(const libCZI::CDimCoordinate *plane_, int index_m_, bool is_mosaic_, char* str_p_)
-      :SubblockSortable(plane_, index_m_, is_mosaic_), m_string(str_p_) {
+      SubblockString(const libCZI::CDimCoordinate *plane_, int index_m_, bool is_mosaic_, char* str_p_, size_t str_size_)
+      :SubblockSortable(plane_, index_m_, is_mosaic_), m_string(str_p_, str_size_) {
           //clear string from garbage symbols
           std::regex lthan("&lt;"), gthan("&gt;"), spce("\\s*\\r\\n\\s*");
           std::regex metatag("</METADATA>.*"), quote("\\\"");

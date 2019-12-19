@@ -205,7 +205,8 @@ namespace pylibczi {
           size_t metaSize = 0;
           auto subblock = m_czireader->ReadSubBlock(match_.second);
           auto sharedPtrString = subblock->GetRawData(libCZI::ISubBlock::Metadata, &metaSize);
-          metaSubblocks.emplace_back(match_.first.coordinatePtr(), match_.first.mIndex(), isMosaic(), (char*) (sharedPtrString.get()));
+          metaSubblocks.emplace_back(match_.first.coordinatePtr(), match_.first.mIndex(),
+              isMosaic(), (char*) (sharedPtrString.get()), metaSize);
       });
 
       return metaSubblocks;
