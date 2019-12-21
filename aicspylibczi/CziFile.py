@@ -59,6 +59,19 @@ class CziFile(object):
         self.meta_root = None
 
     @property
+    def shape_is_consistent(self):
+        """
+        Query if the file shape is consistent across scenes.
+
+        Returns
+        -------
+        bool
+            true if consistent, false the scenes have different dimension shapes
+
+        """
+        return self.reader.has_consistent_shape()
+
+    @property
     def dims(self):
         """
         Get the dimensions present the binary data (not the metadata)
