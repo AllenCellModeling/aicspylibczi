@@ -11,7 +11,7 @@
 namespace pylibczi {
 
   Reader::Reader(std::shared_ptr<libCZI::IStream> istream_)
-      :m_czireader(new CCZIReader), m_specifyScene(false)
+      :m_czireader(new CCZIReader), m_specifyScene(true)
   {
       m_czireader->Open(std::move(istream_));
       m_statistics = m_czireader->GetStatistics();
@@ -21,7 +21,7 @@ namespace pylibczi {
   }
 
   Reader::Reader(const wchar_t* file_name_)
-      :m_czireader(new CCZIReader), m_specifyScene(false)
+      :m_czireader(new CCZIReader), m_specifyScene(true)
   {
       std::shared_ptr<libCZI::IStream> sp;
       sp = std::shared_ptr<libCZI::IStream>(new CSimpleStreamImplCppStreams(file_name_));
@@ -35,16 +35,8 @@ namespace pylibczi {
   void
   Reader::checkSceneShapes()
   {
-      if (m_statistics.sceneBoundingBoxes.size()<2) return;
-      libCZI::IntRect kept = m_statistics.sceneBoundingBoxes[0].boundingBoxLayer0;
-      for_each(m_statistics.sceneBoundingBoxes.begin(),
-          m_statistics.sceneBoundingBoxes.end(),
-          [&](const auto& bbox_) {
-              if (!m_specifyScene && (bbox_.second.boundingBoxLayer0.w!=kept.w || bbox_.second.boundingBoxLayer0.h!=kept.h)) {
-                  m_specifyScene = true;
-              }
-          });
-
+      auto dShapes = readDimsRange();
+      m_specifyScene = !consistentShape(dShapes);
   }
 
   std::string
@@ -64,26 +56,21 @@ namespace pylibczi {
   /// @brief get_shape_from_fp returns the Dimensions of a ZISRAW/CZI when provided a ICZIReader object
   /// @param czi: a shared_ptr to an initialized CziReader object
   /// @return A Python Dictionary as a PyObject*
-  Reader::DimensionRangeMap
-  Reader::readDims()
+  Reader::DimsShape
+  Reader::readDimsRange()
   {
-      DimensionIndexRangeMap tbl;
-      m_statistics.dimBounds.EnumValidDimensions([&tbl](libCZI::DimensionIndex di_, int start_, int size_) -> bool {
-          tbl.emplace(di_, std::make_pair(start_, size_+start_-1)); // changed from [start, end) to be [start, end]
-          return true;
-      });
-
-      DimensionRangeMap ans;
-      for_each(tbl.begin(), tbl.end(), [&](const auto& pr_) {
-          ans.emplace(dimToChar(pr_.first), pr_.second);
-      });
-
-      if( isMosaic() ) ans.emplace('M', std::make_pair(m_statistics.minMindex, m_statistics.maxMindex));
-
-      libCZI::IntRect sbsize = getSceneYXSize();
-
-      ans.emplace('Y', std::make_pair(0, sbsize.h-1));
-      ans.emplace('X', std::make_pair(0, sbsize.w-1));
+      DimsShape ans;
+      int sceneStart(0), sceneSize(0);
+      if (!m_statistics.dimBounds.TryGetInterval(libCZI::DimensionIndex::S, &sceneStart, &sceneSize)) {
+          ans.push_back(sceneShape(-1));
+          return ans;
+      }
+      for (int i = sceneStart; i<sceneStart+sceneSize; i++)
+          ans.push_back(sceneShape(i));
+      if (!m_specifyScene && ans.size()>1) {
+          ans[0][DimIndex::S].second = (*(ans.rbegin()))[DimIndex::S].second;
+          ans.resize(1); // remove the exta channels
+      }
       return ans;
   }
 
@@ -92,9 +79,13 @@ namespace pylibczi {
   std::vector<int>
   Reader::dimSizes()
   {
-      DimensionIndexRangeMap tbl;
+      std:
+      string dString = dimsString();
+      if (m_specifyScene) return std::vector<int>(dString.size(), -1);
+
+      DimIndexRangeMap tbl;
       m_statistics.dimBounds.EnumValidDimensions([&](libCZI::DimensionIndex di_, int start_, int size_) -> bool {
-          tbl.emplace(di_, std::make_pair(start_, size_)); // changed from [start, end) to be [start, end]
+          tbl.emplace(dimensionIndexToDimIndex(di_), std::make_pair(start_, size_)); // changed from [start, end) to be [start, end]
           return true;
       }); // sorts the letters into ascending order by default { Z, C, T, S }
       std::vector<int> ans(tbl.size());
@@ -103,32 +94,115 @@ namespace pylibczi {
           return pr_.second.second;
       });
 
-      if( isMosaic() ){
-          ans.push_back(m_statistics.maxMindex + 1); // The M-index is zero based
-      }
+      if (isMosaic()) { ans.push_back(m_statistics.maxMindex+1); } // The M-index is zero based
 
       libCZI::IntRect sbsize = getSceneYXSize();
-
       ans.push_back(sbsize.h);
       ans.push_back(sbsize.w);
 
       return ans;
   }
 
+  std::tuple<bool, int, int>
+  Reader::scenesStartSize()
+  {
+      bool scenesDefined = false;
+      int sceneStart = 0;
+      int sceneSize = 0;
+      scenesDefined = m_statistics.dimBounds.TryGetInterval(libCZI::DimensionIndex::S, &sceneStart, &sceneSize);
+      return {scenesDefined, sceneStart, sceneSize};
+  }
+
+  bool
+  Reader::consistentShape(DimsShape& dShape_)
+  {
+      bool regularShape = true;
+      for (int i = 1; regularShape && i<dShape_.size(); i++) {
+          for (auto kVal: dShape_[i]) {
+              if( kVal.first == DimIndex::S ) continue;
+              auto found = dShape_[0].find(kVal.first);
+              if (found==dShape_[0].end()) regularShape = false;
+              else regularShape &= (kVal==*found);
+          }
+      }
+      return regularShape;
+  }
+
+  Reader::DimIndexRangeMap
+  Reader::sceneShape(int scene_index_)
+  {
+      bool sceneBool(false);
+      int sceneStart(0), sceneSize(0);
+      tie(sceneBool, sceneStart, sceneSize) = scenesStartSize();
+
+      DimIndexRangeMap tbl;
+
+      if (!sceneBool) {
+          // scenes are not defined so the dimBounds define the shape
+          m_statistics.dimBounds.EnumValidDimensions([&tbl](libCZI::DimensionIndex di_, int start_, int size_) -> bool {
+              tbl.emplace(dimensionIndexToDimIndex(di_),
+                  std::make_pair(start_, size_+start_)); // changed from [start, end) to be [start, end]
+              return true;
+          });
+
+          auto xySize = getSceneYXSize();
+          tbl.emplace(charToDimIndex('Y'), std::make_pair(0, xySize.h));
+          tbl.emplace(charToDimIndex('X'), std::make_pair(0, xySize.w));
+      }
+      else {
+          if (scene_index_<sceneStart || sceneStart+sceneSize<=scene_index_) {
+              std::stringstream ss;
+              ss << "Scene index " << scene_index_ << " ∉ " << "[" << sceneStart << ", " << sceneStart+sceneSize << ")";
+              throw CDimCoordinatesOverspecifiedException(ss.str().c_str());
+          }
+          libCZI::CDimCoordinate cDim{{libCZI::DimensionIndex::S, scene_index_}};
+          SubblockSortable sceneToFind(&cDim, -1, false);
+          SubblockIndexVec matches = getMatches(sceneToFind);
+
+          // get the condensed set of values
+          std::map<DimIndex, set<int> > definedDims;
+          for (auto x : matches) {
+              x.first.coordinatePtr()->EnumValidDimensions([&definedDims](libCZI::DimensionIndex di_, int val_) -> bool {
+                  definedDims[dimensionIndexToDimIndex(di_)].emplace(val_);
+                  return true;
+              });
+              if (isMosaic()) definedDims[DimIndex::M].emplace(x.first.mIndex());
+          }
+          for (auto x : definedDims) tbl.emplace(x.first, std::make_pair(*x.second.begin(), *x.second.rbegin()+1));
+
+          auto xySize = getSceneYXSize(scene_index_);
+          tbl.emplace(DimIndex::Y, std::make_pair(0, xySize.h));
+          tbl.emplace(DimIndex::X, std::make_pair(0, xySize.w));
+      }
+      return tbl;
+  }
+
   libCZI::IntRect
   Reader::getSceneYXSize(int scene_index_)
   {
-      if (m_statistics.dimBounds.IsValid(libCZI::DimensionIndex::S)) {
+      bool hasScene = m_statistics.dimBounds.IsValid(libCZI::DimensionIndex::S);
+      if (!isMosaic() && hasScene) {
           int sStart(0), sSize(0);
           m_statistics.dimBounds.TryGetInterval(libCZI::DimensionIndex::S, &sStart, &sSize);
           if (scene_index_>=sStart && (sStart+sSize-1)<=scene_index_
               && !m_statistics.sceneBoundingBoxes.empty())
               return m_statistics.sceneBoundingBoxes[scene_index_].boundingBoxLayer0;
       }
-      int index = m_orderMapping.front().second;
-      auto subblk = m_czireader->ReadSubBlock(index);
-      auto sbkInfo = subblk->GetSubBlockInfo();
-      return sbkInfo.logicalRect;
+      int embeddedSceneIndex = 0;
+      for (const auto& x : m_orderMapping) {
+          if (hasScene) {
+              x.first.coordinatePtr()->TryGetPosition(libCZI::DimensionIndex::S, &embeddedSceneIndex);
+              if (embeddedSceneIndex==scene_index_) {
+                  int index = x.second;
+                  auto subblk = m_czireader->ReadSubBlock(index);
+                  auto sbkInfo = subblk->GetSubBlockInfo();
+                  return sbkInfo.logicalRect;
+              }
+          }
+      }
+      auto blk = m_czireader->ReadSubBlock(m_orderMapping.front().second);
+      auto info = blk->GetSubBlockInfo();
+      return info.logicalRect;
   }
 
   /// @brief get the Dimensions in the order they appear in
@@ -146,7 +220,7 @@ namespace pylibczi {
           return libCZI::Utils::CharToDimension(a_)>libCZI::Utils::CharToDimension(b_);
       });
 
-      if( isMosaic() ) ans += "M";
+      if (isMosaic()) ans += "M";
 
       ans += "YX";
       return ans;
@@ -220,13 +294,13 @@ namespace pylibczi {
       SubblockIndexVec ans;
       std::copy_if(m_orderMapping.begin(), m_orderMapping.end(), std::back_inserter(ans),
           [&match_](const SubblockIndexVec::value_type& a_) {
-          return match_==a_.first;
-      });
-      if(ans.empty()){
+              return match_==a_.first;
+          });
+      if (ans.empty()) {
           // check for invalid Dimension specification
-          match_.coordinatePtr()->EnumValidDimensions([&](libCZI::DimensionIndex di_, int value_){
+          match_.coordinatePtr()->EnumValidDimensions([&](libCZI::DimensionIndex di_, int value_) {
               bool keepGoing = true;
-              if(!m_statistics.dimBounds.IsValid(di_)){
+              if (!m_statistics.dimBounds.IsValid(di_)) {
                   std::stringstream tmp;
                   tmp << dimToChar(di_) << " Not present in defined file Coordinates!";
                   throw CDimCoordinatesOverspecifiedException(tmp.str());
@@ -234,10 +308,10 @@ namespace pylibczi {
 
               int start(0), size(0);
               m_statistics.dimBounds.TryGetInterval(di_, &start, &size);
-              if( value_ < start || value_ >= (start + size)){
+              if (value_<start || value_>=(start+size)) {
                   std::stringstream tmp;
                   tmp << dimToChar(di_) << " value " << value_ << "invalid, ∉ [" << start << ", "
-                    << start + size << ")" << std::endl;
+                      << start+size << ")" << std::endl;
                   throw CDimCoordinatesOverspecifiedException(tmp.str());
               }
               return true;
@@ -289,12 +363,12 @@ namespace pylibczi {
       if (im_box_.w==-1 && im_box_.h==-1) im_box_ = m_statistics.boundingBox;
       isValidRegion(im_box_, m_statistics.boundingBox); // if not throws RegionSelectionException
 
-      if( plane_coord_.IsValid(libCZI::DimensionIndex::S) ){
+      if (plane_coord_.IsValid(libCZI::DimensionIndex::S)) {
           throw CDimCoordinatesOverspecifiedException("Do not set S when reading mosaic files!");
       }
 
-      if( !plane_coord_.IsValid(libCZI::DimensionIndex::C) ){
-          throw CDimCoordinatesUnderspecifiedException( "C is not set, to read mosaic files you must specify C.");
+      if (!plane_coord_.IsValid(libCZI::DimensionIndex::C)) {
+          throw CDimCoordinatesUnderspecifiedException("C is not set, to read mosaic files you must specify C.");
       }
       SubblockSortable subBlockToFind(&plane_coord_, -1); // just check that the dims match something ignore that it's a mosaic file
       getMatches(subBlockToFind); // this does the checking

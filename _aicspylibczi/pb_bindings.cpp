@@ -8,6 +8,7 @@
 
 // the below headers are crucial otherwise the custom casts aren't recognized
 #include "pb_caster_BytesIO.h"
+#include "pb_caster_DimIndex.h"
 #include "pb_caster_ImageVector.h"
 #include "pb_caster_SubblockMetaVec.h"
 #include "pb_caster_libCZI_DimensionIndex.h"
@@ -34,7 +35,7 @@ PYBIND11_MODULE(_aicspylibczi, m)
     py::class_<pylibczi::Reader>(m, "Reader")
         .def(py::init<std::shared_ptr<libCZI::IStream> >())
         .def("is_mosaic", &pylibczi::Reader::isMosaic)
-        .def("read_dims", &pylibczi::Reader::readDims)
+        .def("read_dims", &pylibczi::Reader::readDimsRange)
         .def("read_dims_string", &pylibczi::Reader::dimsString)
         .def("read_dims_sizes", &pylibczi::Reader::dimSizes)
         .def("read_scene_wh", &pylibczi::Reader::getSceneYXSize)

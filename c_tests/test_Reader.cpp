@@ -15,6 +15,14 @@ public:
     pylibczi::Reader* get() { return m_czi.get(); }
 };
 
+class CziCreatorTmp {
+    std::unique_ptr<pylibczi::Reader> m_czi;
+public:
+    CziCreatorTmp()
+        :m_czi(new pylibczi::Reader(L"/allen/aics/assay-dev/MicroscopyData/Melissa/2018/20180211/20180211_M03_001.czi")) { }
+    pylibczi::Reader* get() { return m_czi.get(); }
+};
+
 class CziCreator2 {
     std::unique_ptr<pylibczi::Reader> m_czi;
 public:
@@ -48,12 +56,35 @@ TEST_CASE("open_two_czis", "[Reader_Dup]")
 
 TEST_CASE_METHOD(CziCreator, "test_reader_dims_1", "[Reader_Dims]")
 {
+    using DI=pylibczi::DimIndex;
+    pylibczi::Reader::DimsShape ans{
+        {{DI::X, {0, 475}}, {DI::Y, {0, 325}}, {DI::C, {0, 1}}, {DI::B, {0, 1}}},
+    };
     auto czi = get();
-    auto dims = czi->readDims();
-    auto cDim = find_if(dims.begin(), dims.end(), [](const auto& pr_) { return pr_.first=='C'; });
-    REQUIRE(cDim->second==std::pair<int, int>(0, 0));
-    REQUIRE(dims.size()==4); // B=0, C=0, Y, X for this file
+    auto dimsVec = czi->readDimsRange();
+    REQUIRE(czi->shapeIsConsistent());
+    REQUIRE(dimsVec.size() == 1);
+    REQUIRE(dimsVec == ans);
 }
+
+TEST_CASE_METHOD(CziCreatorTmp, "test_reader_dims_tmp", "[Reader_Dims_tmp]")
+{
+    using DI=pylibczi::DimIndex;
+    pylibczi::Reader::DimsShape ans{
+        {{DI::X, {0, 700}}, {DI::Y, {0, 950}}, {DI::Z, {0, 65}}, {DI::C, {0, 2}}, {DI::B, {0, 1}}, {DI::S, {0, 1}}, {DI::T, {0, 18}}},
+        {{DI::X, {0, 700}}, {DI::Y, {0, 950}}, {DI::Z, {0, 65}}, {DI::C, {0, 2}}, {DI::B, {0, 1}}, {DI::S, {1, 2}}, {DI::T, {0, 17}}},
+        {{DI::X, {0, 700}}, {DI::Y, {0, 950}}, {DI::Z, {0, 65}}, {DI::C, {0, 2}}, {DI::B, {0, 1}}, {DI::S, {2, 3}}, {DI::T, {0, 17}}},
+        {{DI::X, {0, 700}}, {DI::Y, {0, 950}}, {DI::Z, {0, 65}}, {DI::C, {0, 2}}, {DI::B, {0, 1}}, {DI::S, {3, 4}}, {DI::T, {0, 17}}},
+        {{DI::X, {0, 700}}, {DI::Y, {0, 950}}, {DI::Z, {0, 65}}, {DI::C, {0, 2}}, {DI::B, {0, 1}}, {DI::S, {4, 5}}, {DI::T, {0, 17}}},
+        {{DI::X, {0, 700}}, {DI::Y, {0, 950}}, {DI::Z, {0, 65}}, {DI::C, {0, 2}}, {DI::B, {0, 1}}, {DI::S, {5, 6}}, {DI::T, {0, 17}}},
+    };
+    auto czi = get();
+    auto dims = czi->readDimsRange();
+    REQUIRE(!czi->shapeIsConsistent());
+    REQUIRE(dims.size()==6);
+    REQUIRE(dims == ans);
+}
+
 
 TEST_CASE_METHOD(CziCreator, "test_reader_dims_2", "[Reader_Dims_String]")
 {
@@ -67,12 +98,10 @@ TEST_CASE_METHOD(CziCreator2, "test_reader_dims_3", "[Reader_Dims_Size]")
     auto czi = get();
     std::string dstr = czi->dimsString();
     auto dims = czi->dimSizes();
-    //                                  B  S  C  Z
-    std::initializer_list<int> shape = {1, 3, 3, 5, 325, 475};
-    pairedForEach(dims.begin(), dims.end(), shape.begin(), [](int a_, int b_) {
-        REQUIRE(a_==b_);
-    });
+    std::vector<int> shape = {1, 3, 3, 5, 325, 475};
+    REQUIRE(czi->shapeIsConsistent());
     REQUIRE(dstr=="BSCZYX");
+    REQUIRE(dims == shape);
 }
 
 TEST_CASE_METHOD(CziCreator, "test_is_mosaic", "[Reader_Is_Mosaic]")
@@ -96,8 +125,9 @@ TEST_CASE_METHOD(CziCreator, "test_meta_reader", "[Reader_read_meta]")
 TEST_CASE_METHOD(CziCreator, "test_read_selected", "[Reader_read_selected]")
 {
     auto czi = get();
-    auto cDims = libCZI::CDimCoordinate{{libCZI::DimensionIndex::B, 0},
-                                        {libCZI::DimensionIndex::C, 0}};
+    auto cDims = libCZI::CDimCoordinate{};
+//                                        {{libCZI::DimensionIndex::B, 0},
+//                                        {libCZI::DimensionIndex::C, 0}};
     auto imvec = czi->readSelected(cDims).first;
     REQUIRE(imvec.size()==1);
     auto shape = imvec.front()->shape();
@@ -191,17 +221,15 @@ TEST_CASE_METHOD(CziMCreator, "test_mosaic_dimsSize", "[Reader_mosaic_dimsSize]"
 TEST_CASE_METHOD(CziMCreator, "test_mosaic_readdims", "[Reader_mosaic_readdims]")
 {
     auto czi = get();
-    pylibczi::Reader::DimensionRangeMap ans{{'S', {0, 0}}, {'T', {0, 0}}, {'C', {0, 0}},
-                                            {'Z', {0, 0}}, {'M', {0, 1}},
-                                            {'Y', {0, 623}}, {'X', {0, 923}} };
-    auto val = czi->readDims();
-    auto vitt = val.begin();
-    auto aitt = ans.begin();
-    for(; aitt != ans.end() && vitt != val.end(); aitt++, vitt++) {
-        REQUIRE(vitt->first == aitt->first);
-        REQUIRE(vitt->second.first == aitt->second.first);
-        REQUIRE(vitt->second.second == aitt->second.second);
-    }
+    using DI=pylibczi::DimIndex;
+    pylibczi::Reader::DimsShape ans{
+        {
+            {DI::S, {0, 1}}, {DI::T, {0, 1}}, {DI::C, {0, 1}},
+            {DI::Z, {0, 1}}, {DI::M, {0, 2}},
+            {DI::Y, {0, 624}}, {DI::X, {0, 924} }
+        }
+    };
+    auto val = czi->readDimsRange();
     REQUIRE(val == ans);
 }
 
@@ -251,7 +279,6 @@ public:
 TEST_CASE_METHOD(CziBgrCreator, "test_bgr_read", "[Reader_read_bgr]")
 {
     auto czi = get();
-
     libCZI::CDimCoordinate dm;
     auto pr = czi->readSelected(dm);
 
@@ -259,15 +286,14 @@ TEST_CASE_METHOD(CziBgrCreator, "test_bgr_read", "[Reader_read_bgr]")
     std::vector<int> ansSize{1, 624, 924};
     REQUIRE(czi->dimSizes()==ansSize);
 
-    auto dims = czi->readDims();
-    pylibczi::Reader::DimensionRangeMap ansDims{{'T', {0, 0}}, {'Y', {0, 623}}, {'X', {0, 923}}};
-    REQUIRE(!ansDims.empty());
+    using DI=pylibczi::DimIndex;
+    pylibczi::Reader::DimsShape ansDims{{{DI::T, {0, 1}}, {DI::Y, {0, 624}}, {DI::X, {0, 924}}}};
+    auto dims = czi->readDimsRange();
     REQUIRE(!dims.empty());
     REQUIRE(dims==ansDims);
 
     REQUIRE(pr.first.size()==3);
-    REQUIRE(pr.first.front()->shape()[0]==624);
-    REQUIRE(pr.first.front()->shape()[1]==924);
+    REQUIRE(pr.first.front()->shape() == std::vector<size_t>{624, 924});
     REQUIRE(pr.first.front()->pixelType()==libCZI::PixelType::Gray8);
 }
 
@@ -275,7 +301,7 @@ TEST_CASE_METHOD(CziBgrCreator, "test_bgr_flatten", "[Reader_read_flatten_bgr]")
 {
     auto czi = get();
 
-    auto dims = czi->readDims();
+    auto dims = czi->readDimsRange();
 
     libCZI::CDimCoordinate dm;
     auto pr = czi->readSelected(dm, -1);

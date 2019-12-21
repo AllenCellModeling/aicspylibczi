@@ -34,14 +34,16 @@ find_library(libCZI REQUIRED PATHS ${CMAKE_SOURCE_DIR}/libCZI)
 
 set(PYLIBCZI_C_SRC_HEADERS _aicspylibczi/Reader.h _aicspylibczi/helper_algorithms.h _aicspylibczi/exceptions.h _aicspylibczi/inc_libCZI.h
         _aicspylibczi/IndexMap.h _aicspylibczi/Image.h _aicspylibczi/TypedImage.h _aicspylibczi/ImageFactory.h
-        _aicspylibczi/SourceRange.h _aicspylibczi/TargetRange.h _aicspylibczi/pylibczi_ostream.h _aicspylibczi/SubblockMetaVec.h _aicspylibczi/constants.h)
+        _aicspylibczi/SourceRange.h _aicspylibczi/TargetRange.h _aicspylibczi/pylibczi_ostream.h
+        _aicspylibczi/SubblockMetaVec.h _aicspylibczi/DimIndex.h _aicspylibczi/constants.h)
 
 set(PYLIBCZI_C_SRC _aicspylibczi/Reader.cpp _aicspylibczi/IndexMap.cpp _aicspylibczi/Image.cpp _aicspylibczi/ImageFactory.cpp
-        _aicspylibczi/pylibczi_ostream.cpp _aicspylibczi/exceptions.cpp _aicspylibczi/SubblockSortable.h _aicspylibczi/pb_caster_SubblockMetaVec.h _aicspylibczi/constants.cpp)
+        _aicspylibczi/pylibczi_ostream.cpp _aicspylibczi/exceptions.cpp _aicspylibczi/SubblockSortable.h
+        _aicspylibczi/pb_caster_SubblockMetaVec.h _aicspylibczi/constants.cpp _aicspylibczi/DimIndex.cpp)
 
 set(PYLIBCZI_PYBIND11 _aicspylibczi/pb_bindings.cpp _aicspylibczi/pb_helpers.h _aicspylibczi/pb_helpers.cpp _aicspylibczi/pb_caster_ImageVector.h
         _aicspylibczi/pb_caster_BytesIO.h _aicspylibczi/pb_caster_libCZI_DimensionIndex.h _aicspylibczi/CSimpleStreamImplFromFd.h
-        _aicspylibczi/CSimpleStreamImplFromFd.cpp)
+        _aicspylibczi/CSimpleStreamImplFromFd.cpp _aicspylibczi/pb_caster_DimIndex.h)
 
 set(TARGET_ONE libczi_c++_extension)
 set(TARGET_TWO _aicspylibczi)

@@ -78,10 +78,17 @@ class CziFile(object):
 
         Returns
         -------
-        dict
-            A dictionary containing Dimension / depth, a file with 3 scenes, 7 time-points
+        list[dict]
+            A list of dictionaries containing Dimension / depth. If the shape is consistent across Scenes then
+            the list will have only one Dictionary. If the shape is inconsistent the the list will have a dictionary
+             for each Scene. A consistently shaped file with 3 scenes, 7 time-points
             and 4 Z slices containing images of (h,w) = (325, 475) would return
-            {'S': 3, 'T': 7, 'X': 475, 'Y': 325, 'Z': 4}
+            [{'S': (0, 3), 'T': (0,7), 'X': (0, 475), 'Y': (0, 325), 'Z': (0, 4)}].
+            The result for a similarly shaped file but with different number of time-points per scene would yield
+            [{'S': (0, 1), 'T': (0,8), 'X': (0, 475), 'Y': (0, 325), 'Z': (0, 4)},
+             {'S': (1, 2), 'T': (0,6), 'X': (0, 475), 'Y': (0, 325), 'Z': (0, 4)},
+             {'S': (2, 3), 'T': (0,7), 'X': (0, 475), 'Y': (0, 325), 'Z': (0, 4)}
+             ]
 
         """
         return self.reader.read_dims()
@@ -135,7 +142,8 @@ class CziFile(object):
         Returns
         -------
         tuple
-            a tuple of dimension sizes
+            a tuple of dimension sizes. If the data has inconsistent shape the list will only contain -1 values and
+            the user needs to use dims_shape() to get the indexes.
 
         """
         return tuple(self.reader.read_dims_sizes())

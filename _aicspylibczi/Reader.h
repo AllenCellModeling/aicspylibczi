@@ -8,6 +8,8 @@
 #include <vector>
 
 #include "inc_libCZI.h"
+
+#include "DimIndex.h"
 #include "IndexMap.h"
 #include "Image.h"
 #include "SubblockSortable.h"
@@ -78,6 +80,7 @@ namespace pylibczi {
    * https://github.com/elhuhdron/pylibczi
    */
   class Reader {
+
       std::shared_ptr<CCZIReader> m_czireader; // required for cast in libCZI
       libCZI::SubBlockStatistics m_statistics;
       std::vector<std::pair<SubblockSortable, int> > m_orderMapping;
@@ -85,9 +88,11 @@ namespace pylibczi {
 
   public:
       using SubblockIndexVec = std::vector<std::pair<SubblockSortable, int> >;
-      using DimensionIndexRangeMap = std::map<libCZI::DimensionIndex, std::pair<int, int> >;
+      using DimIndexRangeMap = std::map<DimIndex, std::pair<int, int> >;
       using DimensionRangeMap = std::map<char, std::pair<int, int> >;
       using Shape = std::vector<std::pair<char, size_t> >;
+      using DimsShape = std::vector< DimIndexRangeMap >;
+
       /*!
        * @brief Construct the Reader and load the file statistics (dimensions etc)
        *
@@ -132,9 +137,12 @@ namespace pylibczi {
        * The internal structure suggests that a given dimension could start at a value other than zero.
        * Although I have yet to observe this we return a pair containing both the start and the size for the index.
        *
-       * @return A map< DimensionIndex, pair<int(start), int(end)> > which conforms to [start, end] (inclusive)
+       * @return A vector< map< DimensionIndex, pair<int(start), int(end)> > > which conforms to [start, end) meaning
+       *    for( int i = start; i < end ; i++) is valid. If the shape of the scenes is consistent there will be one
+       *    element in the vector. If the shape is not consistent each Scene will be present in the vector with it's
+       *    explicit dimensions.
        */
-      Reader::DimensionRangeMap readDims();
+      Reader::DimsShape readDimsRange();
 
       /*!
        * @brief Get the Dimensions in the order that they appear.
@@ -144,9 +152,30 @@ namespace pylibczi {
 
       /*!
        * @brief Get the size of the dimensions in the same order as dimsString()
-       * @return a vector containing the dimension sizes. Y & X are included for completeness despite not being DimensionIndexes.
+       * @return a vector containing the dimension sizes. Y & X are included for completeness.
+       *    If the dims are not consistent a vector of -1 values is returned. The used should then use readDimsRange()
        */
       std::vector<int> dimSizes();
+
+      /*!
+       * @brief check if the dims are consistent across scenes
+       * @param dShape_ A vector of scene specific dimensions
+       * @return true if the shape is the same across scene false if it is not
+       */
+      bool consistentShape(DimsShape& dShape_);
+
+      /*!
+       * @brief Enable the user to query the Scene shape directly
+       * @return a tuple, the first index is if S is defined the second is the start index and the third is the number of S indexs
+       */
+      std::tuple<bool, int, int> scenesStartSize();
+
+      /*!
+       * @brief get the shape of the specified Scene
+       * @param scene_index_ the integer index of the Scene
+       * @return A map containing the DimIndex with a pair of integers start, end such that for(int i = start; i < end ; i++) is valid.
+       */
+      Reader::DimIndexRangeMap sceneShape(int scene_index_);
 
       /*!
        * @brief Get the metadata from the CZI file.
@@ -210,6 +239,8 @@ namespace pylibczi {
        * @return The character representing the DimensionIndex
        */
       static char dimToChar(libCZI::DimensionIndex di_) { return libCZI::Utils::DimensionToChar(di_); }
+
+      bool shapeIsConsistent() { return !m_specifyScene; }
 
       virtual ~Reader()
       {
