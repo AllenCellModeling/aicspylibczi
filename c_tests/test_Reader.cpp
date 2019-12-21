@@ -15,14 +15,6 @@ public:
     pylibczi::Reader* get() { return m_czi.get(); }
 };
 
-class CziCreatorTmp {
-    std::unique_ptr<pylibczi::Reader> m_czi;
-public:
-    CziCreatorTmp()
-        :m_czi(new pylibczi::Reader(L"/allen/aics/assay-dev/MicroscopyData/Melissa/2018/20180211/20180211_M03_001.czi")) { }
-    pylibczi::Reader* get() { return m_czi.get(); }
-};
-
 class CziCreator2 {
     std::unique_ptr<pylibczi::Reader> m_czi;
 public:
@@ -67,6 +59,16 @@ TEST_CASE_METHOD(CziCreator, "test_reader_dims_1", "[Reader_Dims]")
     REQUIRE(dimsVec == ans);
 }
 
+/* The file for this test is too large to commit to the repo
+
+class CziCreatorTmp {
+    std::unique_ptr<pylibczi::Reader> m_czi;
+public:
+    CziCreatorTmp()
+        :m_czi(new pylibczi::Reader(L"/allen/aics/assay-dev/MicroscopyData/Melissa/2018/20180211/20180211_M03_001.czi")) { }
+    pylibczi::Reader* get() { return m_czi.get(); }
+};
+
 TEST_CASE_METHOD(CziCreatorTmp, "test_reader_dims_tmp", "[Reader_Dims_tmp]")
 {
     using DI=pylibczi::DimIndex;
@@ -84,6 +86,7 @@ TEST_CASE_METHOD(CziCreatorTmp, "test_reader_dims_tmp", "[Reader_Dims_tmp]")
     REQUIRE(dims.size()==6);
     REQUIRE(dims == ans);
 }
+ */
 
 
 TEST_CASE_METHOD(CziCreator, "test_reader_dims_2", "[Reader_Dims_String]")
