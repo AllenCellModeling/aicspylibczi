@@ -96,12 +96,15 @@ class CziFile(object):
             the list will have only one Dictionary. If the shape is inconsistent the the list will have a dictionary
              for each Scene. A consistently shaped file with 3 scenes, 7 time-points
             and 4 Z slices containing images of (h,w) = (325, 475) would return
-            [{'S': (0, 3), 'T': (0,7), 'X': (0, 475), 'Y': (0, 325), 'Z': (0, 4)}].
+            [
+             {'S': (0, 3), 'T': (0,7), 'X': (0, 475), 'Y': (0, 325), 'Z': (0, 4)}
+            ].
             The result for a similarly shaped file but with different number of time-points per scene would yield
-            [{'S': (0, 1), 'T': (0,8), 'X': (0, 475), 'Y': (0, 325), 'Z': (0, 4)},
+            [
+             {'S': (0, 1), 'T': (0,8), 'X': (0, 475), 'Y': (0, 325), 'Z': (0, 4)},
              {'S': (1, 2), 'T': (0,6), 'X': (0, 475), 'Y': (0, 325), 'Z': (0, 4)},
              {'S': (2, 3), 'T': (0,7), 'X': (0, 475), 'Y': (0, 325), 'Z': (0, 4)}
-             ]
+            ]
 
         """
         return self.reader.read_dims()

@@ -50,17 +50,17 @@ def test_metadata(data_dir, fname, xp_query, expected):
     assert int(vs.text) == expected
 
 
-@pytest.mark.parametrize("fname, expected", [
-    ('s_1_t_1_c_1_z_1.czi', ((1, 1, 325, 475), [('B', 1), ('C', 1), ('Y', 325), ('X', 475)])),
-    ('s_3_t_1_c_3_z_5.czi', ((1, 3, 3, 5, 325, 475), [('B', 1), ('S', 3), ('C', 3), ('Z', 5), ('Y', 325), ('X', 475)])),
+@pytest.mark.parametrize("fname, expected_img_shape, expected_img_dims", [
+    ('s_1_t_1_c_1_z_1.czi', (1, 1, 325, 475), [('B', 1), ('C', 1), ('Y', 325), ('X', 475)]),
+    ('s_3_t_1_c_3_z_5.czi', (1, 3, 3, 5, 325, 475), [('B', 1), ('S', 3), ('C', 3), ('Z', 5), ('Y', 325), ('X', 475)]),
 ])
-def test_read_image_from_istream(data_dir, fname, expected):
+def test_read_image_from_istream(data_dir, fname, expected_img_shape, expected_img_dims):
     with open(data_dir / fname, 'rb') as fp:
         czi = CziFile(czi_filename=fp)
         assert czi.shape_is_consistent
         data = czi.read_image()
-        assert data[0].shape == expected[0]
-        assert data[1] == expected[1]
+        assert data[0].shape == expected_img_shape
+        assert data[1] == expected_img_dims
 
 
 @pytest.mark.parametrize("fname, expected", [
