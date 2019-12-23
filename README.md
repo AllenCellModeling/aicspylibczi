@@ -21,11 +21,11 @@ pth = Path('20190610_S02-02.czi')
 czi = CziFile(pth)
 
 # Get the shape of the data, the coordinate pairs are (start index, size)
-dimensions = czi.dims_shape()  # {'Z': (0, 70), 'C': (0, 2), 'T': (0, 146), 'S': (0, 12), 'B': (0, 1)}
+dimensions = czi.dims_shape()  #  [{'X': (0, 1900), 'Y': (0, 1300), 'Z': (0, 60), 'C': (0, 4), 'S': (0, 40), 'B': (0, 1)}]
 
-czi.dims  #  BSTCZYX
+czi.dims  #  BSCZYX
 
-czi.size  #  (1, 12, 146, 2, 70, 1300, 1900) 
+czi.size  #  (1, 40, 4, 60, 1300, 1900)
 
 # Load the image slice I want from the file
 img, shp = czi.read_image(S=13, Z=16)
@@ -70,7 +70,7 @@ import pathlib
 from PIL import Image
 
 
-mosaic_file = pathlib.Path('20190618_CL001_HB01_Rescan_002.czi')
+mosaic_file = pathlib.Path('mosaic_test.czi')
 czi = aicspylibczi.CziFile(mosaic_file)
 
 # Get the shape of the data
@@ -78,7 +78,7 @@ dimensions = czi.dims   #  'STCZMYX'
 
 czi.size  # (1, 1, 1, 1, 2, 624, 924)
 
-czi.dims_shape()  # {'C': (0, 0), 'M': (0, 1), 'S': (0, 0), 'T': (0, 0), 'X': (0, 923), 'Y': (0, 623), 'Z': (0, 0)}
+czi.dims_shape()  # [{'X': (0, 924), 'Y': (0, 624), 'Z': (0, 1), 'C': (0, 1), 'T': (0, 1), 'M': (0, 2), 'S': (0, 1)}]
 
 czi.is_mosaic()  # True 
  # Mosaic files ignore the S dimension and use an internal mIndex to reconstruct, the scale factor allows one to generate a manageable image
@@ -127,6 +127,11 @@ Use these steps to build and install aicspylibczi locally:
 EXEC : Fatal Python error : initfsencoding: unable to load the file system codec ... 
 ModuleNotFoundError: No module named 'encodings'
 ``` 
+
+## Known Issues
+
+* with read_mosaic if the scale_factor is not 1.0 Zeiss's libCZI will fail to render occasional subblocks within the 
+composite mosaic image.
 
 ## History
 
