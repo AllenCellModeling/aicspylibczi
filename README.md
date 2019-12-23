@@ -130,8 +130,8 @@ ModuleNotFoundError: No module named 'encodings'
 
 ## Known Issues
 
-* with read_mosaic if the scale_factor is not 1.0 Zeiss's libCZI will fail to render occasional subblocks within the 
-composite mosaic image.
+* with read_mosaic if the scale_factor is not 1.0 Zeiss's libCZI will, on some files, fail to render certain subblocks 
+within the composite mosaic image. It is not currently known if this is an issue with the file or with libCZI.
 
 ## History
 
