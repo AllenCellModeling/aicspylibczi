@@ -184,7 +184,7 @@ namespace pylibczi {
       if (!isMosaic() && hasScene) {
           int sStart(0), sSize(0);
           m_statistics.dimBounds.TryGetInterval(libCZI::DimensionIndex::S, &sStart, &sSize);
-          if (scene_index_>=sStart && (sStart+sSize-1)<=scene_index_
+          if (scene_index_>=sStart && (sStart+sSize-1)>=scene_index_
               && !m_statistics.sceneBoundingBoxes.empty())
               return m_statistics.sceneBoundingBoxes[scene_index_].boundingBoxLayer0;
       }
