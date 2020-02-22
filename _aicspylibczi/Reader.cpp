@@ -79,8 +79,7 @@ namespace pylibczi {
   std::vector<int>
   Reader::dimSizes()
   {
-      std:
-      string dString = dimsString();
+      std::string dString = dimsString();
       if (m_specifyScene) return std::vector<int>(dString.size(), -1);
 
       DimIndexRangeMap tbl;
