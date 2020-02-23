@@ -84,6 +84,7 @@ namespace pylibczi {
       std::shared_ptr<CCZIReader> m_czireader; // required for cast in libCZI
       libCZI::SubBlockStatistics m_statistics;
       std::vector<std::pair<SubblockSortable, int> > m_orderMapping;
+      libCZI::PixelType m_pixelType;
       bool m_specifyScene;
 
   public:
@@ -268,7 +269,10 @@ namespace pylibczi {
        */
       libCZI::IntRect getSceneYXSize(int scene_index_ = -1);
 
-      // libCZI::PixelType pixelType() const { auto ans = libCZI::Utils::PixelTypeToInformalString( )}
+      std::string pixelType() const {
+          // each subblock can apparently have a different pixelType 🙄
+          return libCZI::Utils::PixelTypeToInformalString(m_pixelType);
+      }
 
   private:
 

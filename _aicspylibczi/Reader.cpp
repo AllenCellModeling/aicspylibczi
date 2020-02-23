@@ -322,6 +322,8 @@ namespace pylibczi {
   void
   Reader::addOrderMapping()
   {
+      bool firstGo = true;
+      bool inconsistent = false;
       // create a reference for finding one or more subblock indices from a CDimCoordinate
       m_czireader->EnumerateSubBlocks([&](int index_, const libCZI::SubBlockInfo& info_) -> bool {
           if (isPyramid0(info_)) {
@@ -329,6 +331,14 @@ namespace pylibczi {
                   std::make_tuple(&(info_.coordinate), info_.mIndex, isMosaic()),
                   std::make_tuple(index_)
               );
+              if( firstGo ) m_pixelType = info_.pixelType;
+              else if( m_pixelType != info_.pixelType ){
+                  if(!inconsistent) {
+                      std::cout << "warning CZI file contains inconsistent pixel types" << std::endl;
+                      inconsistent = true;
+                  }
+                  m_pixelType = libCZI::PixelType::Invalid;
+              }
           }
           return true;
       });

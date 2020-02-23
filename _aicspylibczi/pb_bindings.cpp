@@ -44,7 +44,8 @@ PYBIND11_MODULE(_aicspylibczi, m)
         .def("read_selected", &pylibczi::Reader::readSelected)
         .def("mosaic_shape", &pylibczi::Reader::mosaicShape)
         .def("read_meta_from_subblock", &pylibczi::Reader::readSubblockMeta)
-        .def("read_mosaic", &pylibczi::Reader::readMosaic);
+        .def("read_mosaic", &pylibczi::Reader::readMosaic)
+        .def("pixelType", &pylibczi::Reader::pixelType);
 
     py::class_<pylibczi::IndexMap>(m, "IndexMap")
         .def(py::init<>())

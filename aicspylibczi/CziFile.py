@@ -109,6 +109,17 @@ class CziFile(object):
         """
         return self.reader.read_dims()
 
+    @property
+    def pixel_type(self):
+        """
+        The pixelType of the images. If the pixelType is different in the different subblocks it returns Invalid.
+
+        Returns
+        -------
+        A string containing the name of the type of each pixel. If inconsistent it returns invalid.
+        """
+        return self.reader.pixelType()
+
     def scene_bounding_box(self, index: int = -1):
         """
         Get the bounding box of the raw collected data (pyramid 0) from the czifile. if not specified it defaults to
