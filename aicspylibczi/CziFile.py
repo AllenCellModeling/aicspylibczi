@@ -302,6 +302,11 @@ class CziFile(object):
             [('S', 1), ('T', 1), ('C', 2), ('Z', 25), ('Y', 1024), ('X', 1024)]
             so if you probed the numpy.ndarray with .shape you would get (1, 1, 2, 25, 1024, 1024).
 
+        Notes
+        -----
+        The M Dimension is a representation of the m_index used inside libCZI. Unfortunately this can be sparsely
+        packed for a given selection which causes problems when indexing memory. Consequently the M Dimension may
+        not match the m_index that is being used in libCZI or displayed in Zeiss' Zen software.
         """
         plane_constraints = self.czilib.DimCoord()
         [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
