@@ -118,7 +118,7 @@ class CziFile(object):
         -------
         A string containing the name of the type of each pixel. If inconsistent it returns invalid.
         """
-        return self.reader.pixelType()
+        return self.reader.pixel_type()
 
     def scene_bounding_box(self, index: int = -1):
         """
