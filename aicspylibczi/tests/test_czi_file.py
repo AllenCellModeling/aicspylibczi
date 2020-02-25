@@ -146,6 +146,18 @@ def test_read_image(data_dir, fname, expected):
     assert img.shape == expected
 
 
+@pytest.mark.parametrize("fname, expected", [
+    ('s_1_t_1_c_1_z_1.czi', "gray16"),
+    ('s_3_t_1_c_3_z_5.czi', "gray16"),
+    ('mosaic_test.czi', 'gray16'),
+    ('RGB-8bit.czi', 'bgr24'),
+])
+def test_pixel_type(data_dir, fname, expected):
+    czi = CziFile(str(data_dir / fname))
+    pix_type = czi.pixel_type
+    assert pix_type == expected
+
+
 @pytest.mark.parametrize("fname, args, expected", [
     ('mosaic_test.czi', {'M': 0}, (1, 1, 1, 1, 1, 624, 924))
 ])
