@@ -22,13 +22,13 @@ namespace pylibczi{
 
       int mIndex() const { return m_indexM; }
 
-      std::map<char, int>  getDimsAsChars() const {
+      std::map<char, size_t>  getDimsAsChars() const {
           return SubblockSortable::getValidIndexes(m_planeCoordinate, m_indexM, m_isMosaic);
       }
 
-      static std::map<char, int> getValidIndexes(const libCZI::CDimCoordinate& planecoord_, int index_m_, bool is_mosaic_=false)
+      static std::map<char, size_t> getValidIndexes(const libCZI::CDimCoordinate& planecoord_, int index_m_, bool is_mosaic_=false)
       {
-          std::map<char, int> ans;
+          std::map<char, size_t> ans;
           for (auto di : Constants::s_sortOrder) {
               int value;
               if (planecoord_.TryGetPosition(di, &value)) ans.emplace(libCZI::Utils::DimensionToChar(di), value);
@@ -37,7 +37,7 @@ namespace pylibczi{
           return ans;
       }
 
-      std::map<char, int> getValidIndexes(bool is_mosaic_ = false) const {
+      std::map<char, size_t> getValidIndexes(bool is_mosaic_ = false) const {
           return SubblockSortable::getValidIndexes(m_planeCoordinate, m_indexM, is_mosaic_);
       }
 

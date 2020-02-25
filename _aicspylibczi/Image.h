@@ -95,13 +95,20 @@ namespace pylibczi {
           });
       }
 
+      std::vector< std::map<char, size_t> >
+      getImageDimsList(){
+          std::vector< std::map<char, size_t> > indexMap;
+          for (const auto& image : *this) {
+              indexMap.push_back(image->getValidIndexes(m_isMosaic)); // only add M if it's a mosaic file
+          }
+          return indexMap;
+      }
+
 
       std::vector<std::pair<char, size_t> >
       getShape(){
-          std::vector< std::map<char, int> > validIndexes;
-          for (const auto& image : *this) {
-              validIndexes.push_back(image->getValidIndexes(m_isMosaic)); // only add M if it's a mosaic file
-          }
+
+          std::vector< std::map<char, size_t> > validIndexes = getImageDimsList();
 
           // TODO This code assumes the data is a matrix, meaning for example scene's have the same number of Z-slices
           // TODO is there another way to do this that could cope with variable data sizes within the matrix?
@@ -122,7 +129,7 @@ namespace pylibczi {
           charSizes.emplace_back('Y', heightByWidth[hByWsize - 2]); // H: 2 - 2 = 0 | 3 - 2 = 1
           charSizes.emplace_back('X', heightByWidth[hByWsize - 1]); // W: 2 - 1 = 1 | 3 - 1 = 2
           // sort them into decending DimensionIndex Order
-          std::sort(charSizes.begin(), charSizes.end(), [&](std::pair<char, int> a_, std::pair<char, int> b_){
+          std::sort(charSizes.begin(), charSizes.end(), [&](std::pair<char, size_t> a_, std::pair<char, size_t> b_){
               return libCZI::Utils::CharToDimension(a_.first) > libCZI::Utils::CharToDimension(b_.first);
           });
           return charSizes;

@@ -241,6 +241,7 @@ namespace pylibczi {
       for_each(matches.begin(), matches.end(), [&](const SubblockIndexVec::value_type& match_) {
           auto subblock = m_czireader->ReadSubBlock(match_.second);
           const libCZI::SubBlockInfo& info = subblock->GetSubBlockInfo();
+          std::cout << "mIndex: " << info.mIndex << std::endl;
           auto image = ImageFactory::constructImage(subblock->CreateBitmap(),
               &info.coordinate, info.logicalRect, info.mIndex);
           // This was conditional on split_bgr_ but that's a bad idea so I'm removing it.
