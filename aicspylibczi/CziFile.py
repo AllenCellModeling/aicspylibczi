@@ -341,8 +341,8 @@ class CziFile(object):
         """
         plane_constraints = self.czilib.DimCoord()
         [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
-		
         m_index = self._get_m_index_from_kwargs(kwargs)
+
         image, shape = self.reader.read_selected(plane_constraints, m_index)
         return image, shape
 
