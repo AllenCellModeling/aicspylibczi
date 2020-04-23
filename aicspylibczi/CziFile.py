@@ -288,12 +288,12 @@ class CziFile(object):
                        I = 6   # The I-dimension ("illumination").
                        H = 7   # The H-dimension ("phase").
                        V = 8   # The V-dimension ("view").
-                       M = 10  # The M_index, this is only valid for Mosaic files!
+                       M = 10  # The M_index, this is only valid for Mosaic files and must be provided here!
 
         Returns
         -------
-        [str]
-            an array of stings containing the specified subblock metadata
+        (int, int, int, int)
+            (x, y, w, h) the bounding box of the tile
 
         """
         plane_constraints = self.czilib.DimCoord()
