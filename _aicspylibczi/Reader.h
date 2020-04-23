@@ -210,6 +210,14 @@ namespace pylibczi {
       SubblockMetaVec readSubblockMeta(libCZI::CDimCoordinate& plane_coord_, int index_m_ = -1);
 
       /*!
+       * @brief provide the subblock info logicalRect coordinates
+       * @param plane_coord_ A structure containing the Dimension constraints
+       * @param index_m_ Must be set to select the tile of the mosaic file
+       * @return an IntRect {x, y, w, h}
+       */
+      libCZI::IntRect readSubblockRect(libCZI::CDimCoordinate& plane_coord_, int index_m_);
+
+      /*!
        * @brief If the czi file is a mosaic tiled image this function can be used to reconstruct it into an image.
        * @param plane_coord_ A class constraining the data to an individual plane.
        * @param scale_factor_ (optional) The native size for mosaic files can be huge the scale factor allows one to get something back of a more reasonable size. The default is 0.1 meaning 10% of the native image.

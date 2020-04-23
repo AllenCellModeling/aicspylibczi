@@ -270,6 +270,37 @@ class CziFile(object):
         m_index = self._get_m_index_from_kwargs(kwargs)
 
         return self.reader.read_meta_from_subblock(plane_constraints, m_index)
+    
+    def read_subblock_rect(self, **kwargs):
+        """
+        Read the subblock specific coordinates
+
+        Parameters
+        ----------
+        kwargs
+            The keywords below allow you to specify the dimensions that you wish to match. If you
+            under-specify the constraints you can easily end up with a massive image stack.
+                       Z = 1   # The Z-dimension.
+                       C = 2   # The C-dimension ("channel").
+                       T = 3   # The T-dimension ("time").
+                       R = 4   # The R-dimension ("rotation").
+                       S = 5   # The S-dimension ("scene").
+                       I = 6   # The I-dimension ("illumination").
+                       H = 7   # The H-dimension ("phase").
+                       V = 8   # The V-dimension ("view").
+                       M = 10  # The M_index, this is only valid for Mosaic files!
+
+        Returns
+        -------
+        [str]
+            an array of stings containing the specified subblock metadata
+
+        """
+        plane_constraints = self.czilib.DimCoord()
+        [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
+        m_index = self._get_m_index_from_kwargs(kwargs)
+        rect = self.reader.read_rect_from_subblock(plane_constraints, m_index)
+        return (rect.x, rect.y, rect.w, rect.h)
 
     def read_image(self, **kwargs):
         """
@@ -310,8 +341,8 @@ class CziFile(object):
         """
         plane_constraints = self.czilib.DimCoord()
         [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
+		
         m_index = self._get_m_index_from_kwargs(kwargs)
-
         image, shape = self.reader.read_selected(plane_constraints, m_index)
         return image, shape
 

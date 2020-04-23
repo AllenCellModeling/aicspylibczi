@@ -285,6 +285,22 @@ namespace pylibczi {
       return metaSubblocks;
   }
 
+  libCZI::IntRect
+  Reader::readSubblockRect(libCZI::CDimCoordinate& plane_coord_, int index_m_)
+  {
+      SubblockSortable subBlockToFind(&plane_coord_, index_m_, isMosaic());
+      SubblockIndexVec matches = getMatches(subBlockToFind);
+
+      libCZI::IntRect rect;
+
+      for_each(matches.begin(), matches.end(), [&](SubblockIndexVec::value_type& match_) {
+          auto subblk = m_czireader->ReadSubBlock(match_.second);
+          auto sbkInfo = subblk->GetSubBlockInfo();
+          rect = sbkInfo.logicalRect;
+      });
+      return rect;
+  }
+
 // private methods
 
   Reader::SubblockIndexVec
