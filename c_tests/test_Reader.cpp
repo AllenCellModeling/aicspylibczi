@@ -344,22 +344,73 @@ TEST_CASE_METHOD(CziCreator2, "test_reader_subblockinforect", "[Reader_Std_Subbl
 {
     auto czi = get();
 
-    std::vector< libCZI::IntRect > answers{
+    std::vector<libCZI::IntRect> answers{
         {39850, 35568, 475, 325},
         {44851, 35568, 475, 325},
         {39850, 39272, 475, 325}
     };
 
-    for( int s_index = 0; s_index < 3; s_index++) {
+    for (int s_index = 0; s_index<3; s_index++) {
         libCZI::CDimCoordinate dm{{libCZI::DimensionIndex::S, s_index}};
         auto rect = czi->readSubblockRect(dm);
         auto ans = answers[s_index];
-        REQUIRE( rect.x == ans.x );
-        REQUIRE( rect.y == ans.y );
-        REQUIRE( rect.w == ans.w );
-        REQUIRE( rect.h == ans.h );
+        REQUIRE(rect.x==ans.x);
+        REQUIRE(rect.y==ans.y);
+        REQUIRE(rect.w==ans.w);
+        REQUIRE(rect.h==ans.h);
     }
 
     libCZI::CDimCoordinate invalid_dim{{libCZI::DimensionIndex::S, 5}};
-    REQUIRE_THROWS_AS( czi->readSubblockRect(invalid_dim), pylibczi::CDimCoordinatesOverspecifiedException );
+    REQUIRE_THROWS_AS(czi->readSubblockRect(invalid_dim), pylibczi::CDimCoordinatesOverspecifiedException);
+}
+
+// Test multichannel BGR
+class CziBgrCreator2 {
+    std::unique_ptr<pylibczi::Reader> m_czi;
+public:
+    CziBgrCreator2()
+        :m_czi(new pylibczi::Reader(L"resources/RGB-multichannel.czi")) { }
+    pylibczi::Reader* get() { return m_czi.get(); }
+};
+
+TEST_CASE_METHOD(CziBgrCreator2, "test_bgr2_read", "[Reader_read_bgr2]")
+{
+    auto czi = get();
+    libCZI::CDimCoordinate dm;
+    auto pr = czi->readSelected(dm);
+
+    REQUIRE(czi->dimsString()==std::string("SCYX"));
+    std::vector<int> ansSize{1, 7, 81, 147};
+    REQUIRE(czi->dimSizes()==ansSize);
+
+    using DI=pylibczi::DimIndex;
+    pylibczi::Reader::DimsShape ansDims{{{DI::S, {0, 1}}, {DI::C, {0, 7}}, {DI::Y, {0, 81}}, {DI::X, {0, 147}}}};
+    auto dims = czi->readDimsRange();
+    REQUIRE(!dims.empty());
+    REQUIRE(dims==ansDims);
+
+    REQUIRE(pr.first.size()==3*7);
+    REQUIRE(pr.first.front()->shape() == std::vector<size_t>{81, 147});
+    REQUIRE(pr.first.front()->pixelType()==libCZI::PixelType::Gray8);
+}
+
+TEST_CASE_METHOD(CziBgrCreator2, "test_bgr2_flatten", "[Reader_read_flatten_bgr2]")
+{
+    auto czi = get();
+
+    auto dims = czi->readDimsRange();
+
+    libCZI::CDimCoordinate dm;
+    auto pr = czi->readSelected(dm, -1);
+    REQUIRE(pr.first.size()==3*7);
+
+    for (auto x : pr.first) {
+        REQUIRE(x->shape()[0]==81);
+        REQUIRE(x->shape()[1]==147);
+    }
+
+    pylibczi::Reader::Shape shapeAns{{'B', 1}, {'S', 1}, {'C', 3*7}, {'Y', 81}, {'X', 147}};
+    REQUIRE(pr.second==shapeAns);
+    REQUIRE(pr.first.front()->pixelType()==libCZI::PixelType::Gray8);
+    // pb_helpers::packArray(pr.first);
 }

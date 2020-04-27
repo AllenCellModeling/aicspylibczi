@@ -38,7 +38,7 @@ namespace pylibczi {
           libCZI::IntRect box_,
           int index_m_);
 
-      static Image::ImVec splitToChannels(std::shared_ptr<Image> img_in_);
+      static Image::ImVec splitToChannels(std::shared_ptr<Image> img_in_, unsigned int c_index_ = 0);
 
   };
 }

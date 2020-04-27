@@ -238,6 +238,7 @@ namespace pylibczi {
       ImageVector images;
       images.reserve(matches.size());
 
+      int idx = 0;
       for_each(matches.begin(), matches.end(), [&](const SubblockIndexVec::value_type& match_) {
           auto subblock = m_czireader->ReadSubBlock(match_.second);
           const libCZI::SubBlockInfo& info = subblock->GetSubBlockInfo();
@@ -246,10 +247,7 @@ namespace pylibczi {
           // This was conditional on split_bgr_ but that's a bad idea so I'm removing it.
           // bgr images will always be split into their base single channel types brg24 => uint8_t
           if (ImageFactory::numberOfChannels(image->pixelType())>1) {
-              int start(0), sze(0);
-              if (m_statistics.dimBounds.TryGetInterval(libCZI::DimensionIndex::C, &start, &sze))
-                  std::cerr << "Warning image has C: start(" << start << ") : size(" << sze << ") - how to handle channels?" << std::endl;
-              auto splitImages = ImageFactory::splitToChannels(image);
+              auto splitImages = ImageFactory::splitToChannels(image, idx++);
               for_each(splitImages.begin(), splitImages.end(), [&images](Image::ImVec::value_type& image_) { images.push_back(image_); });
           }
           else
@@ -404,15 +402,13 @@ namespace pylibczi {
           scale_factor_,
           nullptr);   // use default options
 
-      // TODO how to handle 3 channel BGR image split them as in readSelected or ???
+      // TODO how to handle 3 channel BGR image split them as in readSelected or ??? <= split like readSelected
       auto image = ImageFactory::constructImage(multiTileComposite, &plane_coord_, im_box_, -1);
       ImageVector imageVector;
       imageVector.reserve(1);
+      int idx = 0;
       if (ImageFactory::numberOfChannels(image->pixelType())>1) {
-          int start(0), sze(0);
-          if (m_statistics.dimBounds.TryGetInterval(libCZI::DimensionIndex::C, &start, &sze))
-              std::cerr << "Warning image has C: start(" << start << ") : size(" << sze << ") - how to handle channels?" << std::endl;
-          auto splitImages = ImageFactory::splitToChannels(image);
+          auto splitImages = ImageFactory::splitToChannels(image, idx++);
           for_each(splitImages.begin(), splitImages.end(), [&imageVector](Image::ImVec::value_type& image_) {
               imageVector.push_back(image_);
           });
