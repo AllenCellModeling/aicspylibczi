@@ -236,9 +236,9 @@ namespace pylibczi {
       SubblockSortable subblocksToFind(&plane_coord_, index_m_, isMosaic());
       SubblockIndexVec matches = getMatches(subblocksToFind);
       ImageVector images;
-      images.reserve(matches.size());
+      images.reserve(matches.size()); // this will under-reserve in the case of BGR images
+      bool bgrFlag=false;
 
-      int idx = 0;
       for_each(matches.begin(), matches.end(), [&](const SubblockIndexVec::value_type& match_) {
           auto subblock = m_czireader->ReadSubBlock(match_.second);
           const libCZI::SubBlockInfo& info = subblock->GetSubBlockInfo();
@@ -247,8 +247,13 @@ namespace pylibczi {
           // This was conditional on split_bgr_ but that's a bad idea so I'm removing it.
           // bgr images will always be split into their base single channel types brg24 => uint8_t
           if (ImageFactory::numberOfChannels(image->pixelType())>1) {
-              auto splitImages = ImageFactory::splitToChannels(image, idx++);
+              if ( bgrFlag ){
+                  throw ImageAccessUnderspecifiedException(0, 1,
+                      "In a multi-channel BGR image C must be explicitly specified. This is to avoid confusion between BGR expanded channels.");
+              }
+              auto splitImages = ImageFactory::splitToChannels(image);
               for_each(splitImages.begin(), splitImages.end(), [&images](Image::ImVec::value_type& image_) { images.push_back(image_); });
+              bgrFlag = true;
           }
           else
               images.push_back(image);
@@ -408,7 +413,7 @@ namespace pylibczi {
       imageVector.reserve(1);
       int idx = 0;
       if (ImageFactory::numberOfChannels(image->pixelType())>1) {
-          auto splitImages = ImageFactory::splitToChannels(image, idx++);
+          auto splitImages = ImageFactory::splitToChannels(image);
           for_each(splitImages.begin(), splitImages.end(), [&imageVector](Image::ImVec::value_type& image_) {
               imageVector.push_back(image_);
           });

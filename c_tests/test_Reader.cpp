@@ -376,7 +376,8 @@ public:
 TEST_CASE_METHOD(CziBgrCreator2, "test_bgr2_read", "[Reader_read_bgr2]")
 {
     auto czi = get();
-    libCZI::CDimCoordinate dm;
+    libCZI::CDimCoordinate dm = libCZI::CDimCoordinate{{libCZI::DimensionIndex::B, 0},
+                                                       {libCZI::DimensionIndex::C, 4}};
     auto pr = czi->readSelected(dm);
 
     REQUIRE(czi->dimsString()==std::string("SCYX"));
@@ -389,9 +390,12 @@ TEST_CASE_METHOD(CziBgrCreator2, "test_bgr2_read", "[Reader_read_bgr2]")
     REQUIRE(!dims.empty());
     REQUIRE(dims==ansDims);
 
-    REQUIRE(pr.first.size()==3*7);
+    REQUIRE(pr.first.size()==3);
     REQUIRE(pr.first.front()->shape() == std::vector<size_t>{81, 147});
     REQUIRE(pr.first.front()->pixelType()==libCZI::PixelType::Gray8);
+    auto c_pair = std::find_if(pr.second.begin(), pr.second.end(), [](const std::pair< char, int> &a){ return a.first == 'C'; });
+    REQUIRE(c_pair->first == 'C');
+    REQUIRE(c_pair->second == 3);
 }
 
 TEST_CASE_METHOD(CziBgrCreator2, "test_bgr2_flatten", "[Reader_read_flatten_bgr2]")
@@ -399,18 +403,25 @@ TEST_CASE_METHOD(CziBgrCreator2, "test_bgr2_flatten", "[Reader_read_flatten_bgr2
     auto czi = get();
 
     auto dims = czi->readDimsRange();
-
-    libCZI::CDimCoordinate dm;
+    libCZI::CDimCoordinate dm = libCZI::CDimCoordinate{{libCZI::DimensionIndex::C, 4}};
     auto pr = czi->readSelected(dm, -1);
-    REQUIRE(pr.first.size()==3*7);
+    REQUIRE(pr.first.size()==3);
 
     for (auto x : pr.first) {
         REQUIRE(x->shape()[0]==81);
         REQUIRE(x->shape()[1]==147);
     }
 
-    pylibczi::Reader::Shape shapeAns{{'B', 1}, {'S', 1}, {'C', 3*7}, {'Y', 81}, {'X', 147}};
+    pylibczi::Reader::Shape shapeAns{{'B', 1}, {'S', 1}, {'C', 3}, {'Y', 81}, {'X', 147}};
     REQUIRE(pr.second==shapeAns);
     REQUIRE(pr.first.front()->pixelType()==libCZI::PixelType::Gray8);
     // pb_helpers::packArray(pr.first);
+}
+
+TEST_CASE_METHOD(CziBgrCreator2, "test_bgr_exception", "[Reader_flatten_bgr_exception]")
+{
+    auto czi = get();
+    libCZI::CDimCoordinate dm;
+    REQUIRE_THROWS_AS(czi->readSelected(dm, -1), pylibczi::ImageAccessUnderspecifiedException);
+
 }

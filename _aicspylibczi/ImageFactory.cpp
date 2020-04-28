@@ -112,24 +112,25 @@ namespace pylibczi {
       return std::shared_ptr<Image>(image);
   }
 
-  Image::ImVec ImageFactory::splitToChannels(std::shared_ptr<Image> img_in_, unsigned int c_index_)
+  Image::ImVec ImageFactory::splitToChannels(std::shared_ptr<Image> img_in_)
   {
       Image::ImVec ivec;
       auto shape = img_in_->shape();
       if (shape.size() != 3)
           throw ImageSplitChannelException("TypedImage  only has 2 dimensions. No channels to split.", 0);
-      int cStart = c_index_*3;
-      // TODO figure out if C can have a nonzero value for a BGR image
-//      if ( img_in_->coordinatePtr()->TryGetPosition(libCZI::DimensionIndex::C, &cStart) && cStart != 0)
-//          throw ImageSplitChannelException("attempting to split channels", cStart);
+      int cDim = 0;
+
+      // NOTE I'm forcing the user to specify C, basically because it's difficult to assign meaning between BGR
+      // values for multiple channels
       for (int i = 0; i<shape[0]; i++) {
           // TODO should I change the pixel type from a BGRx to a Grayx/3
           libCZI::PixelType pt = img_in_->pixelType();
           if(pt == libCZI::PixelType::Invalid){
+              img_in_->coordinatePtr()->TryGetPosition(libCZI::DimensionIndex::C, &cDim);
               throw ImageSplitChannelException("Only PixelTypes Bgr24, Bgr48, and Bgr96Float can be split! "
-                                               "You have attempted to split an invalid PixelType", cStart);
+                                               "You have attempted to split an invalid PixelType", cDim);
           }
-          ivec.emplace_back(s_pixelToSplit[pt]( img_in_, cStart + i));
+          ivec.emplace_back(s_pixelToSplit[pt]( img_in_, i));
       }
       return ivec;
   }
