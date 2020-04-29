@@ -238,6 +238,7 @@ def test_mosaic_image_two(data_dir, fname, expects):
         img = czi.read_mosaic(region=rgion, C=0, M=0)
     assert img.shape == expects
 
+
 @pytest.mark.parametrize("fname, s_index, m_index, expected", [
     ('s_3_t_1_c_3_z_5.czi', 0, -1, (39850, 35568, 475, 325)),
     ('s_3_t_1_c_3_z_5.czi', 1, -1, (44851, 35568, 475, 325)),

@@ -270,7 +270,7 @@ class CziFile(object):
         m_index = self._get_m_index_from_kwargs(kwargs)
 
         return self.reader.read_meta_from_subblock(plane_constraints, m_index)
-    
+
     def read_subblock_rect(self, **kwargs):
         """
         Read the subblock specific coordinates. For non-mosaic files S only needs to be set, for mosaic files the
