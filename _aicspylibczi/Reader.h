@@ -215,7 +215,7 @@ namespace pylibczi {
        * @param index_m_ Must be set to select the tile of the mosaic file
        * @return an IntRect {x, y, w, h}
        */
-      libCZI::IntRect readSubblockRect(libCZI::CDimCoordinate& plane_coord_, int index_m_);
+      libCZI::IntRect readSubblockRect(libCZI::CDimCoordinate& plane_coord_, int index_m_ = -1);
 
       /*!
        * @brief If the czi file is a mosaic tiled image this function can be used to reconstruct it into an image.

@@ -320,3 +320,46 @@ TEST_CASE_METHOD(CziBgrCreator, "test_bgr_flatten", "[Reader_read_flatten_bgr]")
     REQUIRE(pr.first.front()->pixelType()==libCZI::PixelType::Gray8);
     // pb_helpers::packArray(pr.first);
 }
+
+TEST_CASE_METHOD(CziMCreator, "test_reader_mosaic_subblockinforect", "[Reader_Mosaic_SubblockInfo_Rect]")
+{
+    auto czi = get();
+
+    std::vector< libCZI::IntRect > answers{{0, 0, 924, 624}, {832, 0, 924, 624}};
+
+    libCZI::CDimCoordinate dm;
+    for( int m_index = 0; m_index < 2 ; m_index++) {
+        auto rect = czi->readSubblockRect(dm, m_index);
+        auto answer = answers[m_index];
+        REQUIRE( rect.x == answer.x);
+        REQUIRE( rect.y == answer.y);
+        REQUIRE( rect.w == answer.w);
+        REQUIRE( rect.h == answer.h);
+    }
+    int invalid_m = 2;
+    REQUIRE_THROWS_AS(czi->readSubblockRect(dm, invalid_m), pylibczi::CDimCoordinatesOverspecifiedException);
+}
+
+TEST_CASE_METHOD(CziCreator2, "test_reader_subblockinforect", "[Reader_Std_SubblockInfo_Rect]")
+{
+    auto czi = get();
+
+    std::vector< libCZI::IntRect > answers{
+        {39850, 35568, 475, 325},
+        {44851, 35568, 475, 325},
+        {39850, 39272, 475, 325}
+    };
+
+    for( int s_index = 0; s_index < 3; s_index++) {
+        libCZI::CDimCoordinate dm{{libCZI::DimensionIndex::S, s_index}};
+        auto rect = czi->readSubblockRect(dm);
+        auto ans = answers[s_index];
+        REQUIRE( rect.x == ans.x );
+        REQUIRE( rect.y == ans.y );
+        REQUIRE( rect.w == ans.w );
+        REQUIRE( rect.h == ans.h );
+    }
+
+    libCZI::CDimCoordinate invalid_dim{{libCZI::DimensionIndex::S, 5}};
+    REQUIRE_THROWS_AS( czi->readSubblockRect(invalid_dim), pylibczi::CDimCoordinatesOverspecifiedException );
+}

@@ -291,14 +291,11 @@ namespace pylibczi {
       SubblockSortable subBlockToFind(&plane_coord_, index_m_, isMosaic());
       SubblockIndexVec matches = getMatches(subBlockToFind);
 
-      libCZI::IntRect rect;
-
-      for_each(matches.begin(), matches.end(), [&](SubblockIndexVec::value_type& match_) {
-          auto subblk = m_czireader->ReadSubBlock(match_.second);
-          auto sbkInfo = subblk->GetSubBlockInfo();
-          rect = sbkInfo.logicalRect;
-      });
-      return rect;
+      if( matches.empty() )
+          throw CDimCoordinatesOverspecifiedException("The specified dimensions and M-index matched nothing.");
+          
+      auto subblk = m_czireader->ReadSubBlock(matches.front().second);
+      return subblk->GetSubBlockInfo().logicalRect;
   }
 
 // private methods

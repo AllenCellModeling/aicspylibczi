@@ -273,7 +273,9 @@ class CziFile(object):
     
     def read_subblock_rect(self, **kwargs):
         """
-        Read the subblock specific coordinates
+        Read the subblock specific coordinates. For non-mosaic files S only needs to be set, for mosaic files the
+        S and M Dimensions need to be specified. In both cases, if underspecified only the first match is returned.
+        If overspecified a PylibCZI_CDimCoordinatesOverspecifiedException is raised.
 
         Parameters
         ----------

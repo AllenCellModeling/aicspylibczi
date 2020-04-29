@@ -237,3 +237,17 @@ def test_mosaic_image_two(data_dir, fname, expects):
         rgion = (sze[0], sze[1], int(sze[2]/2), int(sze[3]/2))
         img = czi.read_mosaic(region=rgion, C=0, M=0)
     assert img.shape == expects
+
+@pytest.mark.parametrize("fname, s_index, m_index, expected", [
+    ('s_3_t_1_c_3_z_5.czi', 0, -1, (39850, 35568, 475, 325)),
+    ('s_3_t_1_c_3_z_5.czi', 1, -1, (44851, 35568, 475, 325)),
+    ('s_3_t_1_c_3_z_5.czi', 2, -1, (39850, 39272, 475, 325)),
+    ('mosaic_test.czi', 0, 0, (0, 0, 924, 624)),
+    ('mosaic_test.czi', 0, 1, (832, 0, 924, 624)),
+])
+def test_subblock_rect(data_dir, fname, s_index, m_index, expected):
+    with open(data_dir / fname, 'rb') as fp:
+        czi = CziFile(czi_filename=fp)
+        args = {'S': s_index} if m_index < 0 else {'S': s_index, 'M': m_index}
+        data = czi.read_subblock_rect(**args)
+        assert data == expected
