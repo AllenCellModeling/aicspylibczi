@@ -4,7 +4,8 @@
 [![codecov](https://codecov.io/gh/AllenCellModeling/aicspylibczi/branch/master/graph/badge.svg)](https://codecov.io/gh/AllenCellModeling/aicspylibczi)
 [![License: BSD3/GPLv3](https://img.shields.io/badge/License-BSD3/GPLv3-blue.svg)](https://github.com/AllenCellModeling/aicspylibczi/blob/master/LICENSE)
 
-Python module to expose [libCZI](https://github.com/zeiss-microscopy/libCZI) functionality for reading (subset of) Zeiss CZI files and meta-data.
+Python module to expose [libCZI](https://github.com/zeiss-microscopy/libCZI) functionality for reading (subset of) Zeiss 
+CZI files and meta-data. We only support 64bit architectures currently if you desperately need 32 bit support please make an issue or modify the source and build it for your use case.
 
 ## Usage
 
@@ -100,6 +101,13 @@ This will install the aicspylibczi python module and extension binaries ([hosted
 `
 pip install aicspylibczi
 `
+
+**If this doesn't work:** Please investigate the following (generally windows issues):
+* your OS is 64 bit - we only support 64 bit binaries
+* your python is a 64 bit application (not 32 bit)
+* are your C++ runtime libraries up to date? [vc_redist.exe](https://aka.ms/vs/16/release/vc_redist.x64.exe)
+
+If you have tried this and are still having trouble please reach out to us and we will endeavor to help.
 
 ## Documentation
 
