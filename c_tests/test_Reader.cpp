@@ -1,5 +1,7 @@
+#include <chrono>
 #include <cstdio>
 #include <algorithm>
+#include <sstream>
 
 #include "catch.hpp"
 
@@ -35,6 +37,22 @@ public:
     pylibczi::Reader* get() { return m_czi.get(); }
 };
 
+class CziCreatorBig {
+    std::unique_ptr<pylibczi::Reader> m_czi;
+public:
+    CziCreatorBig()
+        :m_czi(new pylibczi::Reader(L"/Users/jamies/Data/20190425_S08_001-04-Scene-4-P3-B03.czi")) { }
+    pylibczi::Reader* get() { return m_czi.get(); }
+};
+
+class CziCreator4 {
+    std::unique_ptr<pylibczi::Reader> m_czi;
+public:
+    CziCreator4()
+        :m_czi(new pylibczi::Reader(L"/Users/jamies/Data/s_1_t_10_c_3_z_1.czi")) { }
+    pylibczi::Reader* get() { return m_czi.get(); }
+};
+
 TEST_CASE_METHOD(CziCreatorIStream, "test_reader_constructor", "[Reader]")
 {
     REQUIRE_NOTHROW(get());
@@ -55,8 +73,8 @@ TEST_CASE_METHOD(CziCreator, "test_reader_dims_1", "[Reader_Dims]")
     auto czi = get();
     auto dimsVec = czi->readDimsRange();
     REQUIRE(czi->shapeIsConsistent());
-    REQUIRE(dimsVec.size() == 1);
-    REQUIRE(dimsVec == ans);
+    REQUIRE(dimsVec.size()==1);
+    REQUIRE(dimsVec==ans);
 }
 
 /* The file for this test is too large to commit to the repo
@@ -104,7 +122,7 @@ TEST_CASE_METHOD(CziCreator2, "test_reader_dims_3", "[Reader_Dims_Size]")
     std::vector<int> shape = {1, 3, 3, 5, 325, 475};
     REQUIRE(czi->shapeIsConsistent());
     REQUIRE(dstr=="BSCZYX");
-    REQUIRE(dims == shape);
+    REQUIRE(dims==shape);
 }
 
 TEST_CASE_METHOD(CziCreator, "test_is_mosaic", "[Reader_Is_Mosaic]")
@@ -211,14 +229,14 @@ TEST_CASE_METHOD(CziMCreator, "test_mosaic_is_mosaic", "[Reader_mosaic_is_mosaic
 TEST_CASE_METHOD(CziMCreator, "test_mosaic_dims", "[Reader_mosaic_dims]")
 {
     auto czi = get();
-    REQUIRE(czi->dimsString() == std::string("STCZMYX"));
+    REQUIRE(czi->dimsString()==std::string("STCZMYX"));
 }
 
 TEST_CASE_METHOD(CziMCreator, "test_mosaic_dimsSize", "[Reader_mosaic_dimsSize]")
 {
     auto czi = get();
     std::vector<int> ans{1, 1, 1, 1, 2, 624, 924};
-    REQUIRE(czi->dimSizes() == ans);
+    REQUIRE(czi->dimSizes()==ans);
 }
 
 TEST_CASE_METHOD(CziMCreator, "test_mosaic_readdims", "[Reader_mosaic_readdims]")
@@ -229,11 +247,11 @@ TEST_CASE_METHOD(CziMCreator, "test_mosaic_readdims", "[Reader_mosaic_readdims]"
         {
             {DI::S, {0, 1}}, {DI::T, {0, 1}}, {DI::C, {0, 1}},
             {DI::Z, {0, 1}}, {DI::M, {0, 2}},
-            {DI::Y, {0, 624}}, {DI::X, {0, 924} }
+            {DI::Y, {0, 624}}, {DI::X, {0, 924}}
         }
     };
     auto val = czi->readDimsRange();
-    REQUIRE(val == ans);
+    REQUIRE(val==ans);
 }
 
 TEST_CASE_METHOD(CziMCreator, "test_mosaic_readSelected", "[Reader_mosaic_readSelected]")
@@ -296,7 +314,7 @@ TEST_CASE_METHOD(CziBgrCreator, "test_bgr_read", "[Reader_read_bgr]")
     REQUIRE(dims==ansDims);
 
     REQUIRE(pr.first.size()==3);
-    REQUIRE(pr.first.front()->shape() == std::vector<size_t>{624, 924});
+    REQUIRE(pr.first.front()->shape()==std::vector<size_t>{624, 924});
     REQUIRE(pr.first.front()->pixelType()==libCZI::PixelType::Gray8);
 }
 
@@ -325,16 +343,16 @@ TEST_CASE_METHOD(CziMCreator, "test_reader_mosaic_subblockinforect", "[Reader_Mo
 {
     auto czi = get();
 
-    std::vector< libCZI::IntRect > answers{{0, 0, 924, 624}, {832, 0, 924, 624}};
+    std::vector<libCZI::IntRect> answers{{0, 0, 924, 624}, {832, 0, 924, 624}};
 
     libCZI::CDimCoordinate dm;
-    for( int m_index = 0; m_index < 2 ; m_index++) {
+    for (int m_index = 0; m_index<2; m_index++) {
         auto rect = czi->readSubblockRect(dm, m_index);
         auto answer = answers[m_index];
-        REQUIRE( rect.x == answer.x);
-        REQUIRE( rect.y == answer.y);
-        REQUIRE( rect.w == answer.w);
-        REQUIRE( rect.h == answer.h);
+        REQUIRE(rect.x==answer.x);
+        REQUIRE(rect.y==answer.y);
+        REQUIRE(rect.w==answer.w);
+        REQUIRE(rect.h==answer.h);
     }
     int invalid_m = 2;
     REQUIRE_THROWS_AS(czi->readSubblockRect(dm, invalid_m), pylibczi::CDimCoordinatesOverspecifiedException);
@@ -391,11 +409,11 @@ TEST_CASE_METHOD(CziBgrCreator2, "test_bgr2_read", "[Reader_read_bgr2]")
     REQUIRE(dims==ansDims);
 
     REQUIRE(pr.first.size()==3);
-    REQUIRE(pr.first.front()->shape() == std::vector<size_t>{81, 147});
+    REQUIRE(pr.first.front()->shape()==std::vector<size_t>{81, 147});
     REQUIRE(pr.first.front()->pixelType()==libCZI::PixelType::Gray8);
-    auto c_pair = std::find_if(pr.second.begin(), pr.second.end(), [](const std::pair< char, int> &a){ return a.first == 'C'; });
-    REQUIRE(c_pair->first == 'C');
-    REQUIRE(c_pair->second == 3);
+    auto c_pair = std::find_if(pr.second.begin(), pr.second.end(), [](const std::pair<char, int>& a) { return a.first=='C'; });
+    REQUIRE(c_pair->first=='C');
+    REQUIRE(c_pair->second==3);
 }
 
 TEST_CASE_METHOD(CziBgrCreator2, "test_bgr2_flatten", "[Reader_read_flatten_bgr2]")
@@ -424,4 +442,32 @@ TEST_CASE_METHOD(CziBgrCreator2, "test_bgr_exception", "[Reader_flatten_bgr_exce
     libCZI::CDimCoordinate dm;
     REQUIRE_THROWS_AS(czi->readSelected(dm, -1), pylibczi::ImageAccessUnderspecifiedException);
 
+}
+
+TEST_CASE_METHOD(CziCreatorBig, "test_big_czifile", "[Reader_timed_read]")
+{
+    auto czi = get();
+    libCZI::CDimCoordinate dm = libCZI::CDimCoordinate{{libCZI::DimensionIndex::B, 0},
+                                                       {libCZI::DimensionIndex::S, 0},
+                                                       {libCZI::DimensionIndex::T, 1},
+                                                       {libCZI::DimensionIndex::Z, 5}};
+
+    std::stringstream info("Dims: ");
+    info << czi->dimsString();
+    INFO(info.str());
+    auto dSizes = czi->dimSizes();
+
+    std::stringstream dsizes("Shape: {");
+    for_each(dSizes.begin(), dSizes.end(), [&dsizes](const int& x) {
+        dsizes << x << ", ";
+    });
+    dsizes << "}" << std::endl;
+    INFO( dsizes.str() );
+
+    auto start = std::chrono::high_resolution_clock::now();
+    auto pr = czi->readSelected(dm);
+    auto done = std::chrono::high_resolution_clock::now();
+
+    std::cout << "Duration(milliseconds): " << std::chrono::duration_cast<std::chrono::milliseconds>(done-start).count();
+    REQUIRE(std::chrono::duration_cast<std::chrono::milliseconds>(done-start).count()<5000);
 }

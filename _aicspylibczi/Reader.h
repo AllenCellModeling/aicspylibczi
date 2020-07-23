@@ -286,12 +286,12 @@ namespace pylibczi {
 
       Reader::SubblockIndexVec getMatches(SubblockSortable& match_);
 
-      void addOrderMapping();
-
       static bool isPyramid0(const libCZI::SubBlockInfo& info_)
       {
           return (info_.logicalRect.w==info_.physicalSize.w && info_.logicalRect.h==info_.physicalSize.h);
       }
+
+      void getMemory(SubblockIndexVec & matches_);
 
       static bool isValidRegion(const libCZI::IntRect& in_box_, const libCZI::IntRect& czi_box_);
 

@@ -16,7 +16,7 @@ namespace pylibczi {
       m_czireader->Open(std::move(istream_));
       m_statistics = m_czireader->GetStatistics();
       // create a reference for finding one or more subblock indices from a CDimCoordinate
-      addOrderMapping(); // populate m_orderMapping
+      // addOrderMapping(); // populate m_orderMapping
       checkSceneShapes();
   }
 
@@ -28,7 +28,6 @@ namespace pylibczi {
       m_czireader->Open(sp);
       m_statistics = m_czireader->GetStatistics();
       // create a reference for finding one or more subblock indices from a CDimCoordinate
-      addOrderMapping();// populate m_orderMapping
       checkSceneShapes();
   }
 
@@ -118,7 +117,7 @@ namespace pylibczi {
       bool regularShape = true;
       for (int i = 1; regularShape && i<dShape_.size(); i++) {
           for (auto kVal: dShape_[i]) {
-              if( kVal.first == DimIndex::S ) continue;
+              if (kVal.first==DimIndex::S) continue;
               auto found = dShape_[0].find(kVal.first);
               if (found==dShape_[0].end()) regularShape = false;
               else regularShape &= (kVal==*found);
@@ -136,7 +135,7 @@ namespace pylibczi {
 
       DimIndexRangeMap tbl;
 
-      if (!sceneBool) {
+      if (!sceneBool || sceneSize==1) {
           // scenes are not defined so the dimBounds define the shape
           m_statistics.dimBounds.EnumValidDimensions([&tbl](libCZI::DimensionIndex di_, int start_, int size_) -> bool {
               tbl.emplace(dimensionIndexToDimIndex(di_),
@@ -199,9 +198,15 @@ namespace pylibczi {
               }
           }
       }
-      auto blk = m_czireader->ReadSubBlock(m_orderMapping.front().second);
-      auto info = blk->GetSubBlockInfo();
-      return info.logicalRect;
+
+      libCZI::IntRect lRect;
+      m_czireader->EnumerateSubBlocks([&lRect](int index, const libCZI::SubBlockInfo& info) -> bool {
+          if (!isPyramid0(info)) return true;
+
+          lRect = info.logicalRect;
+          return false;
+      });
+      return lRect;
   }
 
   /// @brief get the Dimensions in the order they appear in
@@ -235,9 +240,10 @@ namespace pylibczi {
       }
       SubblockSortable subblocksToFind(&plane_coord_, index_m_, isMosaic());
       SubblockIndexVec matches = getMatches(subblocksToFind);
+
       ImageVector images;
       images.reserve(matches.size()); // this will under-reserve in the case of BGR images
-      bool bgrFlag=false;
+      bool bgrFlag = false;
 
       for_each(matches.begin(), matches.end(), [&](const SubblockIndexVec::value_type& match_) {
           auto subblock = m_czireader->ReadSubBlock(match_.second);
@@ -247,7 +253,7 @@ namespace pylibczi {
           // This was conditional on split_bgr_ but that's a bad idea so I'm removing it.
           // bgr images will always be split into their base single channel types brg24 => uint8_t
           if (ImageFactory::numberOfChannels(image->pixelType())>1) {
-              if ( bgrFlag ){
+              if (bgrFlag) {
                   throw ImageAccessUnderspecifiedException(0, 1,
                       "In a multi-channel BGR image C must be explicitly specified. This is to avoid confusion between BGR expanded channels.");
               }
@@ -267,6 +273,8 @@ namespace pylibczi {
       return std::make_pair(images, shape);
       // return images;
   }
+
+
 
   SubblockMetaVec
   Reader::readSubblockMeta(libCZI::CDimCoordinate& plane_coord_, int index_m_)
@@ -294,9 +302,9 @@ namespace pylibczi {
       SubblockSortable subBlockToFind(&plane_coord_, index_m_, isMosaic());
       SubblockIndexVec matches = getMatches(subBlockToFind);
 
-      if( matches.empty() )
+      if (matches.empty())
           throw CDimCoordinatesOverspecifiedException("The specified dimensions and M-index matched nothing.");
-          
+
       auto subblk = m_czireader->ReadSubBlock(matches.front().second);
       return subblk->GetSubBlockInfo().logicalRect;
   }
@@ -307,10 +315,19 @@ namespace pylibczi {
   Reader::getMatches(SubblockSortable& match_)
   {
       SubblockIndexVec ans;
-      std::copy_if(m_orderMapping.begin(), m_orderMapping.end(), std::back_inserter(ans),
-          [&match_](const SubblockIndexVec::value_type& a_) {
-              return match_==a_.first;
-          });
+//      std::copy_if(m_orderMapping.begin(), m_orderMapping.end(), std::back_inserter(ans),
+//          [&match_](const SubblockIndexVec::value_type& a_) {
+//              return match_==a_.first;
+//          });
+      m_czireader->EnumerateSubBlocks([&](int index_, const libCZI::SubBlockInfo& info_) -> bool {
+          SubblockSortable subInfo(&(info_.coordinate), info_.mIndex, isMosaic());
+          if (isPyramid0(info_) && match_== subInfo) {
+              // std::cout << "match : " << *(match_.coordinatePtr()) << " adding: " << *(subInfo.coordinatePtr()) << std::endl;
+              ans.emplace_back(std::pair<SubblockSortable, int>(subInfo, index_));
+          }
+          return true; // Enumerate through every subblock
+      });
+
       if (ans.empty()) {
           // check for invalid Dimension specification
           match_.coordinatePtr()->EnumValidDimensions([&](libCZI::DimensionIndex di_, int value_) {
@@ -333,31 +350,6 @@ namespace pylibczi {
           });
       }
       return ans;
-  }
-
-  void
-  Reader::addOrderMapping()
-  {
-      bool firstGo = true;
-      bool inconsistent = false;
-      // create a reference for finding one or more subblock indices from a CDimCoordinate
-      m_czireader->EnumerateSubBlocks([&](int index_, const libCZI::SubBlockInfo& info_) -> bool {
-          if (isPyramid0(info_)) {
-              m_orderMapping.emplace_back(std::piecewise_construct,
-                  std::make_tuple(&(info_.coordinate), info_.mIndex, isMosaic()),
-                  std::make_tuple(index_)
-              );
-              if( firstGo ) m_pixelType = info_.pixelType;
-              else if( m_pixelType != info_.pixelType ){
-                  if(!inconsistent) {
-                      std::cout << "warning CZI file contains inconsistent pixel types" << std::endl;
-                      inconsistent = true;
-                  }
-                  m_pixelType = libCZI::PixelType::Invalid;
-              }
-          }
-          return true;
-      });
   }
 
   bool

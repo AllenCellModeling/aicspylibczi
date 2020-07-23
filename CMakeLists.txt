@@ -50,6 +50,7 @@ set(PYLIBCZI_PYBIND11 _aicspylibczi/pb_bindings.cpp _aicspylibczi/pb_helpers.h _
 
 set(TARGET_ONE libczi_c++_extension)
 set(TARGET_TWO _aicspylibczi)
+set(TARGET_THREE profile_me)
 
 set_target_properties(libCZI PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 add_library(${TARGET_ONE} STATIC ${PYLIBCZI_C_SRC} ${PYLIBCZI_C_SRC_HEADERS})
@@ -63,6 +64,9 @@ add_custom_command(TARGET ${TARGET_TWO} POST_BUILD
         )
 
 add_subdirectory(c_tests)
+
+add_executable(${TARGET_THREE} main.cpp)
+target_link_libraries(${TARGET_THREE} ${TARGET_ONE})
 
 if(DEFINED ENV{BUILD_DOCS})
     add_subdirectory(docs)
