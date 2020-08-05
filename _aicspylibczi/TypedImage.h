@@ -12,7 +12,7 @@ namespace pylibczi {
 
   template<typename T>
   class TypedImage: public Image {
-      std::unique_ptr<T[]> m_array;
+      T* m_array; // raw pointer to memory in ImagesContainer
 
   public:
       /*!
@@ -22,12 +22,13 @@ namespace pylibczi {
        * @param pixel_type_ The Pixel type of the image,
        * @param plane_coordantes_ The coordinate structure used to define the plane, what scene, channel, time-point etc.
        * @param box_ The (x0, y0, w, h) structure containing the logical position of the image.
+       * @param mem_ptr_ The raw pointer to the position to write the image into.
        * @param m_index_ The mosaic index for the image, this is only relevant if the file is a mosaic file.
        */
       TypedImage(std::vector<size_t> shape_, libCZI::PixelType pixel_type_, const libCZI::CDimCoordinate* plane_coordantes_,
-          libCZI::IntRect box_, int m_index_)
+          libCZI::IntRect box_, T *mem_ptr_, int m_index_)
           :Image(shape_, pixel_type_, plane_coordantes_, box_, m_index_),
-           m_array(new T[std::accumulate(shape_.begin(), shape_.end(), (size_t) 1, std::multiplies<>())])
+           m_array(mem_ptr_)
       {
           if (!isTypeMatch<T>())
               throw PixelTypeException(m_pixelType, "TypedImage asked to create a container for PixelType with inconsitent type.");
@@ -44,7 +45,7 @@ namespace pylibczi {
           m_planeCoordinate.Set(libCZI::DimensionIndex::B, 0);  // to be consistent with other types
           m_planeCoordinate.Set(libCZI::DimensionIndex::C, channel_);
           auto ptrPair = img_->channelPtrs(channel_); // BGR24 has type uint8_t so the ptr's should be of the right type
-          std::copy( ptrPair.first, ptrPair.second, m_array.get() );
+          std::copy( ptrPair.first, ptrPair.second, m_array );
       }
 
       /*!
@@ -66,7 +67,7 @@ namespace pylibczi {
        * @param jump_to_ an integer offset from the beginning of the array.
        * @return a pointer to the internally managed memory. Image maintains ownership!
        */
-      T* getRawPtr(int jump_to_ = 0) { return m_array.get()+jump_to_; }
+      T* getRawPtr(int jump_to_ = 0) { return m_array+jump_to_; }
 
       /*!
        * return a pointer to the specified memory poisiton
@@ -74,18 +75,6 @@ namespace pylibczi {
        * @return A pointer into the raw internal data (Image still maintains ownership of the memory).
        */
       T* getRawPtr(std::vector<size_t> list_); // inline definititon below
-
-      /*!
-       * @brief This function releases the memory from the container and gives it to the recipient to handle. The recipient takes
-       * responsible for freeing the memory.
-       * @return The raw pointer of type T*, where T is the storage type corresponding with the PixelType
-       */
-      T* releaseMemory()
-      {
-          if (!isTypeMatch<T>())
-              throw PixelTypeException(pixelType(), "TypedImage PixelType is inconsistent with requested memory type.");
-          return m_array.release();
-      }
 
       /*!
        * @brief Copy the image from the libCZI bitmap object into this Image object
@@ -129,7 +118,7 @@ namespace pylibczi {
           // WARNING do not compute the end of the array by multiplying stride by height, they are both uint32_t and you'll get an overflow for larger images
           uint8_t* sEnd = static_cast<uint8_t*>(lckScoped.ptrDataRoi)+lckScoped.size;
           SourceRange<T> sourceRange(channels_, static_cast<T*>(lckScoped.ptrDataRoi), (T*) (sEnd), lckScoped.stride, size.w);
-          TargetRange<T> targetRange(channels_, size.w, size.h, m_array.get(), m_array.get()+length());
+          TargetRange<T> targetRange(channels_, size.w, size.h, m_array, m_array+length());
           for (std::uint32_t h = 0; h<bitmap_ptr_->GetHeight(); ++h) {
               pairedForEach(sourceRange.strideBegin(h), sourceRange.strideEnd(h), targetRange.strideBegin(h),
                   [&](std::vector<T*> src_, std::vector<T*> tgt_) {
@@ -141,12 +130,14 @@ namespace pylibczi {
       }
   }
 
+  // TODO: I need to think about how I'm handling BGR images and the memory. I think splitting them off the bat is the
+  // TODO: right thing to do but I'll likely have to come back and fix some of this.
   template<typename T>
   inline std::pair<T*, T*>
   TypedImage<T>::channelPtrs(int channel_){
       std::pair<T*, T*> ans;
       size_t planeSize = std::accumulate(m_shape.rbegin(), --(m_shape.rend()), 1, std::multiplies<size_t>() );
-      ans.first = m_array.get() + channel_ * planeSize;
+      ans.first = m_array + channel_ * planeSize;
       ans.second = ans.first + planeSize;
       return ans;
   }

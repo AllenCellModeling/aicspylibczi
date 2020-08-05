@@ -2,6 +2,7 @@
 #define _PYLIBCZI_IMAGEFACTORY_H
 
 #include "Image.h"
+#include "ImagesContainer.h"
 #include "TypedImage.h"
 #include "exceptions.h"
 
@@ -11,15 +12,23 @@ namespace pylibczi {
       using PixelType = libCZI::PixelType;
       using CtorMap = std::map<libCZI::PixelType,
                                std::function<std::shared_ptr<Image>(
-                                   std::vector<size_t>, libCZI::PixelType pixel_type_, const libCZI::CDimCoordinate* plane_coordinate_,
-                                   libCZI::IntRect box_, int mIndex_)
+                                   std::vector<size_t>, libCZI::PixelType pixel_type_,
+                                   const libCZI::CDimCoordinate* plane_coordinate_,
+                                   libCZI::IntRect box_, ImagesContainerBase* bptr,
+                                   size_t img_index_, int mIndex_)
                                > >;
       using SplitCtorMap = std::map<libCZI::PixelType, std::function<std::shared_ptr<Image>( std::shared_ptr<Image> img_, int channel_) > >;
 
       static CtorMap s_pixelToImage;
       static SplitCtorMap s_pixelToSplit;
 
+      ImagesContainerBase::ImagesContainerBasePtr m_imgContainer;
+
   public:
+      ImageFactory::ImageFactory(libCZI::PixelType pixel_type_, size_t pixels_in_all_images_)
+      : m_imgContainer(ImagesContainerBase::getTypedAsBase(pixel_type_, pixels_in_all_images_))
+      {}
+
       static size_t sizeOfPixelType(PixelType pixel_type_);
 
       static size_t numberOfChannels(PixelType pixel_type_);
