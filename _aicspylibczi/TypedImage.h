@@ -35,20 +35,6 @@ namespace pylibczi {
       }
 
       /*!
-       * @brief This constructor is strictly for splitting out a {H, W} Image from a {3, H, W} Image
-       * @param img_ a std::shared_ptr<Image> with shape {3, H, W}
-       * @param channel_ which of the 3 channels {0, 1, or 2} to copy out of Image
-       */
-      TypedImage( std::shared_ptr< TypedImage > img_, libCZI::PixelType pt_, int channel_):
-            TypedImage({img_->shape()[1], img_->shape()[2]}, pt_, img_->coordinatePtr(), img_->bBox(), img_->mIndex())
-      {
-          m_planeCoordinate.Set(libCZI::DimensionIndex::B, 0);  // to be consistent with other types
-          m_planeCoordinate.Set(libCZI::DimensionIndex::C, channel_);
-          auto ptrPair = img_->channelPtrs(channel_); // BGR24 has type uint8_t so the ptr's should be of the right type
-          std::copy( ptrPair.first, ptrPair.second, m_array );
-      }
-
-      /*!
        * @brief the [] accessor, for accessing or changing a pixel value
        * @param idxs_xy_ The X, Y coordinate in the plane (or X, Y, C} order if 3D. can be provided as an initializer list {x, y, c}
        * @return a reference to the pixel

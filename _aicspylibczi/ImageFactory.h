@@ -20,14 +20,19 @@ namespace pylibczi {
       using SplitCtorMap = std::map<libCZI::PixelType, std::function<std::shared_ptr<Image>( std::shared_ptr<Image> img_, int channel_) > >;
 
       static CtorMap s_pixelToImage;
-      static SplitCtorMap s_pixelToSplit;
 
       ImagesContainerBase::ImagesContainerBasePtr m_imgContainer;
 
   public:
-      ImageFactory::ImageFactory(libCZI::PixelType pixel_type_, size_t pixels_in_all_images_)
+      ImageFactory(libCZI::PixelType pixel_type_, size_t pixels_in_all_images_)
       : m_imgContainer(ImagesContainerBase::getTypedAsBase(pixel_type_, pixels_in_all_images_))
       {}
+
+      ImagesContainerBase::ImagesContainerBasePtr returnMemory(void){
+          return std::move(m_imgContainer); // this should empty m_imgContainer
+      }
+
+      size_t numberOfImages(void){ return m_imgContainer->numberOfImages(); }
 
       static size_t sizeOfPixelType(PixelType pixel_type_);
 
@@ -42,12 +47,9 @@ namespace pylibczi {
           return std::dynamic_pointer_cast<TypedImage<T>>(image_ptr_);
       }
 
-      static std::shared_ptr<Image>
+      std::shared_ptr<Image>
       constructImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_ptr_, const libCZI::CDimCoordinate* plane_coordinate_,
-          libCZI::IntRect box_,
-          int index_m_);
-
-      static Image::ImVec splitToChannels(std::shared_ptr<Image> img_in_);
+          libCZI::IntRect box_, size_t mem_index_, int index_m_);
 
   };
 }

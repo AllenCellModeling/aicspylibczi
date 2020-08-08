@@ -5,6 +5,7 @@
 #include "inc_libCZI.h"
 #include "Reader.h"
 #include "ImageFactory.h"
+#include "ImagesContainer.h"
 #include "exceptions.h"
 #include "SubblockMetaVec.h"
 
@@ -15,6 +16,8 @@ namespace pylibczi {
   {
       m_czireader->Open(std::move(istream_));
       m_statistics = m_czireader->GetStatistics();
+      m_pixelType = libCZI::PixelType::Invalid; // get the pixeltype of the first readable subblock
+
       // create a reference for finding one or more subblock indices from a CDimCoordinate
       // addOrderMapping(); // populate m_orderMapping
       checkSceneShapes();
@@ -135,14 +138,13 @@ namespace pylibczi {
 
       DimIndexRangeMap tbl;
 
-      if (!sceneBool || sceneSize==1) {
+      if (!isMosaic() && (!sceneBool || sceneSize==1)) {
           // scenes are not defined so the dimBounds define the shape
           m_statistics.dimBounds.EnumValidDimensions([&tbl](libCZI::DimensionIndex di_, int start_, int size_) -> bool {
               tbl.emplace(dimensionIndexToDimIndex(di_),
                   std::make_pair(start_, size_+start_)); // changed from [start, end) to be [start, end]
               return true;
           });
-
           auto xySize = getSceneYXSize();
           tbl.emplace(charToDimIndex('Y'), std::make_pair(0, xySize.h));
           tbl.emplace(charToDimIndex('X'), std::make_pair(0, xySize.w));
@@ -209,6 +211,18 @@ namespace pylibczi {
       return lRect;
   }
 
+  libCZI::PixelType
+  Reader::getFirstPixelType(void)
+  {
+      libCZI::PixelType pixelType = libCZI::PixelType::Invalid;
+      m_czireader->EnumerateSubBlocks([&pixelType](int index_, const libCZI::SubBlockInfo& info_) -> bool {
+          if (!isPyramid0(info_)) return true;
+          pixelType = info_.pixelType;
+          return false;
+      });
+      return pixelType;
+  }
+
   /// @brief get the Dimensions in the order they appear in
   /// @return a string containing the Dimensions for the image data object
   std::string
@@ -230,7 +244,7 @@ namespace pylibczi {
       return ans;
   }
 
-  std::pair<ImageVector, Reader::Shape>
+  ImagesContainerBase::ImagesContainerBasePtr
   Reader::readSelected(libCZI::CDimCoordinate& plane_coord_, int index_m_)
   {
       int pos;
@@ -240,41 +254,31 @@ namespace pylibczi {
       }
       SubblockSortable subblocksToFind(&plane_coord_, index_m_, isMosaic());
       SubblockIndexVec matches = getMatches(subblocksToFind);
+      m_pixelType = matches.front().first.pixelType();
+      size_t bgrScaling = ImageFactory::numberOfChannels(m_pixelType);
 
-      ImageVector images;
-      images.reserve(matches.size()); // this will under-reserve in the case of BGR images
-      bool bgrFlag = false;
-
+      libCZI::IntRect w_by_h = getSceneYXSize();
+      size_t n_of_pixels = matches.size()*w_by_h.w*w_by_h.h*bgrScaling;
+      ImageFactory imageFactory(m_pixelType, n_of_pixels);
+      size_t memOffset = 0;
       for_each(matches.begin(), matches.end(), [&](const SubblockIndexVec::value_type& match_) {
           auto subblock = m_czireader->ReadSubBlock(match_.second);
           const libCZI::SubBlockInfo& info = subblock->GetSubBlockInfo();
-          auto image = ImageFactory::constructImage(subblock->CreateBitmap(),
-              &info.coordinate, info.logicalRect, info.mIndex);
-          // This was conditional on split_bgr_ but that's a bad idea so I'm removing it.
-          // bgr images will always be split into their base single channel types brg24 => uint8_t
-          if (ImageFactory::numberOfChannels(image->pixelType())>1) {
-              if (bgrFlag) {
-                  throw ImageAccessUnderspecifiedException(0, 1,
-                      "In a multi-channel BGR image C must be explicitly specified. This is to avoid confusion between BGR expanded channels.");
-              }
-              auto splitImages = ImageFactory::splitToChannels(image);
-              for_each(splitImages.begin(), splitImages.end(), [&images](Image::ImVec::value_type& image_) { images.push_back(image_); });
-              bgrFlag = true;
-          }
-          else
-              images.push_back(image);
+          if (m_pixelType!=info.pixelType)
+              throw PixelTypeException(info.pixelType, "Selected subblocks have inconsistent PixelTypes."
+                                                       " You must select subblocks with consistent PixelTypes.");
+
+          auto image = imageFactory.constructImage(subblock->CreateBitmap(),
+              &info.coordinate, info.logicalRect, memOffset, info.mIndex);
+
+          memOffset += bgrScaling*w_by_h.w*w_by_h.h;
       });
 
-      if (images.empty()) {
+      if (imageFactory.numberOfImages()==0) {
           throw pylibczi::CdimSelectionZeroImagesException(plane_coord_, m_statistics.dimBounds, "No pyramid0 selectable subblocks.");
       }
-      images.setMosaic(isMosaic());
-      auto shape = getShape(images, isMosaic());
-      return std::make_pair(images, shape);
-      // return images;
+      return imageFactory.returnMemory();
   }
-
-
 
   SubblockMetaVec
   Reader::readSubblockMeta(libCZI::CDimCoordinate& plane_coord_, int index_m_)
@@ -320,8 +324,8 @@ namespace pylibczi {
 //              return match_==a_.first;
 //          });
       m_czireader->EnumerateSubBlocks([&](int index_, const libCZI::SubBlockInfo& info_) -> bool {
-          SubblockSortable subInfo(&(info_.coordinate), info_.mIndex, isMosaic());
-          if (isPyramid0(info_) && match_== subInfo) {
+          SubblockSortable subInfo(&(info_.coordinate), info_.mIndex, isMosaic(), info_.pixelType);
+          if (isPyramid0(info_) && match_==subInfo) {
               // std::cout << "match : " << *(match_.coordinatePtr()) << " adding: " << *(subInfo.coordinatePtr()) << std::endl;
               ans.emplace_back(std::pair<SubblockSortable, int>(subInfo, index_));
           }
@@ -373,7 +377,7 @@ namespace pylibczi {
       return ans;
   }
 
-  ImageVector
+  ImagesContainerBase::ImagesContainerBasePtr
   Reader::readMosaic(libCZI::CDimCoordinate plane_coord_, float scale_factor_, libCZI::IntRect im_box_)
   {
       // handle the case where the function was called with region=None (default to all)
@@ -388,8 +392,9 @@ namespace pylibczi {
           throw CDimCoordinatesUnderspecifiedException("C is not set, to read mosaic files you must specify C.");
       }
       SubblockSortable subBlockToFind(&plane_coord_, -1); // just check that the dims match something ignore that it's a mosaic file
-      getMatches(subBlockToFind); // this does the checking
-
+      SubblockIndexVec matches = getMatches(subBlockToFind); // this does the checking
+      m_pixelType = matches.front().first.pixelType();
+      size_t bgrScaling = ImageFactory::numberOfChannels(m_pixelType);
       auto accessor = m_czireader->CreateSingleChannelScalingTileAccessor();
 
       // multiTile accessor is not compatible with S, it composites the Scenes and the mIndexs together
@@ -399,22 +404,11 @@ namespace pylibczi {
           scale_factor_,
           nullptr);   // use default options
 
-      // TODO how to handle 3 channel BGR image split them as in readSelected or ??? <= split like readSelected
-      auto image = ImageFactory::constructImage(multiTileComposite, &plane_coord_, im_box_, -1);
-      ImageVector imageVector;
-      imageVector.reserve(1);
-      int idx = 0;
-      if (ImageFactory::numberOfChannels(image->pixelType())>1) {
-          auto splitImages = ImageFactory::splitToChannels(image);
-          for_each(splitImages.begin(), splitImages.end(), [&imageVector](Image::ImVec::value_type& image_) {
-              imageVector.push_back(image_);
-          });
-      }
-      else
-          imageVector.push_back(image);
-
-      imageVector.setMosaic(isMosaic());
-      return imageVector;
+      size_t pixels_in_image = m_statistics.boundingBoxLayer0Only.w * m_statistics.boundingBoxLayer0Only.h * bgrScaling;
+      ImageFactory imageFactory(m_pixelType, pixels_in_image);
+      auto image = imageFactory.constructImage(multiTileComposite, &plane_coord_, im_box_, 0, -1);
+      // set is mosaic?
+      return imageFactory.returnMemory();
   }
 
 }

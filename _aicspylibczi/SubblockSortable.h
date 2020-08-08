@@ -12,15 +12,19 @@ namespace pylibczi{
   class SubblockSortable{
   protected:
     libCZI::CDimCoordinate m_planeCoordinate;
+    libCZI::PixelType m_pixelType;
     int m_indexM;
     bool m_isMosaic;
   public:
-      SubblockSortable(const libCZI::CDimCoordinate  *plane_, int index_m_, bool is_mosaic_=false)
-      : m_planeCoordinate(plane_), m_indexM(index_m_), m_isMosaic(is_mosaic_) {}
+      SubblockSortable(const libCZI::CDimCoordinate  *plane_, int index_m_,bool is_mosaic_=false,
+          libCZI::PixelType pixel_type_=libCZI::PixelType::Invalid)
+      : m_planeCoordinate(plane_), m_pixelType(pixel_type_), m_indexM(index_m_), m_isMosaic(is_mosaic_) {}
 
       const libCZI::CDimCoordinate* coordinatePtr() const { return &m_planeCoordinate; }
 
       int mIndex() const { return m_indexM; }
+
+      libCZI::PixelType pixelType(void) const { return m_pixelType; }
 
       std::map<char, size_t>  getDimsAsChars() const {
           return SubblockSortable::getValidIndexes(m_planeCoordinate, m_indexM, m_isMosaic);

@@ -149,7 +149,8 @@ TEST_CASE_METHOD(CziCreator, "test_read_selected", "[Reader_read_selected]")
     auto cDims = libCZI::CDimCoordinate{};
 //                                        {{libCZI::DimensionIndex::B, 0},
 //                                        {libCZI::DimensionIndex::C, 0}};
-    auto imvec = czi->readSelected(cDims).first;
+    auto imCont = czi->readSelected(cDims);
+    auto imvec = imCont->images();
     REQUIRE(imvec.size()==1);
     auto shape = imvec.front()->shape();
     REQUIRE(shape[0]==325); // height
@@ -161,7 +162,8 @@ TEST_CASE_METHOD(CziCreator2, "test_read_selected2", "[Reader_read_selected]")
     auto czi = get();
     auto cDims = libCZI::CDimCoordinate{{libCZI::DimensionIndex::B, 0},
                                         {libCZI::DimensionIndex::C, 0}};
-    auto imvec = czi->readSelected(cDims).first;
+    auto imCont = czi->readSelected(cDims);
+    auto imvec = imCont->images();
     REQUIRE(imvec.size()==15);
     auto shape = imvec.front()->shape();
     REQUIRE(shape[0]==325); // height
@@ -172,7 +174,8 @@ TEST_CASE_METHOD(CziCreatorIStream, "test_read_selected3", "[Reader_read_selecte
 {
     auto czi = get();
     auto cDims = libCZI::CDimCoordinate{{libCZI::DimensionIndex::C, 0}};
-    auto imvec = czi->readSelected(cDims).first;
+    auto imCont = czi->readSelected(cDims);
+    auto imvec = imCont->images();
     REQUIRE(imvec.size()==1);
     auto shape = imvec.front()->shape();
     REQUIRE(shape[0]==325); // height
@@ -183,7 +186,8 @@ TEST_CASE_METHOD(CziCreatorIStream, "test_read_selected4", "[Reader_read_selecte
 {
     auto czi = get();
     auto cDims = libCZI::CDimCoordinate();
-    auto imvec = czi->readSelected(cDims).first;
+    auto imCont = czi->readSelected(cDims);
+    auto imvec = imCont->images();
     REQUIRE(imvec.size()==1);
     auto shape = imvec.front()->shape();
     REQUIRE(shape[0]==325); // height
@@ -262,15 +266,17 @@ TEST_CASE_METHOD(CziMCreator, "test_mosaic_readSelected", "[Reader_mosaic_readSe
     std::vector<int> szeAns{1, 1, 1, 1, 2, 624, 924};
     REQUIRE(sze==szeAns);
     libCZI::CDimCoordinate c_dims;
-    auto imvec = czi->readSelected(c_dims);
-    REQUIRE(imvec.first.size()==2);
+    auto imCont = czi->readSelected(c_dims);
+    auto imvec = imCont->images();
+    REQUIRE(imvec.size()==2);
 }
 
 TEST_CASE_METHOD(CziMCreator, "test_mosaic_read", "[Reader_mosaic_read]")
 {
     auto czi = get();
     auto c_dims = libCZI::CDimCoordinate{{libCZI::DimensionIndex::C, 0}};
-    auto imvec = czi->readMosaic(c_dims);
+    auto imCont = czi->readMosaic(c_dims);
+    auto imvec = imCont->images();
     REQUIRE(imvec.size()==1);
 }
 
@@ -301,7 +307,8 @@ TEST_CASE_METHOD(CziBgrCreator, "test_bgr_read", "[Reader_read_bgr]")
 {
     auto czi = get();
     libCZI::CDimCoordinate dm;
-    auto pr = czi->readSelected(dm);
+    auto imgCont = czi->readSelected(dm);
+    auto pr = imgCont->images();
 
     REQUIRE(czi->dimsString()==std::string("TYX"));
     std::vector<int> ansSize{1, 624, 924};
@@ -313,9 +320,9 @@ TEST_CASE_METHOD(CziBgrCreator, "test_bgr_read", "[Reader_read_bgr]")
     REQUIRE(!dims.empty());
     REQUIRE(dims==ansDims);
 
-    REQUIRE(pr.first.size()==3);
-    REQUIRE(pr.first.front()->shape()==std::vector<size_t>{624, 924});
-    REQUIRE(pr.first.front()->pixelType()==libCZI::PixelType::Gray8);
+    REQUIRE(pr.size()==1);
+    REQUIRE(pr.front()->shape()==std::vector<size_t>{3, 624, 924});
+    REQUIRE(pr.front()->pixelType()==libCZI::PixelType::Gray8);
 }
 
 TEST_CASE_METHOD(CziBgrCreator, "test_bgr_flatten", "[Reader_read_flatten_bgr]")
@@ -325,17 +332,21 @@ TEST_CASE_METHOD(CziBgrCreator, "test_bgr_flatten", "[Reader_read_flatten_bgr]")
     auto dims = czi->readDimsRange();
 
     libCZI::CDimCoordinate dm;
-    auto pr = czi->readSelected(dm, -1);
-    REQUIRE(pr.first.size()==3);
+    auto imgCont = czi->readSelected(dm, -1);
+    auto pr = imgCont->images();
+    auto shape = imgCont->shape();
+    REQUIRE(pr.size()==1);
 
-    for (auto x : pr.first) {
-        REQUIRE(x->shape()[0]==624);
-        REQUIRE(x->shape()[1]==924);
+    for (auto x : pr) {
+        REQUIRE(x->shape()[0]==3);
+        REQUIRE(x->shape()[1]==624);
+        REQUIRE(x->shape()[2]==924);
     }
 
-    pylibczi::Reader::Shape shapeAns{{'B', 1}, {'T', 1}, {'C', 3}, {'Y', 624}, {'X', 924}};
-    REQUIRE(pr.second==shapeAns);
-    REQUIRE(pr.first.front()->pixelType()==libCZI::PixelType::Gray8);
+    pylibczi::Reader::Shape shapeAns{{'T', 1}, {'Y', 624}, {'X', 924}};
+
+    REQUIRE(shape==shapeAns);
+    REQUIRE(pr.front()->pixelType()==libCZI::PixelType::Gray8);
     // pb_helpers::packArray(pr.first);
 }
 
@@ -396,7 +407,9 @@ TEST_CASE_METHOD(CziBgrCreator2, "test_bgr2_read", "[Reader_read_bgr2]")
     auto czi = get();
     libCZI::CDimCoordinate dm = libCZI::CDimCoordinate{{libCZI::DimensionIndex::B, 0},
                                                        {libCZI::DimensionIndex::C, 4}};
-    auto pr = czi->readSelected(dm);
+    auto imgCont = czi->readSelected(dm);
+    auto pr = imgCont->images();
+    auto shape = imgCont->shape();
 
     REQUIRE(czi->dimsString()==std::string("SCYX"));
     std::vector<int> ansSize{1, 7, 81, 147};
@@ -408,12 +421,13 @@ TEST_CASE_METHOD(CziBgrCreator2, "test_bgr2_read", "[Reader_read_bgr2]")
     REQUIRE(!dims.empty());
     REQUIRE(dims==ansDims);
 
-    REQUIRE(pr.first.size()==3);
-    REQUIRE(pr.first.front()->shape()==std::vector<size_t>{81, 147});
-    REQUIRE(pr.first.front()->pixelType()==libCZI::PixelType::Gray8);
-    auto c_pair = std::find_if(pr.second.begin(), pr.second.end(), [](const std::pair<char, int>& a) { return a.first=='C'; });
-    REQUIRE(c_pair->first=='C');
-    REQUIRE(c_pair->second==3);
+    REQUIRE(pr.size()==1);
+    REQUIRE(pr.front()->shape()==std::vector<size_t>{3, 81, 147});
+    REQUIRE(pr.front()->pixelType()==libCZI::PixelType::Gray8);
+    auto c_pair = std::find_if(shape.begin(), shape.end(), [](const std::pair<char, int>& a) { return a.first=='C'; });
+    // REQUIRE(c_pair->first=='C');
+    // REQUIRE(c_pair->second==3);
+    // TODO: Figure out how to report channels in BGR Images.
 }
 
 TEST_CASE_METHOD(CziBgrCreator2, "test_bgr2_flatten", "[Reader_read_flatten_bgr2]")
@@ -422,26 +436,33 @@ TEST_CASE_METHOD(CziBgrCreator2, "test_bgr2_flatten", "[Reader_read_flatten_bgr2
 
     auto dims = czi->readDimsRange();
     libCZI::CDimCoordinate dm = libCZI::CDimCoordinate{{libCZI::DimensionIndex::C, 4}};
-    auto pr = czi->readSelected(dm, -1);
-    REQUIRE(pr.first.size()==3);
+    auto imgCont = czi->readSelected(dm, -1);
+    auto pr = imgCont->images();
+    auto shape = imgCont->shape();
 
-    for (auto x : pr.first) {
-        REQUIRE(x->shape()[0]==81);
-        REQUIRE(x->shape()[1]==147);
+    REQUIRE(pr.size()==1);
+
+    for (auto x : pr) {
+        REQUIRE(x->shape()[0]==3);
+        REQUIRE(x->shape()[1]==81);
+        REQUIRE(x->shape()[2]==147);
     }
 
-    pylibczi::Reader::Shape shapeAns{{'B', 1}, {'S', 1}, {'C', 3}, {'Y', 81}, {'X', 147}};
-    REQUIRE(pr.second==shapeAns);
-    REQUIRE(pr.first.front()->pixelType()==libCZI::PixelType::Gray8);
+    pylibczi::Reader::Shape shapeAns{{'S', 1}, {'C', 1}, {'Y', 81}, {'X', 147}};
+    REQUIRE(shape==shapeAns);
+    REQUIRE(pr.front()->pixelType()==libCZI::PixelType::Gray8);
     // pb_helpers::packArray(pr.first);
 }
 
-TEST_CASE_METHOD(CziBgrCreator2, "test_bgr_exception", "[Reader_flatten_bgr_exception]")
+TEST_CASE_METHOD(CziBgrCreator2, "test_bgr_7channel", "[Reader_bgr_7channel]")
 {
     auto czi = get();
     libCZI::CDimCoordinate dm;
-    REQUIRE_THROWS_AS(czi->readSelected(dm, -1), pylibczi::ImageAccessUnderspecifiedException);
-
+    auto imCont = czi->readSelected(dm, -1);
+    auto images = imCont->images();
+    auto shape = imCont->shape();
+    pylibczi::Reader::Shape shapeAns{{'S', 1}, {'C', 7}, {'Y', 81}, {'X', 147}};
+    REQUIRE( shape==shapeAns);
 }
 
 TEST_CASE_METHOD(CziCreatorBig, "test_big_czifile", "[Reader_timed_read]")
@@ -465,9 +486,9 @@ TEST_CASE_METHOD(CziCreatorBig, "test_big_czifile", "[Reader_timed_read]")
     INFO( dsizes.str() );
 
     auto start = std::chrono::high_resolution_clock::now();
-    auto pr = czi->readSelected(dm);
+    auto imgCont = czi->readSelected(dm);
     auto done = std::chrono::high_resolution_clock::now();
 
     std::cout << "Duration(milliseconds): " << std::chrono::duration_cast<std::chrono::milliseconds>(done-start).count();
-    REQUIRE(std::chrono::duration_cast<std::chrono::milliseconds>(done-start).count()<5000);
+    REQUIRE(std::chrono::duration_cast<std::chrono::milliseconds>(done-start).count()<5050);
 }

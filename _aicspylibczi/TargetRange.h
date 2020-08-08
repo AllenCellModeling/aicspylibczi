@@ -64,7 +64,7 @@ namespace pylibczi {
               return !(*this==other_);
           }
 
-          std::vector<T*> operator*()
+          std::vector<T*> &operator*()
           {
               return m_ptr;
           }
