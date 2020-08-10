@@ -139,7 +139,7 @@ def test_mosaic_size(data_dir, fname, expected):
     ('s_1_t_1_c_1_z_1.czi', (1, 1, 325, 475)),  # B C Y X
     ('s_3_t_1_c_3_z_5.czi', (1, 3, 3, 5, 325, 475)),  # B S C Z Y X
     ('mosaic_test.czi', (1, 1, 1, 1, 2, 624, 924)),  # S T C Z M Y X
-    ('RGB-8bit.czi', (1, 1, 3, 624, 924)),  # B T C Y X
+    ('RGB-8bit.czi', (1, 3, 624, 924)),  # T C Y X
 ])
 def test_read_image(data_dir, fname, expected):
     czi = CziFile(str(data_dir / fname))
@@ -249,7 +249,7 @@ def test_mosaic_image(data_dir, fname, expects):
 
 
 @pytest.mark.parametrize("fname, expects", [
-    ('mosaic_test.czi', (1, 1, int(624/2), int(1756/2))),
+    ('mosaic_test.czi', (1, int(624/2), int(1756/2))),
 ])
 def test_mosaic_image_two(data_dir, fname, expects):
     with open(data_dir / fname, 'rb') as fp:

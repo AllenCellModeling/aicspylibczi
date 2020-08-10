@@ -244,7 +244,7 @@ namespace pylibczi {
       return ans;
   }
 
-  ImagesContainerBase::ImagesContainerBasePtr
+  std::pair<ImagesContainerBase::ImagesContainerBasePtr, std::vector< std::pair<char, size_t> > >
   Reader::readSelected(libCZI::CDimCoordinate& plane_coord_, int index_m_)
   {
       int pos;
@@ -260,6 +260,8 @@ namespace pylibczi {
       libCZI::IntRect w_by_h = getSceneYXSize();
       size_t n_of_pixels = matches.size()*w_by_h.w*w_by_h.h*bgrScaling;
       ImageFactory imageFactory(m_pixelType, n_of_pixels);
+
+      imageFactory.setMosaic(isMosaic());
       size_t memOffset = 0;
       for_each(matches.begin(), matches.end(), [&](const SubblockIndexVec::value_type& match_) {
           auto subblock = m_czireader->ReadSubBlock(match_.second);
@@ -277,7 +279,8 @@ namespace pylibczi {
       if (imageFactory.numberOfImages()==0) {
           throw pylibczi::CdimSelectionZeroImagesException(plane_coord_, m_statistics.dimBounds, "No pyramid0 selectable subblocks.");
       }
-      return imageFactory.returnMemory();
+      auto charShape = imageFactory.getFixedShape();
+      return std::make_pair(imageFactory.returnMemory(), charShape);
   }
 
   SubblockMetaVec

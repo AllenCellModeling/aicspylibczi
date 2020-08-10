@@ -150,7 +150,7 @@ TEST_CASE_METHOD(CziCreator, "test_read_selected", "[Reader_read_selected]")
 //                                        {{libCZI::DimensionIndex::B, 0},
 //                                        {libCZI::DimensionIndex::C, 0}};
     auto imCont = czi->readSelected(cDims);
-    auto imvec = imCont->images();
+    auto imvec = imCont.first->images();
     REQUIRE(imvec.size()==1);
     auto shape = imvec.front()->shape();
     REQUIRE(shape[0]==325); // height
@@ -163,7 +163,7 @@ TEST_CASE_METHOD(CziCreator2, "test_read_selected2", "[Reader_read_selected]")
     auto cDims = libCZI::CDimCoordinate{{libCZI::DimensionIndex::B, 0},
                                         {libCZI::DimensionIndex::C, 0}};
     auto imCont = czi->readSelected(cDims);
-    auto imvec = imCont->images();
+    auto imvec = imCont.first->images();
     REQUIRE(imvec.size()==15);
     auto shape = imvec.front()->shape();
     REQUIRE(shape[0]==325); // height
@@ -175,7 +175,7 @@ TEST_CASE_METHOD(CziCreatorIStream, "test_read_selected3", "[Reader_read_selecte
     auto czi = get();
     auto cDims = libCZI::CDimCoordinate{{libCZI::DimensionIndex::C, 0}};
     auto imCont = czi->readSelected(cDims);
-    auto imvec = imCont->images();
+    auto imvec = imCont.first->images();
     REQUIRE(imvec.size()==1);
     auto shape = imvec.front()->shape();
     REQUIRE(shape[0]==325); // height
@@ -187,7 +187,7 @@ TEST_CASE_METHOD(CziCreatorIStream, "test_read_selected4", "[Reader_read_selecte
     auto czi = get();
     auto cDims = libCZI::CDimCoordinate();
     auto imCont = czi->readSelected(cDims);
-    auto imvec = imCont->images();
+    auto imvec = imCont.first->images();
     REQUIRE(imvec.size()==1);
     auto shape = imvec.front()->shape();
     REQUIRE(shape[0]==325); // height
@@ -267,7 +267,7 @@ TEST_CASE_METHOD(CziMCreator, "test_mosaic_readSelected", "[Reader_mosaic_readSe
     REQUIRE(sze==szeAns);
     libCZI::CDimCoordinate c_dims;
     auto imCont = czi->readSelected(c_dims);
-    auto imvec = imCont->images();
+    auto imvec = imCont.first->images();
     REQUIRE(imvec.size()==2);
 }
 
@@ -308,7 +308,7 @@ TEST_CASE_METHOD(CziBgrCreator, "test_bgr_read", "[Reader_read_bgr]")
     auto czi = get();
     libCZI::CDimCoordinate dm;
     auto imgCont = czi->readSelected(dm);
-    auto pr = imgCont->images();
+    auto pr = imgCont.first->images();
 
     REQUIRE(czi->dimsString()==std::string("TYX"));
     std::vector<int> ansSize{1, 624, 924};
@@ -333,8 +333,8 @@ TEST_CASE_METHOD(CziBgrCreator, "test_bgr_flatten", "[Reader_read_flatten_bgr]")
 
     libCZI::CDimCoordinate dm;
     auto imgCont = czi->readSelected(dm, -1);
-    auto pr = imgCont->images();
-    auto shape = imgCont->shape();
+    auto pr = imgCont.first->images();
+    auto shape = imgCont.second;
     REQUIRE(pr.size()==1);
 
     for (auto x : pr) {
@@ -343,7 +343,7 @@ TEST_CASE_METHOD(CziBgrCreator, "test_bgr_flatten", "[Reader_read_flatten_bgr]")
         REQUIRE(x->shape()[2]==924);
     }
 
-    pylibczi::Reader::Shape shapeAns{{'T', 1}, {'Y', 624}, {'X', 924}};
+    pylibczi::Reader::Shape shapeAns{{'T', 1}, {'C', 3}, {'Y', 624}, {'X', 924}};
 
     REQUIRE(shape==shapeAns);
     REQUIRE(pr.front()->pixelType()==libCZI::PixelType::Gray8);
@@ -408,8 +408,8 @@ TEST_CASE_METHOD(CziBgrCreator2, "test_bgr2_read", "[Reader_read_bgr2]")
     libCZI::CDimCoordinate dm = libCZI::CDimCoordinate{{libCZI::DimensionIndex::B, 0},
                                                        {libCZI::DimensionIndex::C, 4}};
     auto imgCont = czi->readSelected(dm);
-    auto pr = imgCont->images();
-    auto shape = imgCont->shape();
+    auto pr = imgCont.first->images();
+    auto shape = imgCont.second;
 
     REQUIRE(czi->dimsString()==std::string("SCYX"));
     std::vector<int> ansSize{1, 7, 81, 147};
@@ -437,8 +437,8 @@ TEST_CASE_METHOD(CziBgrCreator2, "test_bgr2_flatten", "[Reader_read_flatten_bgr2
     auto dims = czi->readDimsRange();
     libCZI::CDimCoordinate dm = libCZI::CDimCoordinate{{libCZI::DimensionIndex::C, 4}};
     auto imgCont = czi->readSelected(dm, -1);
-    auto pr = imgCont->images();
-    auto shape = imgCont->shape();
+    auto pr = imgCont.first->images();
+    auto shape = imgCont.second;
 
     REQUIRE(pr.size()==1);
 
@@ -448,7 +448,7 @@ TEST_CASE_METHOD(CziBgrCreator2, "test_bgr2_flatten", "[Reader_read_flatten_bgr2
         REQUIRE(x->shape()[2]==147);
     }
 
-    pylibczi::Reader::Shape shapeAns{{'S', 1}, {'C', 1}, {'Y', 81}, {'X', 147}};
+    pylibczi::Reader::Shape shapeAns{{'S', 1}, {'C', 3}, {'Y', 81}, {'X', 147}};
     REQUIRE(shape==shapeAns);
     REQUIRE(pr.front()->pixelType()==libCZI::PixelType::Gray8);
     // pb_helpers::packArray(pr.first);
@@ -459,9 +459,9 @@ TEST_CASE_METHOD(CziBgrCreator2, "test_bgr_7channel", "[Reader_bgr_7channel]")
     auto czi = get();
     libCZI::CDimCoordinate dm;
     auto imCont = czi->readSelected(dm, -1);
-    auto images = imCont->images();
-    auto shape = imCont->shape();
-    pylibczi::Reader::Shape shapeAns{{'S', 1}, {'C', 7}, {'Y', 81}, {'X', 147}};
+    auto images = imCont.first->images();
+    auto shape = imCont.second;
+    pylibczi::Reader::Shape shapeAns{{'S', 1}, {'C', 21}, {'Y', 81}, {'X', 147}};
     REQUIRE( shape==shapeAns);
 }
 

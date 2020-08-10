@@ -40,7 +40,7 @@ public:
         auto cDims = libCZI::CDimCoordinate{{libCZI::DimensionIndex::B, 0},
                                             {libCZI::DimensionIndex::C, 0}};
         auto imgCont = m_czi->readSelected(cDims);
-        auto imVec = imgCont->images();
+        auto imVec = imgCont.first->images();
         return imVec.front();
     }
 };

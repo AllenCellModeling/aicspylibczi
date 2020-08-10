@@ -21,6 +21,7 @@ namespace pylibczi {
   private:
       ImageVector m_images;
       Shape m_shape;
+      libCZI::PixelType m_cziPixelType;
 
   public:
       static ImagesContainerBasePtr getTypedAsBase(libCZI::PixelType& pixel_type_, size_t pixels_in_all_images_);
@@ -41,6 +42,14 @@ namespace pylibczi {
               m_shape = m_images.getShape();
           return m_shape;
       }
+
+      void setCziFilePixelType(libCZI::PixelType pixel_type_){
+          m_cziPixelType = pixel_type_;
+      }
+
+      libCZI::PixelType pixelType(void){
+          return m_cziPixelType;
+      }
   };
 
   template<typename T>
@@ -56,6 +65,7 @@ namespace pylibczi {
           return m_uniquePtr.get()+position_;
       }
 
+      T* releaseMemory(void){ return m_uniquePtr.release(); }
   };
 
   inline
@@ -85,6 +95,7 @@ namespace pylibczi {
       case libCZI::PixelType::Invalid:
           throw PixelTypeException(pixel_type_, "unsupported pixel type.");
       }
+      imageMemory->setCziFilePixelType(pixel_type_); // make sure imageMemory has the original pixel type
       return imageMemory;
   }
 

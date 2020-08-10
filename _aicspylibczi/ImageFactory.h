@@ -38,6 +38,8 @@ namespace pylibczi {
 
       static size_t numberOfChannels(PixelType pixel_type_);
 
+      void setMosaic(bool val_) { m_imgContainer->images().setMosaic(val_); }
+
       template<typename T>
       static std::shared_ptr< TypedImage<T> >
       getDerived(std::shared_ptr<Image> image_ptr_)
@@ -51,6 +53,7 @@ namespace pylibczi {
       constructImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_ptr_, const libCZI::CDimCoordinate* plane_coordinate_,
           libCZI::IntRect box_, size_t mem_index_, int index_m_);
 
+      vector<std::pair<char, size_t>> getFixedShape(void);
   };
 }
 

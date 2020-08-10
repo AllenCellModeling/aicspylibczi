@@ -200,7 +200,8 @@ namespace pylibczi {
        * @param plane_coord_ A structure containing the Dimension constraints
        * @param index_m_ Is only relevant for mosaic files, if you wish to select one frame.
        */
-      ImagesContainerBase::ImagesContainerBasePtr readSelected(libCZI::CDimCoordinate& plane_coord_, int index_m_ = -1);
+      std::pair<ImagesContainerBase::ImagesContainerBasePtr, std::vector< std::pair<char, size_t> > >
+      readSelected(libCZI::CDimCoordinate& plane_coord_, int index_m_ = -1);
 
       /*!
        * @brief provide the subblock metadata in index order consistent with readSelected.
@@ -278,8 +279,9 @@ namespace pylibczi {
        */
       libCZI::IntRect getSceneYXSize(int scene_index_ = -1);
 
-      std::string pixelType() const {
+      std::string pixelType() {
           // each subblock can apparently have a different pixelType 🙄
+          if(m_pixelType == libCZI::PixelType::Invalid) m_pixelType = getFirstPixelType();
           return libCZI::Utils::PixelTypeToInformalString(m_pixelType);
       }
 

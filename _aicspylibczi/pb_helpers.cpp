@@ -11,31 +11,53 @@
 
 namespace pb_helpers {
 
-  py::array packArray(pylibczi::ImageVector& images_)
+  std::vector<std::pair<char, size_t> > getAndFixShape(pylibczi::ImagesContainerBase *bptr_){
+      auto images = bptr_->images();
+      images.sort();
+      auto charSizes = images.getShape();
+      if( bptr_->pixelType() == libCZI::PixelType::Bgr24 ||
+          bptr_->pixelType() == libCZI::PixelType::Bgr48 ||
+          bptr_->pixelType() == libCZI::PixelType::Bgr96Float ){
+          auto ittr = find_if(charSizes.begin(), charSizes.end(), [](std::pair<char, size_t> &pr){
+              return (pr.first == 'C');
+          });
+          if( ittr != charSizes.end()) ittr->second *=3;
+          else {
+              charSizes.push_back(std::pair<char, size_t>('C', 3));
+              std::sort(charSizes.begin(), charSizes.end(), [&](std::pair<char, size_t> a_, std::pair<char, size_t> b_) {
+                  return libCZI::Utils::CharToDimension(a_.first)>libCZI::Utils::CharToDimension(b_.first);
+              });
+          }
+      }
+      return charSizes;
+  }
+  
+  py::array packArray(pylibczi::ImagesContainerBase::ImagesContainerBasePtr &base_ptr_)
   {
-      // assumptions: The array contains images of the same size and the array is contiguous.
-      images_.sort();
-      auto charSizes = images_.getShape();
+      pylibczi::ImagesContainerBase *icBase = base_ptr_.release();
+      std::vector<std::pair<char, size_t> > charSizes;
 
-      size_t newSize = images_.front()->length()*images_.size();
-      std::vector<ssize_t> shape(charSizes.size(), 0);
-      std::transform(charSizes.begin(), charSizes.end(), shape.begin(), [](const std::pair<char, size_t>& a_) {
-          return a_.second;
-      });
-      py::array* arrP = nullptr;
-      switch (images_.front()->pixelType()) {
+      charSizes = getAndFixShape(icBase);
+      py::array *arr;
+
+      switch (icBase->pixelType()){
       case libCZI::PixelType::Gray8:
-      case libCZI::PixelType::Bgr24: arrP = makeArray<uint8_t>(newSize, shape, images_);
+      case libCZI::PixelType::Bgr24:
+          arr = memoryToNpArray<uint8_t>(icBase, charSizes);
           break;
       case libCZI::PixelType::Gray16:
-      case libCZI::PixelType::Bgr48: arrP = makeArray<uint16_t>(newSize, shape, images_);
+      case libCZI::PixelType::Bgr48:
+          arr = memoryToNpArray<uint16_t>(icBase, charSizes);
+          break;
+      case libCZI::PixelType::Gray32:
+          arr = memoryToNpArray<uint32_t>(icBase, charSizes);
           break;
       case libCZI::PixelType::Gray32Float:
-      case libCZI::PixelType::Bgr96Float: arrP = makeArray<float>(newSize, shape, images_);
+      case libCZI::PixelType::Bgr96Float:
+          arr = memoryToNpArray<float>(icBase, charSizes);
           break;
-      default: throw pylibczi::PixelTypeException(images_.front()->pixelType(), "Unsupported pixel type");
       }
-      return *arrP;
+      return *arr;
   }
 
   py::list* packStringArray(pylibczi::SubblockMetaVec& metadata_){

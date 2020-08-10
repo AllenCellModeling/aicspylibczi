@@ -140,4 +140,25 @@ namespace pylibczi {
       return sImage;
   }
 
+  std::vector< std::pair< char, size_t> >
+  ImageFactory::getFixedShape(void){
+      auto images = m_imgContainer->images();
+      images.sort();
+      auto charSizes = images.getShape();
+      if( m_imgContainer->pixelType() == libCZI::PixelType::Bgr24 ||
+          m_imgContainer->pixelType() == libCZI::PixelType::Bgr48 ||
+          m_imgContainer->pixelType() == libCZI::PixelType::Bgr96Float ){
+          auto ittr = find_if(charSizes.begin(), charSizes.end(), [](std::pair<char, size_t> &pr){
+              return (pr.first == 'C');
+          });
+          if( ittr != charSizes.end()) ittr->second *=3;
+          else {
+              charSizes.push_back(std::pair<char, size_t>('C', 3));
+              std::sort(charSizes.begin(), charSizes.end(), [&](std::pair<char, size_t> a_, std::pair<char, size_t> b_) {
+                  return libCZI::Utils::CharToDimension(a_.first)>libCZI::Utils::CharToDimension(b_.first);
+              });
+          }
+      }
+      return charSizes;
+  }
 }

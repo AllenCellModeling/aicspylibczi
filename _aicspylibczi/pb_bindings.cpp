@@ -9,7 +9,7 @@
 // the below headers are crucial otherwise the custom casts aren't recognized
 #include "pb_caster_BytesIO.h"
 #include "pb_caster_DimIndex.h"
-#include "pb_caster_ImageVector.h"
+#include "pb_caster_ImagesContainer.h"
 #include "pb_caster_SubblockMetaVec.h"
 #include "pb_caster_libCZI_DimensionIndex.h"
 
