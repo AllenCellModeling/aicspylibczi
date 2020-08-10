@@ -37,6 +37,8 @@ public:
     pylibczi::Reader* get() { return m_czi.get(); }
 };
 
+#ifdef LOCAL_TEST
+
 class CziCreatorBig {
     std::unique_ptr<pylibczi::Reader> m_czi;
 public:
@@ -44,6 +46,8 @@ public:
         :m_czi(new pylibczi::Reader(L"/Users/jamies/Data/20190425_S08_001-04-Scene-4-P3-B03.czi")) { }
     pylibczi::Reader* get() { return m_czi.get(); }
 };
+
+#endif
 
 class CziCreator4 {
     std::unique_ptr<pylibczi::Reader> m_czi;
@@ -465,6 +469,8 @@ TEST_CASE_METHOD(CziBgrCreator2, "test_bgr_7channel", "[Reader_bgr_7channel]")
     REQUIRE( shape==shapeAns);
 }
 
+#ifdef LOCAL_TEST
+
 TEST_CASE_METHOD(CziCreatorBig, "test_big_czifile", "[Reader_timed_read]")
 {
     auto czi = get();
@@ -492,3 +498,5 @@ TEST_CASE_METHOD(CziCreatorBig, "test_big_czifile", "[Reader_timed_read]")
     std::cout << "Duration(milliseconds): " << std::chrono::duration_cast<std::chrono::milliseconds>(done-start).count();
     REQUIRE(std::chrono::duration_cast<std::chrono::milliseconds>(done-start).count()<5050);
 }
+
+#endif
