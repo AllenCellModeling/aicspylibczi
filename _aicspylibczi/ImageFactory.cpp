@@ -130,7 +130,8 @@ namespace pylibczi {
 
       size_t mem_index = 0;
 
-      std::shared_ptr<Image> image = s_pixelToImageConstructor[pixelType](shape, pixelType, plane_coordinate_, box_,
+      auto imageFactoryFunction = s_pixelToImageConstructor[pixelType];
+      std::shared_ptr<Image> image = imageFactoryFunction(shape, pixelType, plane_coordinate_, box_,
           m_imgContainer.get(), mem_index_, index_m_);
       if (image==nullptr)
           throw std::bad_alloc();

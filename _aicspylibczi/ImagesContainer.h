@@ -28,7 +28,7 @@ namespace pylibczi {
 
       template<typename T>
       ImagesContainer<T>* getBaseAsTyped(void)
-      {   // this has to be static_cast because of the templating and the polymorphism 
+      {   // this has to be static_cast because of the templating and the polymorphism
           return static_cast< ImagesContainer<T> *>(this);
       }
 
