@@ -11,14 +11,14 @@ namespace pybind11 {
     template<> struct type_caster<pylibczi::ImagesContainerBase::ImagesContainerBasePtr> {
     public:
         /**
-         * This macro establishes the name pylibczi::ImageVector  in
+         * This macro establishes the name pylibczi::ImageContainerBasePtr in
          * function signatures and declares a local variable
-         * 'value' of type pylibczi::ImageVector
+         * 'value' of type pylibczi::ImageContainerBasePtr
          */
     PYBIND11_TYPE_CASTER(pylibczi::ImagesContainerBase::ImagesContainerBasePtr, _("numpy.ndarray"));
 
         /**
-         * Conversion part 1 (Python->C++): convert a PyObject( numpy.ndarray ) into an ImageVector
+         * Conversion part 1 (Python->C++): convert a PyObject( numpy.ndarray ) into an ImageContainerBasePtr
          * instance or return false upon failure. The second argument
          * indicates whether implicit conversions should be applied.
          */
@@ -40,7 +40,7 @@ namespace pybind11 {
          */
         static handle cast(pylibczi::ImagesContainerBase::ImagesContainerBasePtr src_, return_value_policy /* policy */, handle /* parent */)
         {
-            return pb_helpers::packArray(src_);
+            return pb_helpers::packArray(src_);  // the helper takes the ImagesContainerBasePtr and converts it to a numpy ndarray
         }
     };
   }

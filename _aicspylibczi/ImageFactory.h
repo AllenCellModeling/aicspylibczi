@@ -19,7 +19,7 @@ namespace pylibczi {
                                > >;
       using SplitCtorMap = std::map<libCZI::PixelType, std::function<std::shared_ptr<Image>( std::shared_ptr<Image> img_, int channel_) > >;
 
-      static CtorMap s_pixelToImage;
+      static CtorMap s_pixelToImageConstructor;
 
       ImagesContainerBase::ImagesContainerBasePtr m_imgContainer;
 

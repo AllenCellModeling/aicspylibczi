@@ -5,7 +5,7 @@
 
 namespace pylibczi {
 
-  ImageFactory::CtorMap ImageFactory::s_pixelToImage{
+  ImageFactory::CtorMap ImageFactory::s_pixelToImageConstructor{
       {PixelType::Gray8,
        [](std::vector<size_t> shape_, PixelType pixel_type_, const libCZI::CDimCoordinate* plane_coordinate_, libCZI::IntRect box_,
            ImagesContainerBase* bptr, size_t mem_index_, int index_m_) {
@@ -130,7 +130,7 @@ namespace pylibczi {
 
       size_t mem_index = 0;
 
-      std::shared_ptr<Image> image = s_pixelToImage[pixelType](shape, pixelType, plane_coordinate_, box_,
+      std::shared_ptr<Image> image = s_pixelToImageConstructor[pixelType](shape, pixelType, plane_coordinate_, box_,
           m_imgContainer.get(), mem_index_, index_m_);
       if (image==nullptr)
           throw std::bad_alloc();
@@ -142,6 +142,16 @@ namespace pylibczi {
 
   std::vector< std::pair< char, size_t> >
   ImageFactory::getFixedShape(void){
+      /*!
+       * @brief In order to deal with the BGR images in a way that doesn't cause bad API behavior the solution I landed
+       * upon was to use the CZI dims. What I mean by this is that if queried about the shape of a BGR image treat the
+       * BRG channel as 1 although it's actually 3 channels packed together. This function is then for internal used
+       * as it expands BGR images by multiplying C by 3. This is different than the shape that is returned but is needed
+       * in order to tell numpy the shape of the ndarray memory.
+       *
+       * This will result in an API change in that shape of a BRG image would come back with 7 channels for example but
+       * the numpy ndarray will have 21 channels.
+       */
       auto images = m_imgContainer->images();
       images.sort();
       auto charSizes = images.getShape();
@@ -151,8 +161,8 @@ namespace pylibczi {
           auto ittr = find_if(charSizes.begin(), charSizes.end(), [](std::pair<char, size_t> &pr){
               return (pr.first == 'C');
           });
-          if( ittr != charSizes.end()) ittr->second *=3;
-          else {
+          if( ittr != charSizes.end()) ittr->second *=3; // scale the C channel by 3 because we're expanding it
+          else { // There's an implicit C channel so add it and set it to 3
               charSizes.push_back(std::pair<char, size_t>('C', 3));
               std::sort(charSizes.begin(), charSizes.end(), [&](std::pair<char, size_t> a_, std::pair<char, size_t> b_) {
                   return libCZI::Utils::CharToDimension(a_.first)>libCZI::Utils::CharToDimension(b_.first);

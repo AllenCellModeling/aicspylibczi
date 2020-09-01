@@ -29,7 +29,7 @@ namespace pylibczi {
       template<typename T>
       ImagesContainer<T>* getBaseAsTyped(void)
       {
-          return static_cast< ImagesContainer<T>*>(this);
+          return dynamic_cast< ImagesContainer<T>*>(this);
       }
 
       void addImage( std::shared_ptr<Image> img_){ m_images.push_back(img_); }
