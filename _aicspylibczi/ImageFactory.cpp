@@ -135,9 +135,8 @@ namespace pylibczi {
       if (image==nullptr)
           throw std::bad_alloc();
       image->loadImage(bitmap_ptr_, channels);
-      auto sImage = std::shared_ptr<Image>(image);
-      m_imgContainer->addImage(sImage);
-      return sImage;
+      m_imgContainer->addImage(image);
+      return image;
   }
 
   std::vector< std::pair< char, size_t> >
