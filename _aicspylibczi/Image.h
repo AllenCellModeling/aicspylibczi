@@ -70,6 +70,7 @@ namespace pylibczi {
 
       virtual void loadImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_ptr_, size_t channels_) = 0;
 
+      virtual ~Image() {}
   };
 
   template<typename T>
