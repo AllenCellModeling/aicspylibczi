@@ -20,6 +20,8 @@ namespace pylibczi {
           libCZI::PixelType pixel_type_ = libCZI::PixelType::Invalid)
           :m_planeCoordinate(plane_), m_pixelType(pixel_type_), m_indexM(index_m_), m_isMosaic(is_mosaic_) { }
 
+      virtual ~SubblockSortable() { }
+
       const libCZI::CDimCoordinate* coordinatePtr() const { return &m_planeCoordinate; }
 
       int mIndex() const { return m_indexM; }
