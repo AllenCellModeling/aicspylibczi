@@ -404,7 +404,7 @@ namespace pylibczi {
 
       size_t pixels_in_image = m_statistics.boundingBoxLayer0Only.w*m_statistics.boundingBoxLayer0Only.h*bgrScaling;
       ImageFactory imageFactory(m_pixelType, pixels_in_image);
-      auto image = imageFactory.constructImage(multiTileComposite, &plane_coord_, im_box_, 0, -1);
+      imageFactory.constructImage(multiTileComposite, &plane_coord_, im_box_, 0, -1);
       // set is mosaic?
       return imageFactory.transferMemoryContainer();
   }
