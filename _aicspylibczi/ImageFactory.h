@@ -28,7 +28,7 @@ namespace pylibczi {
       : m_imgContainer(ImagesContainerBase::getTypedAsBase(pixel_type_, pixels_in_all_images_))
       {}
 
-      ImagesContainerBase::ImagesContainerBasePtr returnMemory(void){
+      ImagesContainerBase::ImagesContainerBasePtr transferMemoryContainer(void){
           return std::move(m_imgContainer); // this should empty m_imgContainer
       }
 

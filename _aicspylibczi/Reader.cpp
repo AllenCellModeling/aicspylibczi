@@ -280,7 +280,7 @@ namespace pylibczi {
           throw pylibczi::CdimSelectionZeroImagesException(plane_coord_, m_statistics.dimBounds, "No pyramid0 selectable subblocks.");
       }
       auto charShape = imageFactory.getFixedShape();
-      return std::make_pair(imageFactory.returnMemory(), charShape);
+      return std::make_pair(imageFactory.transferMemoryContainer(), charShape);
   }
 
   SubblockMetaVec
@@ -411,7 +411,7 @@ namespace pylibczi {
       ImageFactory imageFactory(m_pixelType, pixels_in_image);
       auto image = imageFactory.constructImage(multiTileComposite, &plane_coord_, im_box_, 0, -1);
       // set is mosaic?
-      return imageFactory.returnMemory();
+      return imageFactory.transferMemoryContainer();
   }
 
 }
