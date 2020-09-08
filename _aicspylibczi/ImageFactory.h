@@ -17,7 +17,7 @@ namespace pylibczi {
                                    libCZI::IntRect box_, ImagesContainerBase* bptr,
                                    size_t img_index_, int mIndex_)
                                > >;
-      using SplitCtorMap = std::map<libCZI::PixelType, std::function<std::shared_ptr<Image>( std::shared_ptr<Image> img_, int channel_) > >;
+      using SplitCtorMap = std::map<libCZI::PixelType, std::function<std::shared_ptr<Image>(std::shared_ptr<Image> img_, int channel_)> >;
 
       static CtorMap s_pixelToImageConstructor;
 
@@ -25,14 +25,14 @@ namespace pylibczi {
 
   public:
       ImageFactory(libCZI::PixelType pixel_type_, size_t pixels_in_all_images_)
-      : m_imgContainer(ImagesContainerBase::getTypedAsBase(pixel_type_, pixels_in_all_images_))
-      {}
+          :m_imgContainer(ImagesContainerBase::getTypedAsBase(pixel_type_, pixels_in_all_images_)) { }
 
-      ImagesContainerBase::ImagesContainerBasePtr transferMemoryContainer(void){
+      ImagesContainerBase::ImagesContainerBasePtr transferMemoryContainer(void)
+      {
           return std::move(m_imgContainer); // this should empty m_imgContainer
       }
 
-      size_t numberOfImages(void){ return m_imgContainer->numberOfImages(); }
+      size_t numberOfImages(void) { return m_imgContainer->numberOfImages(); }
 
       static size_t sizeOfPixelType(PixelType pixel_type_);
 
@@ -41,7 +41,7 @@ namespace pylibczi {
       void setMosaic(bool val_) { m_imgContainer->images().setMosaic(val_); }
 
       template<typename T>
-      static std::shared_ptr< TypedImage<T> >
+      static std::shared_ptr<TypedImage<T> >
       getDerived(std::shared_ptr<Image> image_ptr_)
       {
           if (!image_ptr_->isTypeMatch<T>())

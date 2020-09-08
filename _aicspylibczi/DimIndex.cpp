@@ -1,8 +1,9 @@
 #include "DimIndex.h"
 
-namespace pylibczi{
-  char dimIndexToChar(DimIndex index_){
-      switch(index_){
+namespace pylibczi {
+  char dimIndexToChar(DimIndex index_)
+  {
+      switch (index_) {
       case DimIndex::X: return 'X';
       case DimIndex::Y: return 'Y';
       case DimIndex::Z: return 'Z';
@@ -21,29 +22,42 @@ namespace pylibczi{
 
   DimIndex charToDimIndex(char c_)
   {
-      switch (c_)
-      {
-      case 'x':case'X': return DimIndex::X;
-      case 'y':case'Y': return DimIndex::Y;
-      case 'z':case'Z': return DimIndex::Z;
-      case 'c':case'C': return DimIndex::C;
-      case 't':case'T': return DimIndex::T;
-      case 'r':case'R': return DimIndex::R;
-      case 'm':case'M': return DimIndex::M;
-      case 's':case'S': return DimIndex::S;
-      case 'i':case'I': return DimIndex::I;
-      case 'h':case'H': return DimIndex::H;
-      case 'v':case'V': return DimIndex::V;
-      case 'b':case'B': return DimIndex::B;
+      switch (c_) {
+      case 'x':
+      case 'X': return DimIndex::X;
+      case 'y':
+      case 'Y': return DimIndex::Y;
+      case 'z':
+      case 'Z': return DimIndex::Z;
+      case 'c':
+      case 'C': return DimIndex::C;
+      case 't':
+      case 'T': return DimIndex::T;
+      case 'r':
+      case 'R': return DimIndex::R;
+      case 'm':
+      case 'M': return DimIndex::M;
+      case 's':
+      case 'S': return DimIndex::S;
+      case 'i':
+      case 'I': return DimIndex::I;
+      case 'h':
+      case 'H': return DimIndex::H;
+      case 'v':
+      case 'V': return DimIndex::V;
+      case 'b':
+      case 'B': return DimIndex::B;
       default: return DimIndex::invalid;
       }
   }
 
-  libCZI::DimensionIndex dimIndexToDimensionIndex(DimIndex index_){
+  libCZI::DimensionIndex dimIndexToDimensionIndex(DimIndex index_)
+  {
       return libCZI::Utils::CharToDimension(dimIndexToChar(index_));
   }
 
-  DimIndex dimensionIndexToDimIndex(libCZI::DimensionIndex index_){
+  DimIndex dimensionIndexToDimIndex(libCZI::DimensionIndex index_)
+  {
       return charToDimIndex(libCZI::Utils::DimensionToChar(index_));
   }
 

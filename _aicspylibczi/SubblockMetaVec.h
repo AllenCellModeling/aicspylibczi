@@ -14,11 +14,12 @@
 
 namespace pylibczi {
 
-  class SubblockString : public SubblockSortable {
+  class SubblockString: public SubblockSortable {
       std::string m_string;
   public:
-      SubblockString(const libCZI::CDimCoordinate *plane_, int index_m_, bool is_mosaic_, char* str_p_, size_t str_size_)
-      :SubblockSortable(plane_, index_m_, is_mosaic_), m_string(str_p_, str_size_) {
+      SubblockString(const libCZI::CDimCoordinate* plane_, int index_m_, bool is_mosaic_, char* str_p_, size_t str_size_)
+          :SubblockSortable(plane_, index_m_, is_mosaic_), m_string(str_p_, str_size_)
+      {
           //clear string from garbage symbols
           std::regex lthan("&lt;"), gthan("&gt;"), spce("\\s*\\r\\n\\s*");
           std::regex metatag("</METADATA>.*"), quote("\\\"");
@@ -32,22 +33,25 @@ namespace pylibczi {
       std::string getString() const { return m_string; }
   };
 
-  class SubblockMetaVec: public std::vector< SubblockString > {
+  class SubblockMetaVec: public std::vector<SubblockString> {
       bool m_isMosaic = false;
   public:
-      SubblockMetaVec(): std::vector< SubblockString >() {}
+      SubblockMetaVec()
+          :std::vector<SubblockString>() { }
 
-      void setMosaic(bool mosaic_){ m_isMosaic = mosaic_; }
+      void setMosaic(bool mosaic_) { m_isMosaic = mosaic_; }
 
-      void sort(){
-          std::sort(begin(), end(), [](SubblockString& a_, SubblockString& b_)->bool{
-              return a_ < b_;
+      void sort()
+      {
+          std::sort(begin(), end(), [](SubblockString& a_, SubblockString& b_) -> bool {
+              return a_<b_;
           });
       }
 
       std::vector<std::pair<char, size_t> >
-      getShape(){
-          std::vector< std::map<char, size_t> > validIndexes;
+      getShape()
+      {
+          std::vector<std::map<char, size_t> > validIndexes;
           for (const auto& image : *this) {
               validIndexes.push_back(image.getValidIndexes(m_isMosaic)); // only add M if it's a mosaic file
           }
@@ -57,18 +61,18 @@ namespace pylibczi {
           std::vector<std::pair<char, size_t> > charSizes;
           std::map<char, std::set<size_t> > charSetSize;
           std::map<char, std::set<size_t> >::iterator found;
-          for( const auto& validMap : validIndexes){
-              for( auto keySet : validMap) {
+          for (const auto& validMap : validIndexes) {
+              for (auto keySet : validMap) {
                   found = charSetSize.emplace(keySet.first, std::set<size_t>()).first;
                   found->second.insert(keySet.second);
               }
           }
-          for( auto keySet : charSetSize){
+          for (auto keySet : charSetSize) {
               charSizes.emplace_back(keySet.first, keySet.second.size());
           }
           // sort them into descending DimensionIndex Order
-          std::sort(charSizes.begin(), charSizes.end(), [&](std::pair<char, size_t> a_, std::pair<char, size_t> b_){
-              return libCZI::Utils::CharToDimension(a_.first) > libCZI::Utils::CharToDimension(b_.first);
+          std::sort(charSizes.begin(), charSizes.end(), [&](std::pair<char, size_t> a_, std::pair<char, size_t> b_) {
+              return libCZI::Utils::CharToDimension(a_.first)>libCZI::Utils::CharToDimension(b_.first);
           });
           return charSizes;
       }

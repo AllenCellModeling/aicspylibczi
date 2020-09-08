@@ -93,7 +93,7 @@ namespace pylibczi {
       using DimIndexRangeMap = std::map<DimIndex, std::pair<int, int> >;
       using DimensionRangeMap = std::map<char, std::pair<int, int> >;
       using Shape = std::vector<std::pair<char, size_t> >;
-      using DimsShape = std::vector< DimIndexRangeMap >;
+      using DimsShape = std::vector<DimIndexRangeMap>;
 
       /*!
        * @brief Construct the Reader and load the file statistics (dimensions etc)
@@ -200,7 +200,7 @@ namespace pylibczi {
        * @param plane_coord_ A structure containing the Dimension constraints
        * @param index_m_ Is only relevant for mosaic files, if you wish to select one frame.
        */
-      std::pair<ImagesContainerBase::ImagesContainerBasePtr, std::vector< std::pair<char, size_t> > >
+      std::pair<ImagesContainerBase::ImagesContainerBasePtr, std::vector<std::pair<char, size_t> > >
       readSelected(libCZI::CDimCoordinate& plane_coord_, int index_m_ = -1);
 
       /*!
@@ -279,9 +279,10 @@ namespace pylibczi {
        */
       libCZI::IntRect getSceneYXSize(int scene_index_ = -1);
 
-      std::string pixelType() {
+      std::string pixelType()
+      {
           // each subblock can apparently have a different pixelType 🙄
-          if(m_pixelType == libCZI::PixelType::Invalid) m_pixelType = getFirstPixelType();
+          if (m_pixelType==libCZI::PixelType::Invalid) m_pixelType = getFirstPixelType();
           return libCZI::Utils::PixelTypeToInformalString(m_pixelType);
       }
 
@@ -294,7 +295,7 @@ namespace pylibczi {
           return (info_.logicalRect.w==info_.physicalSize.w && info_.logicalRect.h==info_.physicalSize.h);
       }
 
-      void getMemory(SubblockIndexVec & matches_);
+      void getMemory(SubblockIndexVec& matches_);
 
       static bool isValidRegion(const libCZI::IntRect& in_box_, const libCZI::IntRect& czi_box_);
 

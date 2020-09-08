@@ -18,23 +18,23 @@ namespace pylibczi {
        [](std::vector<size_t> shape_, PixelType pixel_type_, const libCZI::CDimCoordinate* plane_coordinate_, libCZI::IntRect box_,
            ImagesContainerBase* bptr, size_t mem_index_, int index_m_) {
            auto typedPtr = bptr->getBaseAsTyped<uint8_t>();
-           return std::shared_ptr<TypedImage<uint8_t>>( new TypedImage<uint8_t>(std::move(shape_), PixelType::Gray8,
-                   plane_coordinate_, box_, typedPtr->getPointerAtIndex(mem_index_), index_m_
-                   ));
+           return std::shared_ptr<TypedImage<uint8_t>>(new TypedImage<uint8_t>(std::move(shape_), PixelType::Gray8,
+               plane_coordinate_, box_, typedPtr->getPointerAtIndex(mem_index_), index_m_
+           ));
        }},
       {PixelType::Gray16,
        [](std::vector<size_t> shape_, PixelType pixel_type_, const libCZI::CDimCoordinate* plane_coordinate_, libCZI::IntRect box_,
            ImagesContainerBase* bptr, size_t mem_index_, int index_m_) {
            auto typedPtr = bptr->getBaseAsTyped<uint16_t>();
-           return std::shared_ptr<TypedImage<uint16_t>>( new TypedImage<uint16_t>(std::move(shape_), pixel_type_,
-                   plane_coordinate_, box_, typedPtr->getPointerAtIndex(mem_index_), index_m_
-                   ));
+           return std::shared_ptr<TypedImage<uint16_t>>(new TypedImage<uint16_t>(std::move(shape_), pixel_type_,
+               plane_coordinate_, box_, typedPtr->getPointerAtIndex(mem_index_), index_m_
+           ));
        }},
       {PixelType::Gray32,
        [](std::vector<size_t> shape_, PixelType pixel_type_, const libCZI::CDimCoordinate* plane_coordinate_, libCZI::IntRect box_,
            ImagesContainerBase* bptr, size_t mem_index_, int index_m_) {
            auto typedPtr = bptr->getBaseAsTyped<uint32_t>();
-           return std::shared_ptr<TypedImage<uint32_t>>( new TypedImage<uint32_t>(std::move(shape_), pixel_type_,
+           return std::shared_ptr<TypedImage<uint32_t>>(new TypedImage<uint32_t>(std::move(shape_), pixel_type_,
                plane_coordinate_, box_, typedPtr->getPointerAtIndex(mem_index_), index_m_
            ));
        }},
@@ -42,25 +42,25 @@ namespace pylibczi {
        [](std::vector<size_t> shape_, PixelType pixel_type_, const libCZI::CDimCoordinate* plane_coordinate_, libCZI::IntRect box_,
            ImagesContainerBase* bptr, size_t mem_index_, int index_m_) {
            auto typedPtr = bptr->getBaseAsTyped<uint16_t>();
-           return std::shared_ptr<TypedImage<uint16_t>>( new TypedImage<uint16_t>(std::move(shape_), PixelType::Gray16,
-                   plane_coordinate_, box_, typedPtr->getPointerAtIndex(mem_index_), index_m_
-                   ));
+           return std::shared_ptr<TypedImage<uint16_t>>(new TypedImage<uint16_t>(std::move(shape_), PixelType::Gray16,
+               plane_coordinate_, box_, typedPtr->getPointerAtIndex(mem_index_), index_m_
+           ));
        }},
       {PixelType::Gray32Float,
        [](std::vector<size_t> shape_, PixelType pixel_type_, const libCZI::CDimCoordinate* plane_coordinate_, libCZI::IntRect box_,
            ImagesContainerBase* bptr, size_t mem_index_, int index_m_) {
            auto typedPtr = bptr->getBaseAsTyped<float>();
-           return std::shared_ptr<TypedImage<float>>( new TypedImage<float>(std::move(shape_), pixel_type_,
+           return std::shared_ptr<TypedImage<float>>(new TypedImage<float>(std::move(shape_), pixel_type_,
                plane_coordinate_, box_, typedPtr->getPointerAtIndex(mem_index_), index_m_
-               ));
+           ));
        }},
       {PixelType::Bgr96Float,
        [](std::vector<size_t> shape_, PixelType pixel_type_, const libCZI::CDimCoordinate* plane_coordinate_, libCZI::IntRect box_,
            ImagesContainerBase* bptr, size_t mem_index_, int index_m_) {
            auto typedPtr = bptr->getBaseAsTyped<float>();
-           return std::shared_ptr<TypedImage<float>>( new TypedImage<float>(std::move(shape_), PixelType::Gray32Float,
+           return std::shared_ptr<TypedImage<float>>(new TypedImage<float>(std::move(shape_), PixelType::Gray32Float,
                plane_coordinate_, box_, typedPtr->getPointerAtIndex(mem_index_), index_m_
-               ));
+           ));
        }}
   };
 
@@ -122,8 +122,9 @@ namespace pylibczi {
       return image;
   }
 
-  std::vector< std::pair< char, size_t> >
-  ImageFactory::getFixedShape(void){
+  std::vector<std::pair<char, size_t> >
+  ImageFactory::getFixedShape(void)
+  {
       /*!
        * @brief In order to deal with the BGR images in a way that doesn't cause bad API behavior the solution I landed
        * upon was to use the CZI dims. What I mean by this is that if queried about the shape of a BGR image treat the
@@ -137,13 +138,13 @@ namespace pylibczi {
       auto images = m_imgContainer->images();
       images.sort();
       auto charSizes = images.getShape();
-      if( m_imgContainer->pixelType() == libCZI::PixelType::Bgr24 ||
-          m_imgContainer->pixelType() == libCZI::PixelType::Bgr48 ||
-          m_imgContainer->pixelType() == libCZI::PixelType::Bgr96Float ){
-          auto ittr = find_if(charSizes.begin(), charSizes.end(), [](std::pair<char, size_t> &pr){
-              return (pr.first == 'C');
+      if (m_imgContainer->pixelType()==libCZI::PixelType::Bgr24 ||
+          m_imgContainer->pixelType()==libCZI::PixelType::Bgr48 ||
+          m_imgContainer->pixelType()==libCZI::PixelType::Bgr96Float) {
+          auto ittr = find_if(charSizes.begin(), charSizes.end(), [](std::pair<char, size_t>& pr) {
+              return (pr.first=='C');
           });
-          if( ittr != charSizes.end()) ittr->second *=3; // scale the C channel by 3 because we're expanding it
+          if (ittr!=charSizes.end()) ittr->second *= 3; // scale the C channel by 3 because we're expanding it
           else { // There's an implicit C channel so add it and set it to 3
               charSizes.push_back(std::pair<char, size_t>('C', 3));
               std::sort(charSizes.begin(), charSizes.end(), [&](std::pair<char, size_t> a_, std::pair<char, size_t> b_) {

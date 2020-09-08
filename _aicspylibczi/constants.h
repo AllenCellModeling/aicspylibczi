@@ -8,7 +8,7 @@
 
 #include "inc_libCZI.h"
 
-namespace pylibczi{
+namespace pylibczi {
 
   struct Constants {
       using CziDi = libCZI::DimensionIndex;

@@ -26,7 +26,7 @@ namespace pylibczi {
    * one subblock which may be either 2D or 3D, in the case of 3D the data is then later split into multiple 2D Image<T> so that
    * the concept of a Channel isn't destroyed.
    */
-  class Image : public SubblockSortable {
+  class Image: public SubblockSortable {
   protected:
       /*!
        * ImageBC holds the data describing the image (Image<T> inherits it). The m_matrixSizes can be 2D or 3D depending on
@@ -60,7 +60,6 @@ namespace pylibczi {
 
       libCZI::IntRect bBox() const { return m_xywh; }
 
-
       size_t length()
       {
           return std::accumulate(m_shape.begin(), m_shape.end(), (size_t) 1, std::multiplies<>());
@@ -70,7 +69,7 @@ namespace pylibczi {
 
       virtual void loadImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_ptr_, size_t channels_) = 0;
 
-      virtual ~Image() {}
+      virtual ~Image() { }
   };
 
   template<typename T>
@@ -90,48 +89,50 @@ namespace pylibczi {
 
   public:
       void setMosaic(bool val_) { m_isMosaic = val_; }
-      void sort(){
-          std::sort(begin(), end(), [](const std::shared_ptr<Image> &a_, const std::shared_ptr<Image> &b_)->bool{
-              return *a_ < *b_;
+      void sort()
+      {
+          std::sort(begin(), end(), [](const std::shared_ptr<Image>& a_, const std::shared_ptr<Image>& b_) -> bool {
+              return *a_<*b_;
           });
       }
 
-      std::vector< std::map<char, size_t> >
-      getImageDimsList(){
-          std::vector< std::map<char, size_t> > indexMap;
+      std::vector<std::map<char, size_t> >
+      getImageDimsList()
+      {
+          std::vector<std::map<char, size_t> > indexMap;
           for (const auto& image : *this) {
               indexMap.push_back(image->getValidIndexes(m_isMosaic)); // only add M if it's a mosaic file
           }
           return indexMap;
       }
 
-
       std::vector<std::pair<char, size_t> >
-      getShape(){
+      getShape()
+      {
 
-          std::vector< std::map<char, size_t> > validIndexes = getImageDimsList();
+          std::vector<std::map<char, size_t> > validIndexes = getImageDimsList();
 
           // TODO This code assumes the data is a matrix, meaning for example scene's have the same number of Z-slices
           // TODO is there another way to do this that could cope with variable data sizes within the matrix?
           std::vector<std::pair<char, size_t> > charSizes;
           std::map<char, std::set<size_t> > charSetSize;
           std::map<char, std::set<size_t> >::iterator found;
-          for( const auto& validMap : validIndexes){
-              for( auto keySet : validMap) {
+          for (const auto& validMap : validIndexes) {
+              for (auto keySet : validMap) {
                   found = charSetSize.emplace(keySet.first, std::set<size_t>()).first;
                   found->second.insert(keySet.second);
               }
           }
-          for( auto keySet : charSetSize){
+          for (auto keySet : charSetSize) {
               charSizes.emplace_back(keySet.first, keySet.second.size());
           }
           auto heightByWidth = front()->shape(); // assumption: images are the same shape, if not 🙃
           size_t hByWsize = heightByWidth.size();
-          charSizes.emplace_back('Y', heightByWidth[hByWsize - 2]); // H: 2 - 2 = 0 | 3 - 2 = 1
-          charSizes.emplace_back('X', heightByWidth[hByWsize - 1]); // W: 2 - 1 = 1 | 3 - 1 = 2
+          charSizes.emplace_back('Y', heightByWidth[hByWsize-2]); // H: 2 - 2 = 0 | 3 - 2 = 1
+          charSizes.emplace_back('X', heightByWidth[hByWsize-1]); // W: 2 - 1 = 1 | 3 - 1 = 2
           // sort them into decending DimensionIndex Order
-          std::sort(charSizes.begin(), charSizes.end(), [&](std::pair<char, size_t> a_, std::pair<char, size_t> b_){
-              return libCZI::Utils::CharToDimension(a_.first) > libCZI::Utils::CharToDimension(b_.first);
+          std::sort(charSizes.begin(), charSizes.end(), [&](std::pair<char, size_t> a_, std::pair<char, size_t> b_) {
+              return libCZI::Utils::CharToDimension(a_.first)>libCZI::Utils::CharToDimension(b_.first);
           });
           return charSizes;
       }

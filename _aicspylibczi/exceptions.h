@@ -83,7 +83,7 @@ namespace pylibczi {
   class ImageIteratorException: public std::exception {
       std::string m_message;
   public:
-      explicit ImageIteratorException(const std::string &message_)
+      explicit ImageIteratorException(const std::string& message_)
           :m_message("ImageIteratorException: "+message_) { }
 
       const char* what() const noexcept override
@@ -96,7 +96,7 @@ namespace pylibczi {
       std::string m_message;
       int m_channel;
   public:
-      ImageSplitChannelException(const std::string &message_, int channel_)
+      ImageSplitChannelException(const std::string& message_, int channel_)
           :m_message("ImageSplitChannelExcetion: "+message_), m_channel(channel_) { }
 
       const char* what() const noexcept override
@@ -129,13 +129,14 @@ namespace pylibczi {
   class CDimCoordinatesOverspecifiedException: public std::exception {
       std::string m_message;
   public:
-      explicit CDimCoordinatesOverspecifiedException(std::string message_): m_message(std::move(message_)) {}
+      explicit CDimCoordinatesOverspecifiedException(std::string message_)
+          :m_message(std::move(message_)) { }
 
       const char* what() const noexcept override
       {
           std::stringstream tmp;
           tmp << "The coordinates are overspecified = you have specified a Dimension or Dimension value that is not valid. "
-          << m_message << std::endl;
+              << m_message << std::endl;
           return tmp.str().c_str();
       }
   };
@@ -143,7 +144,8 @@ namespace pylibczi {
   class CDimCoordinatesUnderspecifiedException: public std::exception {
       std::string m_message;
   public:
-      explicit CDimCoordinatesUnderspecifiedException(std::string message_): m_message(std::move(message_)) {}
+      explicit CDimCoordinatesUnderspecifiedException(std::string message_)
+          :m_message(std::move(message_)) { }
 
       const char* what() const noexcept override
       {

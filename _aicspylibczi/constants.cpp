@@ -4,17 +4,16 @@
 namespace pylibczi {
 
   const std::initializer_list<Constants::CziDi>
-  Constants::s_sortOrder{Constants::CziDi::B,
-                         Constants::CziDi::V,
-                         Constants::CziDi::H,
-                         Constants::CziDi::I,
-                         Constants::CziDi::S,
-                         Constants::CziDi::R,
-                         Constants::CziDi::T,
-                         Constants::CziDi::C,
-                         Constants::CziDi::Z
+      Constants::s_sortOrder{Constants::CziDi::B,
+                             Constants::CziDi::V,
+                             Constants::CziDi::H,
+                             Constants::CziDi::I,
+                             Constants::CziDi::S,
+                             Constants::CziDi::R,
+                             Constants::CziDi::T,
+                             Constants::CziDi::C,
+                             Constants::CziDi::Z
   };
-
 
   bool
   Constants::dimsMatch(const libCZI::CDimCoordinate& target_dims_, const libCZI::CDimCoordinate& czi_dims_)

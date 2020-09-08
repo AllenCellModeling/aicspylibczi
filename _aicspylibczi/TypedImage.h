@@ -26,7 +26,7 @@ namespace pylibczi {
        * @param m_index_ The mosaic index for the image, this is only relevant if the file is a mosaic file.
        */
       TypedImage(std::vector<size_t> shape_, libCZI::PixelType pixel_type_, const libCZI::CDimCoordinate* plane_coordantes_,
-          libCZI::IntRect box_, T *mem_ptr_, int m_index_)
+          libCZI::IntRect box_, T* mem_ptr_, int m_index_)
           :Image(shape_, pixel_type_, plane_coordantes_, box_, m_index_),
            m_array(mem_ptr_)
       {
@@ -120,11 +120,12 @@ namespace pylibczi {
   // TODO: right thing to do but I'll likely have to come back and fix some of this.
   template<typename T>
   inline std::pair<T*, T*>
-  TypedImage<T>::channelPtrs(int channel_){
+  TypedImage<T>::channelPtrs(int channel_)
+  {
       std::pair<T*, T*> ans;
-      size_t planeSize = std::accumulate(m_shape.rbegin(), --(m_shape.rend()), 1, std::multiplies<size_t>() );
-      ans.first = m_array + channel_ * planeSize;
-      ans.second = ans.first + planeSize;
+      size_t planeSize = std::accumulate(m_shape.rbegin(), --(m_shape.rend()), 1, std::multiplies<size_t>());
+      ans.first = m_array+channel_*planeSize;
+      ans.second = ans.first+planeSize;
       return ans;
   }
 
