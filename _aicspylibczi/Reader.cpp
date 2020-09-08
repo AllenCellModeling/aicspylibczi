@@ -322,14 +322,9 @@ namespace pylibczi {
   Reader::getMatches(SubblockSortable& match_)
   {
       SubblockIndexVec ans;
-//      std::copy_if(m_orderMapping.begin(), m_orderMapping.end(), std::back_inserter(ans),
-//          [&match_](const SubblockIndexVec::value_type& a_) {
-//              return match_==a_.first;
-//          });
       m_czireader->EnumerateSubBlocks([&](int index_, const libCZI::SubBlockInfo& info_) -> bool {
           SubblockSortable subInfo(&(info_.coordinate), info_.mIndex, isMosaic(), info_.pixelType);
           if (isPyramid0(info_) && match_==subInfo) {
-              // std::cout << "match : " << *(match_.coordinatePtr()) << " adding: " << *(subInfo.coordinatePtr()) << std::endl;
               ans.emplace_back(std::pair<SubblockSortable, int>(subInfo, index_));
           }
           return true; // Enumerate through every subblock
