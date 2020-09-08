@@ -64,24 +64,6 @@ namespace pylibczi {
        }}
   };
 
-//  ImageFactory::SplitCtorMap ImageFactory::s_pixelToSplit{
-//      {PixelType::Bgr24,
-//       [](std::shared_ptr<Image> img_, int channel_) {
-//           return std::shared_ptr<TypedImage<uint8_t>>(
-//               new TypedImage<uint8_t>(ImageFactory::getDerived<uint8_t>(img_), libCZI::PixelType::Gray8, channel_));
-//       }},
-//      {PixelType::Bgr48,
-//       [](std::shared_ptr<Image> img_, int channel_) {
-//           return std::shared_ptr<TypedImage<uint16_t>>(
-//               new TypedImage<uint16_t>(ImageFactory::getDerived<uint16_t>(img_), libCZI::PixelType::Gray16, channel_));
-//       }},
-//      {PixelType::Bgr96Float,
-//       [](std::shared_ptr<Image> img_, int channel_) {
-//           return std::shared_ptr<TypedImage<float>>(
-//               new TypedImage<float>(ImageFactory::getDerived<float>(img_), libCZI::PixelType::Gray32Float, channel_));
-//       }}
-//  };
-
   size_t
   ImageFactory::sizeOfPixelType(PixelType pixel_type_)
   {
