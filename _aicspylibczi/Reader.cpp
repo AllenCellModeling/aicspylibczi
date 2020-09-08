@@ -244,7 +244,7 @@ namespace pylibczi {
       return ans;
   }
 
-  std::pair<ImagesContainerBase::ImagesContainerBasePtr, std::vector< std::pair<char, size_t> > >
+  std::pair<ImagesContainerBase::ImagesContainerBasePtr, std::vector<std::pair<char, size_t> > >
   Reader::readSelected(libCZI::CDimCoordinate& plane_coord_, int index_m_)
   {
       int pos;
@@ -270,7 +270,7 @@ namespace pylibczi {
               throw PixelTypeException(info.pixelType, "Selected subblocks have inconsistent PixelTypes."
                                                        " You must select subblocks with consistent PixelTypes.");
 
-          auto image = imageFactory.constructImage(subblock->CreateBitmap(),
+          imageFactory.constructImage(subblock->CreateBitmap(),
               &info.coordinate, info.logicalRect, memOffset, info.mIndex);
 
           memOffset += bgrScaling*w_by_h.w*w_by_h.h;
@@ -407,7 +407,7 @@ namespace pylibczi {
           scale_factor_,
           nullptr);   // use default options
 
-      size_t pixels_in_image = m_statistics.boundingBoxLayer0Only.w * m_statistics.boundingBoxLayer0Only.h * bgrScaling;
+      size_t pixels_in_image = m_statistics.boundingBoxLayer0Only.w*m_statistics.boundingBoxLayer0Only.h*bgrScaling;
       ImageFactory imageFactory(m_pixelType, pixels_in_image);
       auto image = imageFactory.constructImage(multiTileComposite, &plane_coord_, im_box_, 0, -1);
       // set is mosaic?
