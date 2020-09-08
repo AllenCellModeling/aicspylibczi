@@ -6,10 +6,9 @@
 #include <iostream>
 #include "CSimpleStreamImplFromFd.h"
 
-
 namespace pybind11 {
   namespace detail {
-    template<> struct type_caster< std::shared_ptr<libCZI::IStream> > {
+    template<> struct type_caster<std::shared_ptr<libCZI::IStream> > {
     public:
         /**
          * This macro establishes the name 'FILE *' in
