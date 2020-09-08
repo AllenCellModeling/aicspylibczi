@@ -53,7 +53,7 @@ namespace pylibczi {
        * @param jump_to_ an integer offset from the beginning of the array.
        * @return a pointer to the internally managed memory. Image maintains ownership!
        */
-      T* getRawPtr(int jump_to_ = 0) { return m_array+jump_to_; }
+      T* getRawPtr(size_t jump_to_ = 0) { return m_array+jump_to_; }
 
       /*!
        * return a pointer to the specified memory poisiton
