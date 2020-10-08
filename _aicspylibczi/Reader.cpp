@@ -172,7 +172,10 @@ namespace pylibczi {
               });
               if (isMosaic()) definedDims[DimIndex::M].emplace(x.first.mIndex());
           }
-          for (auto x : definedDims) tbl.emplace(x.first, std::make_pair(*x.second.begin(), *x.second.rbegin()+1));
+          for (auto x : definedDims)
+            tbl.emplace(
+              x.first,
+              std::make_pair(*x.second.begin(), *x.second.rbegin() + 1));
 
           auto xySize = getSceneYXSize(scene_index_);
           tbl.emplace(DimIndex::Y, std::make_pair(0, xySize.h));
@@ -181,38 +184,50 @@ namespace pylibczi {
       return tbl;
   }
 
-  libCZI::IntRect
-  Reader::getSceneYXSize(int scene_index_)
+  std::vector<libCZI::IntRect>
+  Reader::getAllSceneYXSize(int scene_index_, bool get_all_matches_)
   {
-      bool hasScene = m_statistics.dimBounds.IsValid(libCZI::DimensionIndex::S);
-      if (!isMosaic() && hasScene) {
-          int sStart(0), sSize(0);
-          m_statistics.dimBounds.TryGetInterval(libCZI::DimensionIndex::S, &sStart, &sSize);
-          if (scene_index_>=sStart && (sStart+sSize-1)>=scene_index_
-              && !m_statistics.sceneBoundingBoxes.empty())
-              return m_statistics.sceneBoundingBoxes[scene_index_].boundingBoxLayer0;
+    std::vector<libCZI::IntRect> result;
+    bool hasScene = m_statistics.dimBounds.IsValid(libCZI::DimensionIndex::S);
+    if (!isMosaic() && hasScene) {
+      int sStart(0), sSize(0);
+      m_statistics.dimBounds.TryGetInterval(
+        libCZI::DimensionIndex::S, &sStart, &sSize);
+      if (scene_index_ >= sStart && (sStart + sSize - 1) >= scene_index_ &&
+          !m_statistics.sceneBoundingBoxes.empty()) {
+        result.emplace_back(
+          m_statistics.sceneBoundingBoxes[scene_index_].boundingBoxLayer0);
+        return result;
       }
-      int embeddedSceneIndex = 0;
-      for (const auto& x : m_orderMapping) {
-          if (hasScene) {
-              x.first.coordinatePtr()->TryGetPosition(libCZI::DimensionIndex::S, &embeddedSceneIndex);
-              if (embeddedSceneIndex==scene_index_) {
-                  int index = x.second;
-                  auto subblk = m_czireader->ReadSubBlock(index);
-                  auto sbkInfo = subblk->GetSubBlockInfo();
-                  return sbkInfo.logicalRect;
-              }
-          }
+    }
+    int embeddedSceneIndex = 0;
+    for (const auto& x : m_orderMapping) {
+      if (hasScene) {
+        x.first.coordinatePtr()->TryGetPosition(libCZI::DimensionIndex::S,
+                                                &embeddedSceneIndex);
+        if (embeddedSceneIndex == scene_index_) {
+          int index = x.second;
+          auto subblk = m_czireader->ReadSubBlock(index);
+          auto sbkInfo = subblk->GetSubBlockInfo();
+          result.emplace_back(sbkInfo.logicalRect);
+          if (!get_all_matches_)
+            return result;
+        }
       }
+    }
+    if (hasScene && !result.empty())
+      return result;
 
-      libCZI::IntRect lRect;
-      m_czireader->EnumerateSubBlocks([&lRect](int index, const libCZI::SubBlockInfo& info) -> bool {
-          if (!isPyramid0(info)) return true;
+    m_czireader->EnumerateSubBlocks(
+      [&result, get_all_matches_](int index,
+                                  const libCZI::SubBlockInfo& info) -> bool {
+        if (!isPyramid0(info))
+          return true;
 
-          lRect = info.logicalRect;
-          return false;
+        result.emplace_back(info.logicalRect);
+        return get_all_matches_;
       });
-      return lRect;
+    return result;
   }
 
   libCZI::PixelType
