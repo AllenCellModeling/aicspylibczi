@@ -22,8 +22,6 @@ namespace pylibczi {
       m_statistics = m_czireader->GetStatistics();
       m_pixelType = libCZI::PixelType::Invalid; // get the pixeltype of the first readable subblock
 
-      // create a reference for finding one or more subblock indices from a CDimCoordinate
-      // addOrderMapping(); // populate m_orderMapping
       checkSceneShapes();
   }
 
@@ -200,8 +198,15 @@ namespace pylibczi {
         return result;
       }
     }
+
+    libCZI::CDimCoordinate scene_coord; // default constructor
+    if(hasScene && scene_index_ >= 0)
+      scene_coord = libCZI::CDimCoordinate({{libCZI::DimensionIndex::S, scene_index_}});
+    SubblockSortable subblocksToFind(&scene_coord, -1, false);
+    SubblockIndexVec matches = getMatches(subblocksToFind);
+
     int embeddedSceneIndex = 0;
-    for (const auto& x : m_orderMapping) {
+    for (const auto& x : matches) {
       if (hasScene) {
         x.first.coordinatePtr()->TryGetPosition(libCZI::DimensionIndex::S,
                                                 &embeddedSceneIndex);

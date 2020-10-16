@@ -84,14 +84,12 @@ namespace pylibczi {
 
       std::shared_ptr<CCZIReader> m_czireader; // required for cast in libCZI
       libCZI::SubBlockStatistics m_statistics;
-      std::vector<std::pair<SubblockSortable, int> > m_orderMapping;
       libCZI::PixelType m_pixelType;
       bool m_specifyScene;
 
   public:
       using SubblockIndexVec = std::vector<std::pair<SubblockSortable, int> >;
       using DimIndexRangeMap = std::map<DimIndex, std::pair<int, int> >;
-      using DimensionRangeMap = std::map<char, std::pair<int, int> >;
       using Shape = std::vector<std::pair<char, size_t> >;
       using DimsShape = std::vector<DimIndexRangeMap>;
 

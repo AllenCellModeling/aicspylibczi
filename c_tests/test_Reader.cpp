@@ -63,6 +63,16 @@ public:
   pylibczi::Reader* get() { return m_czi.get(); }
 };
 
+class CziCreatorBigM
+{
+  std::unique_ptr<pylibczi::Reader> m_czi;
+
+public:
+  CziCreatorBigM()
+    : m_czi(new pylibczi::Reader(L"/Users/jamies/Data/20190614_C01_001.czi"))
+  {}
+  pylibczi::Reader* get() { return m_czi.get(); }
+};
 #endif
 
 class CziCreator4
@@ -504,6 +514,7 @@ TEST_CASE_METHOD(CziBgrCreator2, "test_bgr_7channel", "[Reader_bgr_7channel]")
   REQUIRE(shape == shapeAns);
 }
 
+
 #ifdef LOCAL_TEST
 
 TEST_CASE_METHOD(CziCreatorBig, "test_big_czifile", "[Reader_timed_read]")
@@ -538,5 +549,18 @@ TEST_CASE_METHOD(CziCreatorBig, "test_big_czifile", "[Reader_timed_read]")
   REQUIRE(std::chrono::duration_cast<std::chrono::milliseconds>(done - start)
             .count() < 5050);
 }
+
+TEST_CASE_METHOD(CziCreatorBigM, "test_bigm_czifile", "[Reader_bbox]"){
+  auto czi = get();
+  auto dSizes = czi->dimSizes();
+
+  auto ans = czi->getAllSceneYXSize(0, true);
+  assert(ans.size() == 88); // 2 channels * 44 m_index
+  assert(ans[2].x == 22739);
+  assert(ans[2].y == 19201);
+  assert(ans[2].w == 950);
+  assert(ans[2].h == 650);
+}
+
 
 #endif

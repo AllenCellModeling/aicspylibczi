@@ -163,13 +163,14 @@ class CziFile(object):
 
     def mosaic_scene_bounding_boxes(self, index: int = -1):
         """
-        Get the bounding boxes of the raw collected data (pyramid 0) from the mosaic czifile. if not specified it
-        defaults to the first scene
+        Get the bounding boxes of the raw collected data (pyramid 0) from the mosaic czifile.
+        This retrieves all pyramid 0 bounding boxes if the scene is not defined in the file or if the user
+        calls the function with the default index value.
 
         Parameters
         ----------
         index
-             the scene index, omit and it defaults to the first one
+             the scene index, omit and it defaults to all
 
         Returns
         -------
