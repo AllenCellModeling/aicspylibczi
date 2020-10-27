@@ -282,10 +282,11 @@ def test_cores_arg():
 @pytest.mark.parametrize("fname, s_index, m_index, expected", [
     ('s_3_t_1_c_3_z_5.czi', 0, -1, [(39850, 35568, 475, 325)]),
     ('mosaic_test.czi', 0, 0, [(0, 0, 924, 624), (832, 0, 924, 624)]),
+    ('Multiscene_CZI_3Scenes.czi', 0, 0, [(495412, 354694, 256, 256), (495643, 354694, 256, 256),
+                                          (495643, 354924, 256, 256), (495412, 354924, 256, 256)])
 ])
 def test_mosaic_subblock_rect(data_dir, fname, s_index, m_index, expected):
     with open(data_dir / fname, 'rb') as fp:
         czi = CziFile(czi_filename=fp)
         data = czi.mosaic_scene_bounding_boxes(s_index)
-        print(data)
         assert data == expected
