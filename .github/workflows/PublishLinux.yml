@@ -17,9 +17,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install twine
       - name: Build manylinux Python wheels
-        uses: RalfG/python-wheels-manylinux-build@v0.3.1-pypywheels/manylinux2010-pypy_x86_64:latest
+        uses: RalfG/python-wheels-manylinux-build@v0.3.1-manylinux2010_x86_64
         with:
           python-versions: 'cp37-cp37m'
+          system-packages: 'gcc.x86_64'
           build-requirements: 'cython numpy make cmake==3.17.3'
           pre-build-command: 'export PATH=/opt/python/cp37-cp37m/bin:$PATH'
       - name: List Files
