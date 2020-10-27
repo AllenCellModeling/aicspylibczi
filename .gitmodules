@@ -3,4 +3,4 @@
 	url = https://github.com/pybind/pybind11.git
 [submodule "libCZI"]
 	path = libCZI
-	url = https://github.com/zeiss-microscopy/libCZI.git
+	url = https://github.com/AllenCellModeling/libCZI.git
