@@ -21,7 +21,7 @@ jobs:
         with:
           python-versions: 'cp37-cp37m'
           build-requirements: 'cython numpy make cmake==3.17.3'
-          pre-build-command: 'export PATH=/opt/python/cp37-cp37m/bin:$PATH'
+          pre-build-command: 'export PATH=/opt/python/cp37-cp37m/bin:/opt/rh/devtoolset-8/root/usr/bin:$PATH'
       - name: List Files
         run: |
           dist/*-manylinux*.whl
