@@ -5,11 +5,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v1
         with:
-          ref: update/submodule_uri
           submodules: true
-          fetch-depth: 0
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
@@ -23,7 +21,7 @@ jobs:
         with:
           python-versions: 'cp37-cp37m'
           build-requirements: 'cython numpy make cmake==3.17.3'
-          pre-build-command: 'export PATH=/opt/python/cp37-cp37m/bin:$PATH'
+          pre-build-command: 'cmake --version'
       - name: List Files
         run: |
           ls dist/*-manylinux*.whl
