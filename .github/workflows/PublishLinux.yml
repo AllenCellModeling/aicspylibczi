@@ -21,7 +21,8 @@ jobs:
         with:
           python-versions: 'cp37-cp37m'
           build-requirements: 'cython numpy make cmake==3.17.3 twine wheel'
-          pre-build-command: 'bash script/docker_setup.sh'
+          package-path: 'aicspylibczi'
+          pre-build-command: 'bash aicspylibczi/script/docker_setup.sh'
       - name: List Files
         run: |
           ls dist/*-manylinux*.whl
