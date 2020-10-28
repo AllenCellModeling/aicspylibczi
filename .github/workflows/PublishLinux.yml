@@ -7,6 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
+          ref: update/submodule_uri
           submodules: true
           fetch-depth: 0
       - name: Set up Python
