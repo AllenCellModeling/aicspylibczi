@@ -2,6 +2,7 @@ from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
 
 import os
+from pathlib import Path
 import platform
 import re
 import subprocess
@@ -97,6 +98,8 @@ class CMakeBuild(build_ext):
 
     def build_extension(self, ext):
         path_var = os.environ.get('PATH')
+        pth = Path(os.__file__)
+        print(f"pathlib Path={pth}")
         env = dict(os.environ, PATH=path_var)
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
