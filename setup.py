@@ -98,6 +98,7 @@ class CMakeBuild(build_ext):
 
     def build_extension(self, ext):
         path_var = os.environ.get('PATH')
+        print(f"val={Path(sys.executable).parent}")
         path_var = os.pathsep.join(Path(sys.executable).parent, path_var)
         env = dict(os.environ, PATH=path_var)
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
