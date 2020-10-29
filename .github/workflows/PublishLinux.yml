@@ -21,7 +21,7 @@ jobs:
         with:
           python-versions: 'cp37-cp37m'
           build-requirements: 'cython numpy make cmake==3.17.3 twine wheel'
-          pre-build-command: 'export PATH=/opt/python/cp37-cp37m/bin:$PATH'
+          pre-build-command: '/opt/python/cp37-cp37m/bin/python scripts/docker_setup.sh'
       - name: List Files
         run: |
           ls dist/*-manylinux*.whl
