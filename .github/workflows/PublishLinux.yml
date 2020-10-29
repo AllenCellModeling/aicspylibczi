@@ -19,9 +19,8 @@ jobs:
       - name: Build manylinux Python wheels
         uses: allen-cell-animated/python-wheels-manylinux-build@v1.1
         with:
-          python-versions: 'cp37-cp37m'
+          python-versions: 'cp37-cp37m cp38-cp38m'
           build-requirements: 'cython numpy make cmake==3.17.3 twine wheel'
-          pre-build-command: '/bin/bash scripts/docker_setup.sh'
-      - name: List Files
+      - name: Upload Files
         run: |
-          ls dist/*-manylinux*.whl
+          ls dist/*.whl
