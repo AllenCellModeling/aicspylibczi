@@ -25,6 +25,8 @@ jobs:
       - name: Test with pytest
         run: |
           pytest -n1 -s --cov-report xml --cov=aicspylibczi aicspylibczi/tests
+          echo "\ndbug.txt:\n"
+          cat dbug.txt
           codecov -t ${{ secrets.CodeCovKey }}
 
   lint:

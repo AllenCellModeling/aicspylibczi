@@ -455,11 +455,12 @@ namespace pylibczi {
           scale_factor_,
           nullptr);   // use default options
 
+      ofstream dbug("dbug.txt", 'a');
       libCZI::IntSize size = multiTileComposite->GetSize();
       size_t pixels_in_image = size.h*size.w*bgrScaling;
-      std::cout << "initialized pixels_in_image to: " << pixels_in_image << std::endl;
+      dbug << "initialized pixels_in_image to: " << pixels_in_image << std::endl;
       if( pixels_in_image < m_statistics.boundingBoxLayer0Only.w*m_statistics.boundingBoxLayer0Only.h*bgrScaling) {
-        std::cout << "replacing size: " << pixels_in_image << " with: "
+        dbug << "replacing size: " << pixels_in_image << " with: "
                   << m_statistics.boundingBoxLayer0Only.w * m_statistics.boundingBoxLayer0Only.h * bgrScaling
                   << std::endl;
         pixels_in_image = m_statistics.boundingBoxLayer0Only.w * m_statistics.boundingBoxLayer0Only.h * bgrScaling;
