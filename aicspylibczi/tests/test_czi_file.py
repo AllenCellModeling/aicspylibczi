@@ -235,7 +235,6 @@ def test_image_shape(data_dir, fname, expects):
     assert shape == expects
 
 
-@pytest.mark.skip(reason="check github action")
 @pytest.mark.parametrize("fname, expects", [
     ('mosaic_test.czi', [{'B': (0, 1), 'C': (0, 1), 'X': (0, 475), 'Y': (0, 325)}]),
 ])

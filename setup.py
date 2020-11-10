@@ -16,7 +16,6 @@ with open("README.md") as readme_file:
 requirements = [
     "numpy>=1.14.1",
     "lxml",
-    "scikit-image",
 ]
 
 test_requirements = [
