@@ -455,9 +455,10 @@ namespace pylibczi {
           scale_factor_,
           nullptr);   // use default options
 
-      size_t pixels_in_image = m_statistics.boundingBoxLayer0Only.w*m_statistics.boundingBoxLayer0Only.h*bgrScaling;
-      ImageFactory imageFactory(m_pixelType, pixels_in_image);
       libCZI::IntSize size = multiTileComposite->GetSize();
+      size_t pixels_in_image = size.h*size.w*bgrScaling;
+      //m_statistics.boundingBoxLayer0Only.w*m_statistics.boundingBoxLayer0Only.h*bgrScaling;
+      ImageFactory imageFactory(m_pixelType, pixels_in_image);
       imageFactory.constructImage(multiTileComposite, size, &plane_coord_, im_box_, 0, -1);
       // set is mosaic?
       return imageFactory.transferMemoryContainer();
