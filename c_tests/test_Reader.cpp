@@ -301,6 +301,16 @@ TEST_CASE_METHOD(CziMCreator, "test_mosaic_read", "[Reader_mosaic_read]")
   REQUIRE(imvec.size() == 1);
 }
 
+TEST_CASE_METHOD(CziMCreator, "test_mosaic_readScaled", "[Reader_mosaic_readScaled]")
+{
+  auto czi = get();
+  auto c_dims = libCZI::CDimCoordinate{ { libCZI::DimensionIndex::C, 0 } };
+  auto imCont = czi->readMosaic(c_dims, 0.1);
+  auto imvec = imCont->images();
+  REQUIRE(imvec.size() == 1);
+}
+
+
 TEST_CASE_METHOD(CziMCreator, "test_mosaic_shape", "[Reader_mosaic_shape]")
 {
   auto czi = get();
