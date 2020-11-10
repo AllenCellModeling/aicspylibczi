@@ -456,7 +456,8 @@ namespace pylibczi {
           scale_factor_,
           nullptr);   // use default options
 
-      ofstream dbug("dbug.txt", 'a');
+      ofstream dbug;
+      dbug.open("dbug.txt", std::fstream::out | std::fstream::app);
       libCZI::IntSize size = multiTileComposite->GetSize();
       size_t pixels_in_image = size.h*size.w*bgrScaling;
       dbug << "initialized pixels_in_image to: " << pixels_in_image << std::endl;
