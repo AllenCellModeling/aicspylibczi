@@ -290,12 +290,12 @@ namespace pylibczi {
       imageFactory.setMosaic(isMosaic());
       size_t memOffset = 0;
 
-      unsigned int number_of_cores = std::thread::hardware_concurrency();
-      if (number_of_cores - 1 < cores_) {
-          std::cout << "Cores exception requested " << cores_ << " but only " << number_of_cores << " available." << std::endl;
-          throw ThreadingRequestedCoresException(number_of_cores, cores_,
-              "Requested cores should be at most 1 less than the number of available cores.");
-      }
+      /*
+       * On windows the python code says there are far more cores than the C++ code. For that reason we have
+       * implemented this in such a way that it rescales to a workable value when necessary.
+       */
+      unsigned int min_cores = 1; // for the case when hardware_concurency fails and returns 0
+      unsigned int number_of_cores = std::max(min_cores, std::min(cores_, std::thread::hardware_concurrency()-1));
       {
           std::vector< std::future<bool> > jobs;
           Tasks tasks;

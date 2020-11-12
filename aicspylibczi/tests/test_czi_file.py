@@ -160,7 +160,8 @@ def test_pixel_type(data_dir, fname, expected):
 
 
 @pytest.mark.parametrize("fname, args, expected", [
-    ('mosaic_test.czi', {'M': 0}, (1, 1, 1, 1, 1, 624, 924))
+    ('mosaic_test.czi', {'M': 0}, (1, 1, 1, 1, 1, 624, 924)),
+    ('mosaic_test.czi', {'M': 0, 'cores': 2000}, (1, 1, 1, 1, 1, 624, 924))
 ])
 def test_read_image_args(data_dir, fname, args, expected):
     czi = CziFile(data_dir / fname)
