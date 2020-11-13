@@ -125,9 +125,10 @@ TypedImage<T>::loadImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_ptr_
   // WARNING do not compute the end of the array by multiplying stride by
   // height, they are both uint32_t and you'll get an overflow for larger images
   uint8_t* sEnd = static_cast<uint8_t*>(lckScoped.ptrDataRoi) + lckScoped.size;
-  if (m_pixelType == libCZI::PixelType::Gray8 || m_pixelType == libCZI::PixelType::Gray16 ||
-      m_pixelType == libCZI::PixelType::Gray32Float)
+  if ((lckScoped.stride % size_.w == 0) && ( m_pixelType == libCZI::PixelType::Gray8 || m_pixelType == libCZI::PixelType::Gray16 ||
+      m_pixelType == libCZI::PixelType::Gray32Float)) {
     std::memcpy(m_array, lckScoped.ptrDataRoi, lckScoped.size);
+  }
   else {
     SourceRange<T> sourceRange(channels_, static_cast<T*>(lckScoped.ptrDataRoi), (T*)(sEnd), lckScoped.stride, size_.w);
     TargetRange<T> targetRange(channels_, size_.w, size_.h, m_array, m_array + length());
