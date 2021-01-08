@@ -1,15 +1,59 @@
 #include <algorithm>
 #include <chrono>
-#include <cstdio>
+#include <memory>
 #include <sstream>
 
 #include "catch.hpp"
 
 #include "../_aicspylibczi/Reader.h"
-#include "../_aicspylibczi/exceptions.h"
 #include "../_aicspylibczi/pb_helpers.h"
 
 #define CORES_FOR_THREADS 1 // for local testing increase this but for GH Actions it must be 1
+
+void
+printDims(const std::string& msg, const pylibczi::Reader::DimsShape& dimsVec)
+{
+  std::cout << msg << std::endl;
+  using DI = pylibczi::DimIndex;
+  for (const auto& x : dimsVec) {
+    for (const auto& y : x) {
+      char yChar;
+      switch (y.first) {
+        case DI::X:
+          yChar = 'X';
+          break;
+        case DI::Y:
+          yChar = 'Y';
+          break;
+        case DI::Z:
+          yChar = 'Z';
+          break;
+        case DI::M:
+          yChar = 'M';
+          break;
+        case DI::C:
+          yChar = 'C';
+          break;
+        case DI::T:
+          yChar = 'T';
+          break;
+        case DI::V:
+          yChar = 'V';
+          break;
+        case DI::B:
+          yChar = 'B';
+          break;
+        case DI::S:
+          yChar = 'S';
+          break;
+        default:
+          yChar = 'N';
+          break;
+      }
+      std::cout << yChar << "\t [ " << y.second.first << ", " << y.second.second << " ]" << std::endl;
+    }
+  }
+}
 
 class CziCreator
 {
@@ -53,7 +97,7 @@ public:
     : m_czi()
   {
     auto fp = std::shared_ptr<libCZI::IStream>(new CSimpleStreamImplCppStreams(L"resources/s_1_t_1_c_1_z_1.czi"));
-    m_czi = std::unique_ptr<pylibczi::Reader>(new pylibczi::Reader(fp));
+    m_czi = std::make_unique<pylibczi::Reader>(fp);
   }
   pylibczi::Reader* get() { return m_czi.get(); }
 };
@@ -101,6 +145,39 @@ class CziCreator5
 public:
   CziCreator5()
     : m_czi(new pylibczi::Reader(L"resources/Multiscene_CZI_3Scenes.czi"))
+  {}
+  pylibczi::Reader* get() { return m_czi.get(); }
+};
+
+class CziCreatorTiles
+{
+  std::unique_ptr<pylibczi::Reader> m_czi;
+
+public:
+  CziCreatorTiles()
+    : m_czi(new pylibczi::Reader(L"resources/tiles.czi"))
+  {}
+  pylibczi::Reader* get() { return m_czi.get(); }
+};
+
+class CziCreatorTilesTZ
+{
+  std::unique_ptr<pylibczi::Reader> m_czi;
+
+public:
+  CziCreatorTilesTZ()
+    : m_czi(new pylibczi::Reader(L"resources/tiles_time_z.czi"))
+  {}
+  pylibczi::Reader* get() { return m_czi.get(); }
+};
+
+class CziCreatorTilesZ
+{
+  std::unique_ptr<pylibczi::Reader> m_czi;
+
+public:
+  CziCreatorTilesZ()
+    : m_czi(new pylibczi::Reader(L"resources/tiles_z.czi"))
   {}
   pylibczi::Reader* get() { return m_czi.get(); }
 };
@@ -310,7 +387,6 @@ TEST_CASE_METHOD(CziMCreator, "test_mosaic_readScaled", "[Reader_mosaic_readScal
   REQUIRE(imvec.size() == 1);
 }
 
-
 TEST_CASE_METHOD(CziMCreator, "test_mosaic_shape", "[Reader_mosaic_shape]")
 {
   auto czi = get();
@@ -371,7 +447,7 @@ TEST_CASE_METHOD(CziBgrCreator, "test_bgr_flatten", "[Reader_read_flatten_bgr]")
   auto shape = imgCont.second;
   REQUIRE(pr.size() == 1);
 
-  for (auto x : pr) {
+  for (const auto& x : pr) {
     REQUIRE(x->shape()[0] == 3);
     REQUIRE(x->shape()[1] == 624);
     REQUIRE(x->shape()[2] == 924);
@@ -476,10 +552,10 @@ TEST_CASE_METHOD(CziBgrCreator2, "test_bgr2_flatten", "[Reader_read_flatten_bgr2
 
   REQUIRE(pr.size() == 1);
 
-  for (auto x : pr) {
+  for (const auto& x : pr) {
     REQUIRE(x->shape()[0] == 3);
     REQUIRE(x->shape()[1] == 81);
-    REQUIRE(x->shape()[2] == 147);
+    REQUIRE(147 == x->shape()[2]);
   }
 
   pylibczi::Reader::Shape shapeAns{ { 'S', 1 }, { 'C', 3 }, { 'Y', 81 }, { 'X', 147 } };
@@ -538,6 +614,110 @@ TEST_CASE_METHOD(CziCreatorOrder, "test_image_order", "[Reader_image_order]")
            });
 }
 
+TEST_CASE_METHOD(CziCreatorTiles, "test_tile_no_scene", "[Reader_tile_no_scene]")
+{
+  auto czi = get();
+
+  REQUIRE(czi->isMosaic());
+
+  auto dims = czi->dimsString();
+  REQUIRE(dims == std::string("BVTCZMYX"));
+
+  auto dSizes = czi->dimSizes();
+  std::vector<int> dSizesAns = { 1, 1, 1, 2, 1, 4, 256, 256 };
+  REQUIRE(dSizes == dSizesAns);
+
+  using DI = pylibczi::DimIndex;
+  pylibczi::Reader::DimsShape ans{
+    { { DI::X, { 0, 256 } },
+      { DI::Y, { 0, 256 } },
+      { DI::M, { 0, 4 } },
+      { DI::Z, { 0, 1 } },
+      { DI::C, { 0, 2 } },
+      { DI::T, { 0, 1 } },
+      { DI::V, { 0, 1 } },
+      { DI::B, { 0, 1 } } },
+  };
+
+  auto dimsVec = czi->readDimsRange();
+  REQUIRE(czi->shapeIsConsistent());
+  REQUIRE(dimsVec.size() == 1);
+  REQUIRE(dimsVec == ans);
+
+  libCZI::CDimCoordinate dm = { { libCZI::DimensionIndex::C, 0 } };
+  REQUIRE_NOTHROW(czi->readMosaic(dm));
+}
+
+TEST_CASE_METHOD(CziCreatorTilesTZ, "test_tile_tz_no_scene", "[Reader_tile_tz_no_scene]")
+{
+  auto czi = get();
+
+  REQUIRE(czi->isMosaic());
+
+  auto dims = czi->dimsString();
+  REQUIRE(dims == std::string("BVTCZMYX"));
+
+  auto dSizes = czi->dimSizes();
+  std::vector<int> dSizesAns = { 1, 1, 2, 2, 2, 4, 256, 256 };
+  REQUIRE(dSizes == dSizesAns);
+
+  using DI = pylibczi::DimIndex;
+  pylibczi::Reader::DimsShape ans{
+    { { DI::X, { 0, 256 } },
+      { DI::Y, { 0, 256 } },
+      { DI::M, { 0, 4 } },
+      { DI::Z, { 0, 2 } },
+      { DI::C, { 0, 2 } },
+      { DI::T, { 0, 2 } },
+      { DI::V, { 0, 1 } },
+      { DI::B, { 0, 1 } } },
+  };
+
+  auto dimsVec = czi->readDimsRange();
+  REQUIRE(czi->shapeIsConsistent());
+  REQUIRE(dimsVec.size() == 1);
+  REQUIRE(dimsVec == ans);
+
+  libCZI::CDimCoordinate dm = { { libCZI::DimensionIndex::C, 0 },
+                                { libCZI::DimensionIndex::Z, 1 },
+                                { libCZI::DimensionIndex::T, 0 } };
+  REQUIRE_NOTHROW(czi->readMosaic(dm));
+}
+
+TEST_CASE_METHOD(CziCreatorTilesZ, "test_tile_z_no_scene", "[Reader_tile_z_no_scene]")
+{
+  auto czi = get();
+
+  REQUIRE(czi->isMosaic());
+
+  auto dims = czi->dimsString();
+  REQUIRE(dims == std::string("BVTCZMYX"));
+
+  auto dSizes = czi->dimSizes();
+  std::vector<int> dSizesAns = { 1, 1, 1, 2, 2, 4, 256, 256 };
+  REQUIRE(dSizes == dSizesAns);
+
+  using DI = pylibczi::DimIndex;
+  pylibczi::Reader::DimsShape ans{
+    { { DI::X, { 0, 256 } },
+      { DI::Y, { 0, 256 } },
+      { DI::M, { 0, 4 } },
+      { DI::Z, { 0, 2 } },
+      { DI::C, { 0, 2 } },
+      { DI::T, { 0, 1 } },
+      { DI::V, { 0, 1 } },
+      { DI::B, { 0, 1 } } },
+  };
+
+  auto dimsVec = czi->readDimsRange();
+  REQUIRE(czi->shapeIsConsistent());
+  REQUIRE(dimsVec.size() == 1);
+  REQUIRE(dimsVec == ans);
+
+  libCZI::CDimCoordinate dm = { { libCZI::DimensionIndex::C, 0 }, { libCZI::DimensionIndex::Z, 1 } };
+  REQUIRE_NOTHROW(czi->readMosaic(dm));
+}
+
 #ifdef LOCAL_TEST
 
 TEST_CASE_METHOD(CziCreatorBig, "test_big_czifile", "[Reader_timed_read]")
@@ -578,7 +758,7 @@ TEST_CASE_METHOD(CziCreatorBigM, "test_bigm_czifile", "[Reader_bbox]")
   REQUIRE(ans[2].y == 19201);
   REQUIRE(ans[2].w == 950);
   REQUIRE(ans[2].h == 650);
-  libCZI::CDimCoordinate cdims = {{libCZI::DimensionIndex::C, 0}};
+  libCZI::CDimCoordinate cdims = { { libCZI::DimensionIndex::C, 0 } };
   // REQUIRE_NOTHROW not compatible with MSVC as is.
 }
 
