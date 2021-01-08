@@ -646,6 +646,8 @@ TEST_CASE_METHOD(CziCreatorTiles, "test_tile_no_scene", "[Reader_tile_no_scene]"
 
   libCZI::CDimCoordinate dm = { { libCZI::DimensionIndex::C, 0 } };
   REQUIRE_NOTHROW(czi->readMosaic(dm));
+
+  REQUIRE_NOTHROW(czi->readSelected(dm));
 }
 
 TEST_CASE_METHOD(CziCreatorTilesTZ, "test_tile_tz_no_scene", "[Reader_tile_tz_no_scene]")
@@ -716,6 +718,8 @@ TEST_CASE_METHOD(CziCreatorTilesZ, "test_tile_z_no_scene", "[Reader_tile_z_no_sc
 
   libCZI::CDimCoordinate dm = { { libCZI::DimensionIndex::C, 0 }, { libCZI::DimensionIndex::Z, 1 } };
   REQUIRE_NOTHROW(czi->readMosaic(dm));
+
+  REQUIRE_NOTHROW(czi->readSelected(dm));
 }
 
 #ifdef LOCAL_TEST
