@@ -165,7 +165,7 @@ Reader::sceneShape(int scene_index_)
   } else {
     if (scene_index_ < sceneStart || sceneStart + sceneSize <= scene_index_) {
       std::stringstream ss;
-      ss << "Scene index " << scene_index_ << " ∉ "
+      ss << "Scene index " << scene_index_ << " ∉ " // x ∉ Y means x is not an element of Y, or x is not in Y
          << "[" << sceneStart << ", " << sceneStart + sceneSize << ")";
       throw CDimCoordinatesOverspecifiedException(ss.str());
     }
