@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 2.8.12)
+
 set(CMAKE_MACOSX_RPATH 1)
+
+IF (APPLE)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum OS X deployment version" FORCE)
+ENDIF(APPLE)
+
 project(_aicspylibczi)
 # build problems with library dependencies if I go above C++14
 # namely the dependencies on the Eigen library and they have to update
@@ -20,9 +26,7 @@ ELSE()
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++14 -fPIC -O0 -g -D_FILE_OFFSET_BITS=64 -fvisibility=hidden")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__ANSI__ -fPIC -D_FILE_OFFSET_BITS=64")
     add_compile_definitions(LINUXENV)
-    IF (APPLE)
-        set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum OS X deployment version" FORCE)
-    ENDIF(APPLE)
+
 ENDIF(WIN32)
 
 SET(pybind11_DIR pybind11)
