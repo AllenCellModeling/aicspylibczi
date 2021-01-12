@@ -555,7 +555,7 @@ TEST_CASE_METHOD(CziBgrCreator2, "test_bgr2_flatten", "[Reader_read_flatten_bgr2
   for (const auto& x : pr) {
     REQUIRE(x->shape()[0] == 3);
     REQUIRE(x->shape()[1] == 81);
-    REQUIRE(147 == x->shape()[2]);
+    REQUIRE(x->shape()[2] == 147);
   }
 
   pylibczi::Reader::Shape shapeAns{ { 'S', 1 }, { 'C', 3 }, { 'Y', 81 }, { 'X', 147 } };
