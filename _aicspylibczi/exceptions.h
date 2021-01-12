@@ -12,221 +12,125 @@
 
 namespace pylibczi {
 
-class FilePtrException : public std::exception
+class FilePtrException : public std::runtime_error
 {
-  std::string m_message;
-
 public:
-  explicit FilePtrException(std::string message_)
-    : exception()
-    , m_message(std::move(message_))
+  explicit FilePtrException(const std::string& message_)
+    : std::runtime_error("File Pointer Exception: " + message_)
   {}
-  const char* what() const noexcept override
-  {
-    std::string tmp("File Pointer Exception: ");
-    tmp += m_message;
-    return tmp.c_str();
-  }
 };
 
-class ThreadingRequestedCoresException : public std::exception
+class PixelTypeException : public std::runtime_error
 {
-  std::stringstream m_message;
-
-public:
-  explicit ThreadingRequestedCoresException(int cores_, int requested_cores_, std::string message_)
-  {
-    m_message << "Requested " << requested_cores_ << " but there are only " << cores_ << "available. " << message_;
-  }
-
-  const char* what() const noexcept override { return m_message.str().c_str(); }
-};
-
-class PixelTypeException : public std::exception
-{
-  libCZI::PixelType m_pixelType;
-  std::string m_message;
-
   static const std::map<libCZI::PixelType, const std::string> s_byName;
 
 public:
-  PixelTypeException(libCZI::PixelType pixel_type_, std::string message_)
-    : exception()
-    , m_pixelType(pixel_type_)
-    , m_message(std::move(message_))
-  {}
-
-  const char* what() const noexcept override
+  PixelTypeException(libCZI::PixelType pixel_type_, const std::string& message_)
+    : std::runtime_error("")
   {
-    auto tname = s_byName.find(m_pixelType);
+    auto tname = s_byName.find(pixel_type_);
     std::string name((tname == s_byName.end()) ? "Unknown type" : tname->second);
-    std::string tmp("PixelType( " + name + " ): " + m_message);
-    return tmp.c_str();
+    static_cast<std::runtime_error&>(*this) = std::runtime_error("PixelType( " + name + " ): " + message_);
   }
 };
 
-class RegionSelectionException : public std::exception
+class RegionSelectionException : public std::runtime_error
 {
-  libCZI::IntRect m_requested;
-  libCZI::IntRect m_image;
-  std::string m_message;
-
 public:
   RegionSelectionException(const libCZI::IntRect& requested_box_,
                            const libCZI::IntRect& image_box_,
-                           std::string message_)
-    : m_requested(requested_box_)
-    , m_image(image_box_)
-    , m_message(std::move(message_))
-  {}
-
-  const char* what() const noexcept override
+                           const std::string& message_)
+    : std::runtime_error("")
   {
-    std::stringstream front;
+    std::stringstream front;  // x ∉ Y means x is not an element of Y, or x is not in Y
     front << "Requirement violated requested region is not a subset of the "
              "defined image! \n\t "
-          << m_requested << " ⊄ " << m_image << "\n\t" << m_message << std::endl;
-    return front.str().c_str();
+          << requested_box_ << " ⊄ " << image_box_ << "\n\t" << message_ << std::endl;
+    static_cast<std::runtime_error&>(*this) = std::runtime_error(front.str());
   }
 };
 
-class ImageAccessUnderspecifiedException : public std::exception
+class ImageAccessUnderspecifiedException : public std::runtime_error
 {
-  size_t m_given, m_required;
-  std::string m_message;
-
 public:
-  ImageAccessUnderspecifiedException(size_t given_, size_t required_, std::string message_)
-    : m_given(given_)
-    , m_required(required_)
-    , m_message(std::move(message_))
+  ImageAccessUnderspecifiedException(size_t given_, size_t required_, const std::string& message_)
+    : std::runtime_error("Dimensions underspecified, given " + std::to_string(given_) + " dimensions but " +
+                         std::to_string(required_) + " needed! \n\t" + message_)
   {}
-
-  const char* what() const noexcept override
-  {
-    std::stringstream tmp;
-    tmp << "Dimensions underspecified, given " << m_given << " dimensions but " << m_required << " needed! \n\t"
-        << m_message << std::endl;
-    return tmp.str().c_str();
-  }
 };
 
-class ImageIteratorException : public std::exception
+class ImageIteratorException : public std::runtime_error
 {
-  std::string m_message;
-
 public:
   explicit ImageIteratorException(const std::string& message_)
-    : m_message("ImageIteratorException: " + message_)
+    : std::runtime_error("ImageIteratorException: " + message_)
   {}
-
-  const char* what() const noexcept override { return m_message.c_str(); }
 };
 
-class ImageSplitChannelException : public std::exception
+class ImageSplitChannelException : public std::runtime_error
 {
-  std::string m_message;
-  int m_channel;
-
 public:
   ImageSplitChannelException(const std::string& message_, int channel_)
-    : m_message("ImageSplitChannelExcetion: " + message_)
-    , m_channel(channel_)
+    : std::runtime_error("ImageSplitChannelExcetion: " + message_ +
+                         " Channel should be zero or unset but has a value of " + std::to_string(channel_) +
+                         " not sure how to procede in assigning channels.")
   {}
-
-  const char* what() const noexcept override
-  {
-    std::stringstream tmp;
-    tmp << m_message << " Channel should be zero or unset but has a value of " << m_channel
-        << " not sure how to procede in assigning channels." << std::endl;
-    return tmp.str().c_str();
-  }
 };
 
-class ImageCopyAllocFailed : public std::bad_alloc
+class ImageCopyAllocFailed
+  : public std::runtime_error
+  , public std::bad_alloc
 {
-  std::string m_message;
-  unsigned long m_size;
-
 public:
-  ImageCopyAllocFailed(std::string message_, unsigned long alloc_size_)
-    : m_message(std::move(message_))
-    , m_size(alloc_size_)
-  {}
-
-  const char* what() const noexcept override
+  ImageCopyAllocFailed(const std::string& message_, unsigned long alloc_size_)
+    : std::runtime_error("")
   {
     std::stringstream tmp;
-    auto gbSize = static_cast<double>(m_size);
+    auto gbSize = static_cast<double>(alloc_size_);
     gbSize /= 1073741824.0; // 1024 * 1024 * 1024
-    tmp << "ImageCopyAllocFailed [" << std::setprecision(1) << gbSize << " GB requested]: " << m_message << std::endl;
-    return tmp.str().c_str();
+    tmp << "ImageCopyAllocFailed [" << std::setprecision(1) << gbSize << " GB requested]: " << message_ << std::endl;
+    static_cast<std::runtime_error&>(*this) = std::runtime_error(tmp.str());
   }
+
+  // both parent classes define what so it's necessary to override in order to call the appropriate one.
+  const char* what() const noexcept override { return std::runtime_error::what(); }
 };
 
-class CDimCoordinatesOverspecifiedException : public std::exception
+class CDimCoordinatesOverspecifiedException : public std::runtime_error
 {
-  std::string m_message;
-
 public:
-  explicit CDimCoordinatesOverspecifiedException(std::string message_)
-    : m_message(std::move(message_))
+  explicit CDimCoordinatesOverspecifiedException(const std::string& message_)
+    : std::runtime_error("The coordinates are overspecified = you have specified a Dimension "
+                         "or Dimension value that is not valid. " +
+                         message_)
   {}
-
-  const char* what() const noexcept override
-  {
-    std::stringstream tmp;
-    tmp << "The coordinates are overspecified = you have specified a Dimension "
-           "or Dimension value that is not valid. "
-        << m_message << std::endl;
-    return tmp.str().c_str();
-  }
 };
 
-class CDimCoordinatesUnderspecifiedException : public std::exception
+class CDimCoordinatesUnderspecifiedException : public std::runtime_error // std::exception
 {
-  std::string m_message;
-
 public:
-  explicit CDimCoordinatesUnderspecifiedException(std::string message_)
-    : m_message(std::move(message_))
+  explicit CDimCoordinatesUnderspecifiedException(const std::string& message_)
+    : std::runtime_error("The coordinates are underspecified = you have not specified a "
+                         "Dimension that is required. " +
+                         message_)
   {}
-
-  const char* what() const noexcept override
-  {
-    std::stringstream tmp;
-    tmp << "The coordinates are underspecified = you have not specified a "
-           "Dimension that is required. "
-        << m_message << std::endl;
-    return tmp.str().c_str();
-  }
 };
 
-class CdimSelectionZeroImagesException : public std::exception
+class CdimSelectionZeroImagesException : public std::runtime_error
 {
-  libCZI::CDimCoordinate m_requestedPlaneCoordinate; // requested
-  libCZI::CDimBounds m_planeCoordinateBounds;        // image file
-  std::string m_message;
-
 public:
   CdimSelectionZeroImagesException(libCZI::CDimCoordinate& requested_plane_coordinate_,
                                    libCZI::CDimBounds& plane_coordinate_bounds_,
-                                   std::string message_)
-    : m_requestedPlaneCoordinate(requested_plane_coordinate_)
-    , m_planeCoordinateBounds(plane_coordinate_bounds_)
-    , m_message(std::move(message_))
-  {
-    std::cout << this->what();
-  }
-
-  const char* what() const noexcept override
+                                   const std::string& message_)
+    : std::runtime_error("")
   {
     std::stringstream tmp;
-    tmp << "Specified Dims resulted in NO image frames: " << m_requestedPlaneCoordinate << " ∉ "
-        << m_planeCoordinateBounds << std::endl;
-    return tmp.str().c_str();
+    tmp << "Specified Dims resulted in NO image frames: " << requested_plane_coordinate_ << " ∉ "
+        << plane_coordinate_bounds_ << " " << message_ << std::endl;
+    static_cast<std::runtime_error&>(*this) = std::runtime_error(tmp.str());
   }
 };
+
 }
 
 #endif //_PYLIBCZI_EXCEPTIONS_H
