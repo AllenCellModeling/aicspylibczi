@@ -314,8 +314,6 @@ private:
     return (info_.logicalRect.w == info_.physicalSize.w && info_.logicalRect.h == info_.physicalSize.h);
   }
 
-  // void getMemory(SubblockIndexVec& matches_);
-
   static bool isValidRegion(const libCZI::IntRect& in_box_, const libCZI::IntRect& czi_box_);
 
   void checkSceneShapes();
