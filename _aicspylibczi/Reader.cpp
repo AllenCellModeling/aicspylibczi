@@ -292,7 +292,7 @@ Reader::readSelected(libCZI::CDimCoordinate& plane_coord_, int index_m_, unsigne
   size_t bgrScaling = ImageFactory::numberOfChannels(m_pixelType);
 
   libCZI::IntRect w_by_h = getSceneYXSize();
-  size_t n_of_pixels = matches.size() * w_by_h.w * w_by_h.h * bgrScaling;
+  size_t n_of_pixels = matches.size() * w_by_h.w * w_by_h.h; // bgrScaling is handled internally * bgrScaling;
   ImageFactory imageFactory(m_pixelType, n_of_pixels);
 
   imageFactory.setMosaic(isMosaic());
@@ -324,7 +324,7 @@ Reader::readSelected(libCZI::CDimCoordinate& plane_coord_, int index_m_, unsigne
 
         auto bitmap = subblock->CreateBitmap();
         libCZI::IntSize size = bitmap->GetSize();
-
+        // constructImage fixes BRG image data now via channels != 3 condition
         imageFactory.constructImage(bitmap, size, &info.coordinate, info.logicalRect, memOffset, info.mIndex);
         return true;
       }));
