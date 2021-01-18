@@ -126,7 +126,7 @@ TypedImage<T>::loadImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_ptr_
   // height, they are both uint32_t and you'll get an overflow for larger images
   uint8_t* sEnd = static_cast<uint8_t*>(lckScoped.ptrDataRoi) + lckScoped.size;
   if ((lckScoped.stride % size_.w == 0) && ( m_pixelType == libCZI::PixelType::Gray8 || m_pixelType == libCZI::PixelType::Gray16 ||
-      m_pixelType == libCZI::PixelType::Gray32Float)) {
+      m_pixelType == libCZI::PixelType::Gray32Float) && channels_ != 3 ) {
     std::memcpy(m_array, lckScoped.ptrDataRoi, lckScoped.size);
   }
   else {
