@@ -291,3 +291,15 @@ def test_mosaic_subblock_rect(data_dir, fname, s_index, m_index, expected):
         czi = CziFile(czi_filename=fp)
         data = czi.mosaic_scene_bounding_boxes(s_index)
         assert data == expected
+
+
+@pytest.mark.parametrize("fname, p_index, ans_file", [
+    ("RGB-8bit.czi", 1, "RGB-8bit_Gplane.npy")
+])
+def test_bgr_plane_data_x(data_dir, fname, p_index, ans_file):
+    ans = np.load(data_dir/ans_file)
+    with open(data_dir/fname, 'rb') as fp:
+        czi = CziFile(czi_filename=fp)
+        img, dims = czi.read_image()
+        assert img[0, p_index, :, :].shape == ans.shape
+        np.testing.assert_array_almost_equal(img[0, p_index, :, :], ans)

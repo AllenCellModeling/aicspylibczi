@@ -405,12 +405,18 @@ TEST_CASE_METHOD(CziMCreator, "test_mosaic_throw", "[Reader_mosaic_throw]")
 class CziBgrCreator
 {
   std::unique_ptr<pylibczi::Reader> m_czi;
-
+  std::vector<int> m_firstPlaneFirstTen = {7, 6, 5, 6, 6, 7, 7, 7, 7, 7};
+  std::vector<int> m_secondPlaneFirstTen = {14,  8,  5,  4,  4,  5,  5,  5,  5,  5};
+  // y=0, x=0:10
 public:
   CziBgrCreator()
     : m_czi(new pylibczi::Reader(L"resources/RGB-8bit.czi"))
   {}
   pylibczi::Reader* get() { return m_czi.get(); }
+  const std::vector<int> & planeZeroFirstTen() { return m_firstPlaneFirstTen; }
+  const std::vector<int> & planeOneFirstTen() { return m_secondPlaneFirstTen; }
+
+
 };
 
 TEST_CASE_METHOD(CziBgrCreator, "test_bgr_read", "[Reader_read_bgr]")
@@ -433,6 +439,8 @@ TEST_CASE_METHOD(CziBgrCreator, "test_bgr_read", "[Reader_read_bgr]")
   REQUIRE(pr.size() == 1);
   REQUIRE(pr.front()->shape() == std::vector<size_t>{ 3, 624, 924 });
   REQUIRE(pr.front()->pixelType() == libCZI::PixelType::Gray8);
+
+
 }
 
 TEST_CASE_METHOD(CziBgrCreator, "test_bgr_flatten", "[Reader_read_flatten_bgr]")
@@ -457,6 +465,18 @@ TEST_CASE_METHOD(CziBgrCreator, "test_bgr_flatten", "[Reader_read_flatten_bgr]")
 
   REQUIRE(shape == shapeAns);
   REQUIRE(pr.front()->pixelType() == libCZI::PixelType::Gray8);
+
+  // [7, 6, 5, 6, 6, 7, 7, 7, 7, 7]
+  auto timage = pylibczi::ImageFactory::getDerived<uint8_t>(pr.front());
+  uint8_t *tmp = timage->getRawPtr();
+  std::vector<uint8_t> data(tmp, tmp+10);
+  auto planeZero = planeZeroFirstTen();
+  auto planeOne = planeOneFirstTen();
+  // check data values
+  for( size_t i = 0; i < 10; i++){
+    REQUIRE(data[i] == planeZero[i]);
+    REQUIRE( (uint8_t)((*timage)[{i, 0, 1}]) == planeOne[i] );
+  }
 }
 
 TEST_CASE_METHOD(CziMCreator, "test_reader_mosaic_subblockinforect", "[Reader_Mosaic_SubblockInfo_Rect]")
