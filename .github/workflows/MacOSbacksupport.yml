@@ -19,6 +19,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Build Wheel
         run: |
+          export SDKROOT=/Applications/Xcode_12.3.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk
+          export MACOSX_DEPLOYMENT_TARGET=10.9
           pip install wheel
           python setup.py bdist_wheel
           ls dist/*
