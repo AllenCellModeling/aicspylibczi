@@ -1,5 +1,8 @@
 name: Wheel build test
-on: push
+on:
+  push:
+    branches:
+      - 'release/aicspylibczi'
 
 jobs:
   wheel-setup:
@@ -23,66 +26,50 @@ jobs:
           source ~/.bashrc
           source ~/.bash_profile
           export PATH=~/miniconda/bin:$PATH
-          which conda
-          echo "conda create"
           $HOME/miniconda/bin/conda create -y -n jamies36 python=3.6
-          echo "conda activate"
           conda activate jamies36
           export SDKROOT=/Applications/Xcode_12.3.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk
           export MACOSX_DEPLOYMENT_TARGET=10.10
-          echo "which python"
-          which python
           pip install wheel
           python setup.py bdist_wheel
-          ls dist/*
       - name: Build 3.7
         run: |
           source ~/.bashrc
           source ~/.bash_profile
           export PATH=~/miniconda/bin:$PATH
-          which conda
-          echo "conda create"
           $HOME/miniconda/bin/conda create -y -n jamies37 python=3.7
-          echo "conda activate"
           conda activate jamies37
           export SDKROOT=/Applications/Xcode_12.3.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk
           export MACOSX_DEPLOYMENT_TARGET=10.10
-          echo "which python"
-          which python
           pip install wheel
           python setup.py bdist_wheel
-          ls dist/*
       - name: Build 3.8
         run: |
           source ~/.bashrc
           source ~/.bash_profile
           export PATH=~/miniconda/bin:$PATH
-          which conda
-          echo "conda create"
           $HOME/miniconda/bin/conda create -y -n jamies38 python=3.8
-          echo "conda activate"
           conda activate jamies38
           export SDKROOT=/Applications/Xcode_12.3.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk
           export MACOSX_DEPLOYMENT_TARGET=10.10
-          echo "which python"
-          which python
           pip install wheel
           python setup.py bdist_wheel
-          ls dist/*
       - name: Build 3.9
         run: |
           source ~/.bashrc
           source ~/.bash_profile
           export PATH=~/miniconda/bin:$PATH
-          which conda
-          echo "conda create"
           $HOME/miniconda/bin/conda create -y -n jamies39 python=3.9
-          echo "conda activate"
           conda activate jamies39
           export SDKROOT=/Applications/Xcode_12.3.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk
           export MACOSX_DEPLOYMENT_TARGET=10.10
-          echo "which python"
-          which python
           pip install wheel
           python setup.py bdist_wheel
+      - name: Publish to PyPi
+        run: |
+          export PATH=~/miniconda/bin:$PATH
+          conda activate jamies39
+          pip install twine
+          pip install --user --upgrade twine
+          twine upload --repository-url https://upload.pypi.org/legacy/ -u aicspypi -p '${{ secrets.PYPI_TOKEN }}' dist/*
           ls dist/*
