@@ -21,7 +21,8 @@ jobs:
         run: |
           sudo conda create -y -n builder python==3.8
           sudo conda init bash
-          bash
+          /bin/bash
+          source ~/.bashrc
           sudo conda activate builder
           export SDKROOT=/Applications/Xcode_12.3.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk
           export MACOSX_DEPLOYMENT_TARGET=10.9
