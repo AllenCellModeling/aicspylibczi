@@ -26,8 +26,8 @@ jobs:
           source ~/.bashrc
           export PATH=~/miniconda/bin:$PATH
           which conda
-          conda create -y -n builder python=3.8
-          conda activate builder
+          ~/miniconda/bin/conda create -y -n builder python=3.8
+          ~/miniconda/bin/conda activate builder
           export SDKROOT=/Applications/Xcode_12.3.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk
           export MACOSX_DEPLOYMENT_TARGET=10.9
           which python
