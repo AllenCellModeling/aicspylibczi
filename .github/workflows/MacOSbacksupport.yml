@@ -20,6 +20,8 @@ jobs:
           $HOME/miniconda/bin/conda init bash
       - name: Build env
         run: |
+          source ~/.bashrc
+          source ~/.bash_profile
           export PATH=~/miniconda/bin:$PATH
           which conda
           echo "conda create"
