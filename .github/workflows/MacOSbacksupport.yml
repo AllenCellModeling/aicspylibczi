@@ -32,8 +32,10 @@ jobs:
           bash scripts/setupWheelEnv.sh -p 3.9 -f 3_9 -t 10.9
       - name: Publish to PyPi
         run: |
+          source ~/.bashrc
+          source ~/.bash_profile
           export PATH=~/miniconda/bin:$PATH
-          ~/miniconda/bin/conda activate jamies3_9
+          conda activate jamies3_9
           # pip install twine
           # pip install --user --upgrade twine
           # twine upload --repository-url https://upload.pypi.org/legacy/ -u aicspypi -p '${{ secrets.PYPI_TOKEN }}' dist/*
