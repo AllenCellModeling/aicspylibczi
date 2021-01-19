@@ -1,8 +1,5 @@
 name: Wheel build test
-on:
-  push:
-    branches:
-      - 'release/aicspylibczi'
+on: push
 
 jobs:
   wheel-setup:
