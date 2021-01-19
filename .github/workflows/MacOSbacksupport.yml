@@ -6,30 +6,23 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [3.7]
         os: [macOS-10.15]
 
     steps:
       - uses: actions/checkout@v1
         with:
           submodules: true
-      - name: Setup Python
-        uses: actions/setup-python@v1
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Build Wheel
+      - name: Build Miniconda
         run: |
           wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O ~/miniconda.sh
           bash ~/miniconda.sh -b -p $HOME/miniconda
           export PATH=~/miniconda/bin:$PATH
-          conda init bash
-          source ~/.bash_profile
+          ~/miniconda/bin/conda init bash
+      -name: Build env
           export PATH=~/miniconda/bin:$PATH
           which conda
           echo "conda create"
           ~/miniconda/bin/conda create -y -n jamies python=3.8
-          echo "conda init"
-          ~/miniconda/bin/conda init bash
           echo "conda activate"
           ~/miniconda/bin/conda activate jamies
           export SDKROOT=/Applications/Xcode_12.3.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk
