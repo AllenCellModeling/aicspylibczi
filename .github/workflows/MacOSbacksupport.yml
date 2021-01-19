@@ -17,8 +17,8 @@ jobs:
           wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O ~/miniconda.sh
           bash ~/miniconda.sh -b -p $HOME/miniconda
           export PATH=~/miniconda/bin:$PATH
-          ~/miniconda/bin/conda init bash
-      -name: Build env
+          $HOME/miniconda/bin/conda init bash
+      - name: Build env
         run: |
           export PATH=~/miniconda/bin:$PATH
           which conda
