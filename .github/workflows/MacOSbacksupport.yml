@@ -19,6 +19,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Build Wheel
         run: |
+          sudo chown 501:20 /usr/local/miniconda/pkgs/cache/53d7ef51.json
           conda env list
           conda create -y -n builder python==3.8
           conda activate builder
