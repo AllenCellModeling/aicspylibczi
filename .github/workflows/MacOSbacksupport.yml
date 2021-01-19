@@ -28,6 +28,8 @@ jobs:
           which conda
           echo "conda create"
           ~/miniconda/bin/conda create -y -n jamies python=3.8
+          echo "conda init"
+          ~/miniconda/bin/conda init bash
           echo "conda activate"
           ~/miniconda/bin/conda activate jamies
           export SDKROOT=/Applications/Xcode_12.3.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk
