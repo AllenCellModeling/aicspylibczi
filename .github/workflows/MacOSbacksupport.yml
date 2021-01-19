@@ -19,6 +19,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Build Wheel
         run: |
+          echo $SHELL
           sudo conda info -e
           sudo conda create -y -n builder python==3.8
           sudo conda activate builder
