@@ -19,7 +19,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Build Wheel
         run: |
-          sudo conda create -y -n builder python==3.8
+          conda create -y -n builder python=3.8
           source ~/.bashrc
           /usr/local/miniconda/bin/activate builder
           export SDKROOT=/Applications/Xcode_12.3.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk
