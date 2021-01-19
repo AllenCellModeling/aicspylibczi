@@ -1,5 +1,8 @@
 name: Wheel build test
-on: push
+on:
+  push:
+    branches:
+      - 'release/aicspylibczi'
 
 jobs:
   wheel-setup:
@@ -36,7 +39,7 @@ jobs:
           source ~/.bash_profile
           export PATH=~/miniconda/bin:$PATH
           conda activate jamies3_9
-          # pip install twine
-          # pip install --user --upgrade twine
-          # twine upload --repository-url https://upload.pypi.org/legacy/ -u aicspypi -p '${{ secrets.PYPI_TOKEN }}' dist/*
+          pip install twine
+          pip install --user --upgrade twine
+          twine upload --repository-url https://upload.pypi.org/legacy/ -u aicspypi -p '${{ secrets.PYPI_TOKEN }}' dist/*
           ls dist/*
