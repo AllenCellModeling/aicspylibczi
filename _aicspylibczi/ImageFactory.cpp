@@ -165,8 +165,8 @@ ImageFactory::constructImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_
   PixelType pixelType = bitmap_ptr_->GetPixelType();
 
   std::vector<size_t> shape;
-  size_t channels = numberOfChannels(pixelType);
-  if (channels == 3)
+  size_t samples_per_pixel = numberOfChannels(pixelType);
+  if (samples_per_pixel == 3)
     shape.emplace_back(3);
   shape.emplace_back(size_.h);
   shape.emplace_back(size_.w);
@@ -176,7 +176,7 @@ ImageFactory::constructImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_
     imageFactoryFunction(shape, pixelType, plane_coordinate_, box_, m_imgContainer.get(), mem_index_, index_m_);
   if (image == nullptr)
     throw std::bad_alloc();
-  image->loadImage(bitmap_ptr_, size_, channels);
+  image->loadImage(bitmap_ptr_, size_, samples_per_pixel);
   m_imgContainer->addImage(image);
   return image;
 }

@@ -85,12 +85,12 @@ public:
   /*!
    * @brief Copy the image from the libCZI bitmap object into this Image object
    * @param bitmap_ptr_ is the image bitmap from libCZI
-   * @param channels_ the number of channels 1 for GrayX, 3 for BgrX etc. (ie
+   * @param samples_per_pixel_ the number of channels 1 for GrayX, 3 for BgrX etc. (ie
    * the number of XY planes required to hold the image)
    */
   void loadImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_ptr_,
                  libCZI::IntSize size_,
-                 size_t channels_) override;
+                 size_t samples_per_pixel_) override;
 
   // TODO Implement set_sort_order() and operator()<
 
@@ -119,19 +119,21 @@ template<typename T>
 inline void
 TypedImage<T>::loadImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_ptr_,
                          libCZI::IntSize size_,
-                         size_t channels_)
+                         size_t samples_per_pixel_)
 {
   libCZI::ScopedBitmapLockerP lckScoped{ bitmap_ptr_.get() };
   // WARNING do not compute the end of the array by multiplying stride by
   // height, they are both uint32_t and you'll get an overflow for larger images
   uint8_t* sEnd = static_cast<uint8_t*>(lckScoped.ptrDataRoi) + lckScoped.size;
   if ((lckScoped.stride % size_.w == 0) && ( m_pixelType == libCZI::PixelType::Gray8 || m_pixelType == libCZI::PixelType::Gray16 ||
-      m_pixelType == libCZI::PixelType::Gray32Float) && channels_ != 3 ) {
+      m_pixelType == libCZI::PixelType::Gray32Float) &&
+      samples_per_pixel_ != 3 ) {
     std::memcpy(m_array, lckScoped.ptrDataRoi, lckScoped.size);
   }
   else {
-    SourceRange<T> sourceRange(channels_, static_cast<T*>(lckScoped.ptrDataRoi), (T*)(sEnd), lckScoped.stride, size_.w);
-    TargetRange<T> targetRange(channels_, size_.w, size_.h, m_array, m_array + length());
+    SourceRange<T> sourceRange(
+      samples_per_pixel_, static_cast<T*>(lckScoped.ptrDataRoi), (T*)(sEnd), lckScoped.stride, size_.w);
+    TargetRange<T> targetRange(samples_per_pixel_, size_.w, size_.h, m_array, m_array + length());
     for (std::uint32_t h = 0; h < bitmap_ptr_->GetHeight(); ++h) {
       pairedForEach(sourceRange.strideBegin(h),
                     sourceRange.strideEnd(h),
