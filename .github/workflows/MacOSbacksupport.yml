@@ -24,6 +24,7 @@ jobs:
           sudo /usr/local/miniconda/bin/activate builder
           export SDKROOT=/Applications/Xcode_12.3.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.1.sdk
           export MACOSX_DEPLOYMENT_TARGET=10.9
+          which python
           pip install wheel
           python setup.py bdist_wheel
           ls dist/*
