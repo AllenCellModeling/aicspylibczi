@@ -4,6 +4,7 @@
 #include <tuple>
 #include <utility>
 
+#include "AttachmentTypes.h"
 #include "ImageFactory.h"
 #include "ImagesContainer.h"
 #include "Reader.h"
@@ -54,6 +55,25 @@ Reader::readMeta()
   auto md = mds->CreateMetaFromMetadataSegment();
   std::string xml = md->GetXml();
   return xml;
+}
+
+std::string
+Reader::readAttachmentInfo()
+{
+  std::map<int, libCZI::AttachmentInfo> attachmentIndex;
+  m_czireader->EnumerateAttachments([&](int index, const libCZI::AttachmentInfo& infi)->bool{
+    std:cout << index << " : " << infi.name << " | " << infi.contentFileType  << std::endl;
+    attachmentIndex.emplace(index, infi);
+    std::shared_ptr<libCZI::IAttachment> attachment =  m_czireader->ReadAttachment(index);
+    auto aStream = libCZI::CreateStreamFromMemory(attachment.get());
+    uint64_t startFrom = 0;
+    if(index == 0)
+      EventLists tEvents(aStream, startFrom);
+    else if(index == 1)
+      TimeStamps ttime(aStream, startFrom);
+    return true;
+  });
+  return std::string("read attachments!");
 }
 
 bool

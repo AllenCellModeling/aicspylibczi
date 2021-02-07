@@ -244,6 +244,13 @@ TEST_CASE_METHOD(CziCreator, "test_meta_reader", "[Reader_read_meta]")
   REQUIRE(std::strncmp(ans.c_str(), xml.c_str(), ans.size()) == 0);
 }
 
+TEST_CASE_METHOD(CziCreator5, "test_attch_reader", "[Reader_read_attachments]")
+{
+  auto czi = get();
+  std::string ans = czi->readAttachmentInfo();
+  REQUIRE( ans == "read attachments!");
+}
+
 TEST_CASE_METHOD(CziCreator, "test_read_selected", "[Reader_read_selected]")
 {
   auto czi = get();

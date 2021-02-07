@@ -187,6 +187,9 @@ public:
    */
   std::string readMeta();
 
+
+  std::string readAttachmentInfo();
+
   /*!
    * @brief Given a CDimCoordinate, even an empty one, return the planes that match as a numpy ndarray
    *
@@ -319,6 +322,7 @@ private:
   void checkSceneShapes();
 
   libCZI::PixelType getFirstPixelType();
+
 };
 
 }

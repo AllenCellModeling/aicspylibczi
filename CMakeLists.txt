@@ -45,12 +45,12 @@ set(PYLIBCZI_C_SRC_HEADERS _aicspylibczi/Reader.h _aicspylibczi/helper_algorithm
         _aicspylibczi/IndexMap.h _aicspylibczi/Image.h _aicspylibczi/TypedImage.h _aicspylibczi/ImageFactory.h
         _aicspylibczi/SourceRange.h _aicspylibczi/TargetRange.h _aicspylibczi/pylibczi_ostream.h
         _aicspylibczi/SubblockMetaVec.h _aicspylibczi/DimIndex.h _aicspylibczi/constants.h
-        _aicspylibczi/StreamImplLockingRead.h _aicspylibczi/Threadpool.h)
+        _aicspylibczi/StreamImplLockingRead.h _aicspylibczi/Threadpool.h _aicspylibczi/AttachmentTypes.h)
 
 set(PYLIBCZI_C_SRC _aicspylibczi/Reader.cpp _aicspylibczi/IndexMap.cpp _aicspylibczi/Image.cpp _aicspylibczi/ImageFactory.cpp
         _aicspylibczi/pylibczi_ostream.cpp _aicspylibczi/exceptions.cpp _aicspylibczi/SubblockSortable.h
         _aicspylibczi/pb_caster_SubblockMetaVec.h _aicspylibczi/constants.cpp _aicspylibczi/DimIndex.cpp
-        _aicspylibczi/StreamImplLockingRead.cpp)
+        _aicspylibczi/StreamImplLockingRead.cpp _aicspylibczi/AttachmentTypes.cpp)
 
 set(PYLIBCZI_PYBIND11 _aicspylibczi/pb_bindings.cpp _aicspylibczi/pb_helpers.h _aicspylibczi/pb_helpers.cpp _aicspylibczi/pb_caster_ImagesContainer.h
         _aicspylibczi/pb_caster_BytesIO.h _aicspylibczi/pb_caster_libCZI_DimensionIndex.h _aicspylibczi/CSimpleStreamImplFromFd.h
