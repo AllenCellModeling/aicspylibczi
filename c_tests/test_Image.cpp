@@ -22,12 +22,12 @@ TEST_CASE("imagefactory_pixeltype", "[ImageFactory_PixelType]")
 
 TEST_CASE("imagefactory_nofchannels", "[ImageFactory_NofChannels]")
 {
-  REQUIRE(ImageFactory::numberOfChannels(libCZI::PixelType::Gray8) == 1);
-  REQUIRE(ImageFactory::numberOfChannels(libCZI::PixelType::Gray16) == 1);
-  REQUIRE(ImageFactory::numberOfChannels(libCZI::PixelType::Bgr24) == 3);
-  REQUIRE(ImageFactory::numberOfChannels(libCZI::PixelType::Bgr48) == 3);
-  REQUIRE(ImageFactory::numberOfChannels(libCZI::PixelType::Gray32Float) == 1);
-  REQUIRE(ImageFactory::numberOfChannels(libCZI::PixelType::Bgr96Float) == 3);
+  REQUIRE(ImageFactory::numberOfSamples(libCZI::PixelType::Gray8) == 1);
+  REQUIRE(ImageFactory::numberOfSamples(libCZI::PixelType::Gray16) == 1);
+  REQUIRE(ImageFactory::numberOfSamples(libCZI::PixelType::Bgr24) == 3);
+  REQUIRE(ImageFactory::numberOfSamples(libCZI::PixelType::Bgr48) == 3);
+  REQUIRE(ImageFactory::numberOfSamples(libCZI::PixelType::Gray32Float) == 1);
+  REQUIRE(ImageFactory::numberOfSamples(libCZI::PixelType::Bgr96Float) == 3);
 }
 
 class CziImageCreator
