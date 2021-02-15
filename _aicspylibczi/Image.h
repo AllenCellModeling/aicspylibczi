@@ -36,12 +36,12 @@ protected:
    * m_matrixSizes can be 2D or 3D depending on m_pixelType which holds the
    * pixel type of the image (see libCZI). Examples: assuming a 1080p image
    * PixelType::Gray16 => 2D (1080, 1920)
-   * PixelType::Bgr48 => 3D (3, 1080, 1920)
+   * PixelType::Bgr48 => 3D (1080, 1920, 3)
    * 3D images can be split up into 2D planes. This functionality is present for
    * consistency with the Channel Dimension.
    */
 
-  std::vector<size_t> m_shape; // C Y X order or Y X  ( H, W )  The shape of the data being stored
+  std::vector<size_t> m_shape; // Y X A order or Y X  ( H, W )  The shape of the data being stored
   libCZI::PixelType m_pixelType;
   libCZI::IntRect m_xywh; // (x0, y0, w, h) for image bounding box
 
@@ -142,8 +142,8 @@ public:
     }
     auto heightByWidth = front()->shape(); // assumption: images are the same shape, if not 🙃
     size_t hByWsize = heightByWidth.size();
-    charSizes.emplace_back('Y', heightByWidth[hByWsize - 2]); // H: 2 - 2 = 0 | 3 - 2 = 1
-    charSizes.emplace_back('X', heightByWidth[hByWsize - 1]); // W: 2 - 1 = 1 | 3 - 1 = 2
+    charSizes.emplace_back('Y', heightByWidth[0]); // H: 0
+    charSizes.emplace_back('X', heightByWidth[1]); // W: 1
     // sort them into decending DimensionIndex Order
     std::sort(charSizes.begin(), charSizes.end(), [&](std::pair<char, size_t> a_, std::pair<char, size_t> b_) {
       return libCZI::Utils::CharToDimension(a_.first) > libCZI::Utils::CharToDimension(b_.first);

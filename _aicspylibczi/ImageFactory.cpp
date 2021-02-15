@@ -137,7 +137,7 @@ ImageFactory::sizeOfPixelType(PixelType pixel_type_)
 }
 
 size_t
-ImageFactory::numberOfChannels(libCZI::PixelType pixel_type_)
+ImageFactory::numberOfSamples(libCZI::PixelType pixel_type_)
 {
   switch (pixel_type_) {
     case PixelType::Gray8:
@@ -165,11 +165,12 @@ ImageFactory::constructImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_
   PixelType pixelType = bitmap_ptr_->GetPixelType();
 
   std::vector<size_t> shape;
-  size_t samples_per_pixel = numberOfChannels(pixelType);
-  if (samples_per_pixel == 3)
-    shape.emplace_back(3);
+  size_t samples_per_pixel = numberOfSamples(pixelType);
+
   shape.emplace_back(size_.h);
   shape.emplace_back(size_.w);
+  if (samples_per_pixel == 3)
+    shape.emplace_back(3);
 
   auto imageFactoryFunction = s_pixelToImageConstructor[pixelType];
   std::shared_ptr<Image> image =
@@ -203,17 +204,9 @@ ImageFactory::getFixedShape(void)
   if (m_imgContainer->pixelType() == libCZI::PixelType::Bgr24 ||
       m_imgContainer->pixelType() == libCZI::PixelType::Bgr48 ||
       m_imgContainer->pixelType() == libCZI::PixelType::Bgr96Float) {
-    auto ittr =
-      find_if(charSizes.begin(), charSizes.end(), [](std::pair<char, size_t>& pr) { return (pr.first == 'C'); });
-    if (ittr != charSizes.end())
-      ittr->second *= 3; // scale the C channel by 3 because we're expanding it
-    else {               // There's an implicit C channel so add it and set it to 3
-      charSizes.push_back(std::pair<char, size_t>('C', 3));
-      std::sort(charSizes.begin(), charSizes.end(), [&](std::pair<char, size_t> a_, std::pair<char, size_t> b_) {
-        return libCZI::Utils::CharToDimension(a_.first) > libCZI::Utils::CharToDimension(b_.first);
-      });
-    }
+    charSizes.emplace_back('A', 3);
   }
   return charSizes;
 }
+
 }

@@ -149,7 +149,7 @@ public:
    * @brief Get the Dimensions in the order that they appear.
    * @return a string containing the dimensions. Y & X are included for completeness despite not being DimensionIndexes.
    */
-  std::string dimsString() const;
+  std::string dimsString();
 
   /*!
    * @brief Get the size of the dimensions in the same order as dimsString()

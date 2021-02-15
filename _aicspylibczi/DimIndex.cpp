@@ -5,6 +5,8 @@ char
 dimIndexToChar(DimIndex index_)
 {
   switch (index_) {
+    case DimIndex::A:
+      return 'A';
     case DimIndex::X:
       return 'X';
     case DimIndex::Y:
@@ -38,6 +40,9 @@ DimIndex
 charToDimIndex(char c_)
 {
   switch (c_) {
+    case 'a':
+    case 'A':
+      return DimIndex::A;
     case 'x':
     case 'X':
       return DimIndex::X;
@@ -80,9 +85,9 @@ charToDimIndex(char c_)
 }
 
 libCZI::DimensionIndex
-dimIndexToDimensionIndex(DimIndex index_)
+DimIndexToDimensionIndex(DimIndex dim_index_)
 {
-  return libCZI::Utils::CharToDimension(dimIndexToChar(index_));
+  return libCZI::Utils::CharToDimension(dimIndexToChar(dim_index_));
 }
 
 DimIndex

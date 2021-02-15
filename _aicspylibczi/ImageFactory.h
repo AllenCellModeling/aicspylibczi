@@ -46,7 +46,7 @@ public:
 
   static size_t sizeOfPixelType(PixelType pixel_type_);
 
-  static size_t numberOfChannels(PixelType pixel_type_);
+  static size_t numberOfSamples(PixelType pixel_type_);
 
   void setMosaic(bool val_) { m_imgContainer->images().setMosaic(val_); }
 

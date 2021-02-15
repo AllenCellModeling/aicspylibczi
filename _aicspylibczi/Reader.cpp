@@ -110,6 +110,10 @@ Reader::dimSizes()
   ans.push_back(sbsize.h);
   ans.push_back(sbsize.w);
 
+  pixelType();
+  if (ImageFactory::numberOfSamples(m_pixelType) == 3)
+    ans.push_back(3);
+
   return ans;
 }
 
@@ -146,6 +150,7 @@ Reader::sceneShape(int scene_index_)
   bool sceneBool(false);
   int sceneStart(0), sceneSize(0);
   tie(sceneBool, sceneStart, sceneSize) = scenesStartSize();
+  pixelType(); // this may look like it isn't used but it's setting m_pixelType
 
   DimIndexRangeMap tbl;
 
@@ -190,6 +195,9 @@ Reader::sceneShape(int scene_index_)
     tbl.emplace(DimIndex::Y, std::make_pair(0, xySize.h));
     tbl.emplace(DimIndex::X, std::make_pair(0, xySize.w));
   }
+  if (ImageFactory::numberOfSamples(m_pixelType) == 3)
+    tbl.emplace(charToDimIndex('A'), std::make_pair(0, 2));
+
   return tbl;
 }
 
@@ -256,7 +264,7 @@ Reader::getFirstPixelType()
 /// @brief get the Dimensions in the order they appear in
 /// @return a string containing the Dimensions for the image data object
 std::string
-Reader::dimsString() const
+Reader::dimsString()
 {
   std::string ans;
   m_statistics.dimBounds.EnumValidDimensions([&ans](libCZI::DimensionIndex di_, int start_, int size_) -> bool {
@@ -272,6 +280,11 @@ Reader::dimsString() const
     ans += "M";
 
   ans += "YX";
+
+  pixelType();
+  if (ImageFactory::numberOfSamples(m_pixelType) == 3)
+    ans += "A";
+
   return ans;
 }
 
@@ -289,7 +302,7 @@ Reader::readSelected(libCZI::CDimCoordinate& plane_coord_, int index_m_, unsigne
   // SubblockIndexVec is actually a set this is crucial to preserve the image order
   SubblockIndexVec matches = getMatches(subblocksToFind);
   m_pixelType = matches.begin()->first.pixelType();
-  size_t bgrScaling = ImageFactory::numberOfChannels(m_pixelType);
+  size_t bgrScaling = ImageFactory::numberOfSamples(m_pixelType);
 
   libCZI::IntRect w_by_h = getSceneYXSize();
   size_t n_of_pixels = matches.size() * w_by_h.w * w_by_h.h; // bgrScaling is handled internally * bgrScaling;
@@ -460,7 +473,7 @@ Reader::readMosaic(libCZI::CDimCoordinate plane_coord_, float scale_factor_, lib
                                   -1); // just check that the dims match something ignore that it's a mosaic file
   SubblockIndexVec matches = getMatches(subBlockToFind); // this does the checking
   m_pixelType = matches.begin()->first.pixelType();
-  size_t bgrScaling = ImageFactory::numberOfChannels(m_pixelType);
+  size_t bgrScaling = ImageFactory::numberOfSamples(m_pixelType);
   auto accessor = m_czireader->CreateSingleChannelScalingTileAccessor();
 
   // multiTile accessor is not compatible with S, it composites the Scenes and the mIndexs together

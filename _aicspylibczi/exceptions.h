@@ -131,6 +131,18 @@ public:
   }
 };
 
+class StrideAssumptionExcetpion : public std::runtime_error
+{
+public:
+  explicit StrideAssumptionExcetpion(const std::string& message_)
+    : std::runtime_error("Image Stride % Width != 0. Please create an issue at "
+                         "https://github.com/AllenCellModeling/aicspylibczi "
+                         "your file represents a case I didn't realized existed. "
+                         "If you can share the file that would be exceptionally helpful. Thank you!"
+                         + message_)
+  {}
+};
+
 }
 
 #endif //_PYLIBCZI_EXCEPTIONS_H
