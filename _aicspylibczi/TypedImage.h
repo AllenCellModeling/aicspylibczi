@@ -125,9 +125,22 @@ TypedImage<T>::loadImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_ptr_
   // WARNING do not compute the end of the array by multiplying stride by
   // height, they are both uint32_t and you'll get an overflow for larger images
   uint8_t* sEnd = static_cast<uint8_t*>(lckScoped.ptrDataRoi) + lckScoped.size;
-  if (lckScoped.stride % size_.w != 0)
-    throw StrideAssumptionExcetpion("");
-  std::memcpy(m_array, lckScoped.ptrDataRoi, lckScoped.size);
+  if (lckScoped.stride%size_.w == 0 && lckScoped.stride/size_.w == sizeof(T)){
+    // this is the vast majority of cases
+    std::memcpy(m_array, lckScoped.ptrDataRoi, lckScoped.size);
+  } else if (lckScoped.stride > size_.w){
+    // This mostly handles scaled mosaic images
+    size_t bytesPerRow = samples_per_pixel_ * sizeof(T) * size_.w;
+    for( int j = 0; j < size_.h ; j++){
+      std::memcpy(m_array + j*bytesPerRow,
+                  (void *)((char *)(lckScoped.ptrDataRoi) + j*lckScoped.stride),
+                  bytesPerRow);
+    }
+  } else{
+    std::stringstream msg;
+    msg << "Stride < width : " << lckScoped.stride << " < " << size_.w << std::endl;
+    throw StrideAssumptionExcetpion(msg.str());
+  }
 }
 
 }
