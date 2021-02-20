@@ -201,11 +201,6 @@ ImageFactory::getFixedShape(void)
   auto images = m_imgContainer->images();
   images.sort();
   auto charSizes = images.getShape();
-  if (m_imgContainer->pixelType() == libCZI::PixelType::Bgr24 ||
-      m_imgContainer->pixelType() == libCZI::PixelType::Bgr48 ||
-      m_imgContainer->pixelType() == libCZI::PixelType::Bgr96Float) {
-    charSizes.emplace_back('A', 3);
-  }
   return charSizes;
 }
 

@@ -2,6 +2,7 @@ import io
 from lxml import etree
 import numpy as np
 import pytest
+import time
 
 from aicspylibczi import CziFile
 from _aicspylibczi import PylibCZI_CDimCoordinatesOverspecifiedException
@@ -139,7 +140,7 @@ def test_mosaic_size(data_dir, fname, expected):
     ('s_1_t_1_c_1_z_1.czi', (1, 1, 325, 475)),  # B C Y X
     ('s_3_t_1_c_3_z_5.czi', (1, 3, 3, 5, 325, 475)),  # B S C Z Y X
     ('mosaic_test.czi', (1, 1, 1, 1, 2, 624, 924)),  # S T C Z M Y X
-    ('RGB-8bit.czi', (1, 3, 624, 924)),  # T C Y X
+    ('RGB-8bit.czi', (1, 624, 924, 3)),  # T C Y X A
 ])
 def test_read_image(data_dir, fname, expected):
     czi = CziFile(str(data_dir / fname))
@@ -175,7 +176,7 @@ def test_read_image_args(data_dir, fname, args, expected):
                                        'S': (0, 3), 'Z': (0, 5)}]),
     ('mosaic_test.czi', "STCZMYX", [{'S': (0, 1), 'T': (0, 1), 'C': (0, 1), 'Z': (0, 1),
                                     'M': (0, 2), 'Y': (0, 624), 'X': (0, 924)}]),
-
+    ('RGB-8bit.czi', "TYXA", [{'T': (0, 1), 'Y': (0, 624), 'X': (0, 924), 'A': (0, 2)}]),
 ])
 def test_read_image_two(data_dir, fname, exp_str, exp_dict):
     czi = CziFile(str(data_dir / fname))
@@ -233,7 +234,7 @@ def test_image_shape(data_dir, fname, expects):
     with open(data_dir / fname, 'rb') as fp:
         czi = CziFile(czi_filename=fp)
         shape = czi.dims_shape()
-    assert shape == expects
+        assert shape == expects
 
 
 @pytest.mark.parametrize("fname, expects", [
@@ -246,7 +247,7 @@ def test_mosaic_image(data_dir, fname, expects):
         assert sze[2] == 1756
         assert sze[3] == 624
         img = czi.read_mosaic(scale_factor=0.1, C=0)
-    assert img.shape[0] == 1
+        assert img.shape[0] == 1
 
 
 @pytest.mark.parametrize("fname, expects", [
@@ -258,7 +259,7 @@ def test_mosaic_image_two(data_dir, fname, expects):
         sze = czi.read_mosaic_size()
         rgion = (sze[0], sze[1], int(sze[2]/2), int(sze[3]/2))
         img = czi.read_mosaic(region=rgion, C=0, M=0)
-    assert img.shape == expects
+        assert img.shape == expects
 
 
 @pytest.mark.parametrize("fname, s_index, m_index, expected", [
@@ -301,5 +302,7 @@ def test_bgr_plane_data_x(data_dir, fname, p_index, ans_file):
     with open(data_dir/fname, 'rb') as fp:
         czi = CziFile(czi_filename=fp)
         img, dims = czi.read_image()
-        assert img[0, p_index, :, :].shape == ans.shape
-        np.testing.assert_array_almost_equal(img[0, p_index, :, :], ans)
+        print(dims)
+        print(img.shape)
+        assert img[0, :, :, p_index].shape == ans.shape
+        np.testing.assert_array_almost_equal(img[0, :, :, p_index], ans)

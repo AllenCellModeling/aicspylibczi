@@ -144,6 +144,8 @@ public:
     size_t hByWsize = heightByWidth.size();
     charSizes.emplace_back('Y', heightByWidth[0]); // H: 0
     charSizes.emplace_back('X', heightByWidth[1]); // W: 1
+    if (hByWsize > 2)
+      charSizes.emplace_back('A', heightByWidth[2]); // A: 3
     // sort them into decending DimensionIndex Order
     std::sort(charSizes.begin(), charSizes.end(), [&](std::pair<char, size_t> a_, std::pair<char, size_t> b_) {
       return libCZI::Utils::CharToDimension(a_.first) > libCZI::Utils::CharToDimension(b_.first);

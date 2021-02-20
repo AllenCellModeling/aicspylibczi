@@ -453,6 +453,9 @@ TEST_CASE_METHOD(CziBgrCreator, "test_bgr_flatten", "[Reader_read_flatten_bgr]")
   auto shape = imgCont.second;
   REQUIRE(pr.size() == 1);
 
+  std::vector<std::pair<char, size_t>> dimsTwo = pr.getShape();
+  std::vector<std::pair<char, size_t>> dimsTwoAns = {{'T', 1}, {'Y', 624}, {'X', 924}, {'A', 3}};
+  REQUIRE(dimsTwo == dimsTwoAns);
   for (const auto& x : pr) {
     REQUIRE(x->shape()[0] == 624);
     REQUIRE(x->shape()[1] == 924);
@@ -562,7 +565,13 @@ TEST_CASE_METHOD(CziBgrCreator2, "test_bgr2_flatten", "[Reader_read_flatten_bgr2
 {
   auto czi = get();
 
+  using pDI = pylibczi::DimIndex;
   auto dims = czi->readDimsRange();
+  pylibczi::Reader::DimsShape ans = {
+    { { pDI::S, { 0, 1 } }, { pDI::C, { 0, 7 } }, { pDI::Y, { 0, 81 } }, { pDI::X, { 0, 147 } }, { pDI::A, { 0, 2 } } }
+  };
+
+  REQUIRE(dims == ans);
   libCZI::CDimCoordinate dm = libCZI::CDimCoordinate{ { libCZI::DimensionIndex::C, 4 } };
   auto imgCont = czi->readSelected(dm, -1, CORES_FOR_THREADS);
   auto pr = imgCont.first->images();
