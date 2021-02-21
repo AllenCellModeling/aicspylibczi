@@ -30,12 +30,6 @@ namespace pb_helpers {
           return a_.second;
       });
 
-      std::cout << "\n[ ";
-      for_each(shape.begin(), shape.end(), [](int x){
-        std::cout << x << ", ";
-      });
-      std:cout << "]" << std::endl;
-
       T* mptr = tptr->releaseMemory();
 
       py::capsule freeWhenDone(mptr, [](void* f_) {
