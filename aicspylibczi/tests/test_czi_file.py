@@ -239,7 +239,7 @@ def test_image_shape(data_dir, fname, expects):
 
 @pytest.mark.parametrize("fname, unscaled_size, expects", [
     ('mosaic_test.czi', (0, 0, 1756, 624), [{'B': (0, 1), 'C': (0, 1), 'X': (0, 475), 'Y': (0, 325)}]),
-    ('Multiscene_CZI_3Scenes.czi',(495412, 354694, 3587, 1926),  [{'X': (0, 358), 'Y': (0,192)}]),
+    ('Multiscene_CZI_3Scenes.czi', (495412, 354694, 3587, 1926),  [{'X': (0, 358), 'Y': (0, 192)}]),
 ])
 def test_mosaic_image(data_dir, fname, unscaled_size, expects):
     with open(data_dir / fname, 'rb') as fp:
@@ -251,7 +251,6 @@ def test_mosaic_image(data_dir, fname, unscaled_size, expects):
         assert img.shape[0] == 1
         assert img.shape[1] == unscaled_size[3]//10
         assert img.shape[2] == unscaled_size[2]//10
-
 
 
 @pytest.mark.parametrize("fname, expects", [
