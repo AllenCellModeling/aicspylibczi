@@ -9,7 +9,9 @@
 
 using namespace std;
 
-ostream& operator<<(ostream& out_, const libCZI::CDimCoordinate& plane_coordante_);
-ostream& operator<<(ostream& out_, const libCZI::CDimBounds& plane_coordinate_bounds_);
+ostream&
+operator<<(ostream& out_, const libCZI::CDimCoordinate& plane_coordante_);
+ostream&
+operator<<(ostream& out_, const libCZI::CDimBounds& plane_coordinate_bounds_);
 
 #endif //_PYLIBCZI_PYLIBCZI_OSTREAM_H

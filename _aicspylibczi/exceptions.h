@@ -42,7 +42,7 @@ public:
                            const std::string& message_)
     : std::runtime_error("")
   {
-    std::stringstream front;  // x ∉ Y means x is not an element of Y, or x is not in Y
+    std::stringstream front; // x ∉ Y means x is not an element of Y, or x is not in Y
     front << "Requirement violated requested region is not a subset of the "
              "defined image! \n\t "
           << requested_box_ << " ⊄ " << image_box_ << "\n\t" << message_ << std::endl;
@@ -138,8 +138,8 @@ public:
     : std::runtime_error("Image Stride % Width != 0. Please create an issue at \n"
                          "https://github.com/AllenCellModeling/aicspylibczi \n"
                          "your file represents a case I didn't realized existed.\n"
-                         "If you can share the file that would be exceptionally helpful. Thank you!\n"
-                         + message_)
+                         "If you can share the file that would be exceptionally helpful. Thank you!\n" +
+                         message_)
   {}
 };
 

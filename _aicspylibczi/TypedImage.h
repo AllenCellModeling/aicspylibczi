@@ -124,19 +124,18 @@ TypedImage<T>::loadImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_ptr_
   libCZI::ScopedBitmapLockerP lckScoped{ bitmap_ptr_.get() };
   // WARNING do not compute the end of the array by multiplying stride by
   // height, they are both uint32_t and you'll get an overflow for larger images
-  if (lckScoped.stride%size_.w == 0 && lckScoped.stride/size_.w == sizeof(T)){
+  if (lckScoped.stride % size_.w == 0 && lckScoped.stride / size_.w == sizeof(T)) {
     // this is the vast majority of cases
     std::memcpy(m_array, lckScoped.ptrDataRoi, lckScoped.size);
-  } else if (lckScoped.stride > size_.w){
+  } else if (lckScoped.stride > size_.w) {
     // This mostly handles scaled mosaic images
-    size_t pixelsPerRow = samples_per_pixel_* size_.w;
+    size_t pixelsPerRow = samples_per_pixel_ * size_.w;
     size_t bytesPerRow = pixelsPerRow * sizeof(T);
-    for( int j = 0; j < size_.h ; j++){
-      std::memcpy(m_array + j*pixelsPerRow,
-                  (void *)((char *)(lckScoped.ptrDataRoi) + j*lckScoped.stride),
-                  bytesPerRow);
+    for (int j = 0; j < size_.h; j++) {
+      std::memcpy(
+        m_array + j * pixelsPerRow, (void*)((char*)(lckScoped.ptrDataRoi) + j * lckScoped.stride), bytesPerRow);
     }
-  } else{
+  } else {
     std::stringstream msg;
     msg << "Stride < width : " << lckScoped.stride << " < " << size_.w << std::endl;
     throw StrideAssumptionExcetpion(msg.str());
