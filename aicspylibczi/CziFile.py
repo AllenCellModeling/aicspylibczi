@@ -19,7 +19,6 @@ class CziFile(object):
 
     Kwargs:
       |  metafile_out (str): Filename of xml file to optionally export czi meta data to.
-      |  use_pylibczi (bool): Set to false to use Christoph Gohlke's czifile reader instead of libCZI.
       |  verbose (bool): Print information and times during czi file access.
 
     .. note::
@@ -42,6 +41,11 @@ class CziFile(object):
     # I = 6  # The I-dimension ("illumination").
     # H = 7  # The H-dimension ("phase").
     # V = 8  # The V-dimension ("view").
+
+    # aicspylibczi extended dims -- These may be returned but can not be used to request subblocks from the file
+    # A  # The A-dimension ("samples" - RGB images).
+    # X  # The X-dimension
+    # Y  # The Y-dimension
     ####
     ZISRAW_DIMS = {'Z', 'C', 'T', 'R', 'S', 'I', 'H', 'V', 'B'}
 
@@ -75,12 +79,30 @@ class CziFile(object):
     def dims(self):
         """
         Get the dimensions present the binary data (not the metadata)
-        Y and X are included for completeness but can not be used as constraints.
+        M, Y, X, A are included for completeness but can not be used as constraints.
 
         Returns
         -------
         str
             A string containing Dimensions letters present, ie "BSTZYX"
+
+        Note
+        ----
+        Dimensions defined in libCZI -
+            V - view
+            H - phase
+            I - illumination
+            S - scene
+            R - rotation
+            T - time
+            C - channel
+            Z - z plane (height)
+
+        Dimensions added by aicspylibczi -
+            M - mosaic tile, mosaic images only
+            Y - image height
+            X - image width
+            A - samples, BGR/RGB images only
 
         """
         return self.reader.read_dims_string()
@@ -174,7 +196,7 @@ class CziFile(object):
         Returns
         -------
         tuple
-            List[BoundingBox tuples] for the specified scene
+            List[(x0, y0, w, h)] for the specified scene
 
         """
         bboxes = self.reader.read_mosaic_scene_boxes(index, True)
@@ -330,7 +352,7 @@ class CziFile(object):
         Returns
         -------
         (int, int, int, int)
-            (x, y, w, h) the bounding box of the tile
+            (x0, y0, w, h) the bounding box of the tile
 
         """
         plane_constraints = self.czilib.DimCoord()
@@ -343,9 +365,9 @@ class CziFile(object):
         """
         Read the subblocks in the CZI file and for any subblocks that match all the constraints in kwargs return
         that data. This allows you to select channels/scenes/time-points/Z-slices etc. Note if passed a BGR image
-        then the dims of the object will returned by this function and the implicit BGR channel will be expanded
-        into 3 channels. This shape differ from the values of dims(), size(), and dims_shape() as these are returning
-        the native shape without changing from BGR_3X to Gray_X.
+        then the dims of the object will returned by this function and the implicit BGR will be expanded into an
+        A dimension. A is samples per pixel and will only be present for BGR images. This is logically more cosistent
+        than mixing the samples into the channels as was done before aicspylibczi-3.0.0.
 
         Parameters
         ----------
@@ -393,7 +415,7 @@ class CziFile(object):
         Returns
         -------
         (int, int, int, int)
-            (x, y, w, h) the bounding box of the mosaic image
+            (x0, y0, w, h) the bounding box of the mosaic image
 
         """
         if not self.reader.is_mosaic():
@@ -418,7 +440,7 @@ class CziFile(object):
         Parameters
         ----------
         region
-            A rectangle specifying the extraction box (x, y, width, height) specified in pixels
+            A rectangle specifying the extraction box (x0, y0, width, height) specified in pixels
         scale_factor
             The amount to scale the data by, 0.1 would mean an image 1/10 the height and width of native, if you
             get distortions it seems to be due to a bug in Zeiss's libCZI I'm trying to track it down but for now
