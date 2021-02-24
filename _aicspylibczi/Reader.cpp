@@ -111,8 +111,8 @@ Reader::dimSizes()
   ans.push_back(sbsize.w);
 
   pixelType();
-  if (ImageFactory::numberOfSamples(m_pixelType) == 3)
-    ans.push_back(3);
+  if (ImageFactory::numberOfSamples(m_pixelType) > 1)
+    ans.push_back(ImageFactory::numberOfSamples(m_pixelType));
 
   return ans;
 }
@@ -195,8 +195,8 @@ Reader::sceneShape(int scene_index_)
     tbl.emplace(DimIndex::Y, std::make_pair(0, xySize.h));
     tbl.emplace(DimIndex::X, std::make_pair(0, xySize.w));
   }
-  if (ImageFactory::numberOfSamples(m_pixelType) == 3)
-    tbl.emplace(charToDimIndex('A'), std::make_pair(0, 2));
+  if (ImageFactory::numberOfSamples(m_pixelType) > 1)
+    tbl.emplace(charToDimIndex('A'), std::make_pair(0, ImageFactory::numberOfSamples(m_pixelType)));
 
   return tbl;
 }
@@ -282,7 +282,7 @@ Reader::dimsString()
   ans += "YX";
 
   pixelType();
-  if (ImageFactory::numberOfSamples(m_pixelType) == 3)
+  if (ImageFactory::numberOfSamples(m_pixelType) > 1)
     ans += "A";
 
   return ans;

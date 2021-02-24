@@ -140,7 +140,7 @@ def test_mosaic_size(data_dir, fname, expected):
     ('s_1_t_1_c_1_z_1.czi', (1, 1, 325, 475)),  # B C Y X
     ('s_3_t_1_c_3_z_5.czi', (1, 3, 3, 5, 325, 475)),  # B S C Z Y X
     ('mosaic_test.czi', (1, 1, 1, 1, 2, 624, 924)),  # S T C Z M Y X
-    ('RGB-8bit.czi', (1, 624, 924, 3)),  # T C Y X A
+    ('RGB-8bit.czi', (1, 624, 924, 3)),  # T Y X A
 ])
 def test_read_image(data_dir, fname, expected):
     czi = CziFile(str(data_dir / fname))
@@ -176,7 +176,7 @@ def test_read_image_args(data_dir, fname, args, expected):
                                        'S': (0, 3), 'Z': (0, 5)}]),
     ('mosaic_test.czi', "STCZMYX", [{'S': (0, 1), 'T': (0, 1), 'C': (0, 1), 'Z': (0, 1),
                                     'M': (0, 2), 'Y': (0, 624), 'X': (0, 924)}]),
-    ('RGB-8bit.czi', "TYXA", [{'T': (0, 1), 'Y': (0, 624), 'X': (0, 924), 'A': (0, 2)}]),
+    ('RGB-8bit.czi', "TYXA", [{'T': (0, 1), 'Y': (0, 624), 'X': (0, 924), 'A': (0, 3)}]),
 ])
 def test_read_image_two(data_dir, fname, exp_str, exp_dict):
     czi = CziFile(str(data_dir / fname))

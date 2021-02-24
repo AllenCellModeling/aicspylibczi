@@ -430,7 +430,7 @@ TEST_CASE_METHOD(CziBgrCreator, "test_bgr_read", "[Reader_read_bgr]")
 
   using DI = pylibczi::DimIndex;
   pylibczi::Reader::DimsShape ansDims{
-    { { DI::T, { 0, 1 } }, { DI::Y, { 0, 624 } }, { DI::X, { 0, 924 } }, { DI::A, { 0, 2 } } }
+    { { DI::T, { 0, 1 } }, { DI::Y, { 0, 624 } }, { DI::X, { 0, 924 } }, { DI::A, { 0, 3 } } }
   };
   auto dims = czi->readDimsRange();
   REQUIRE(!dims.empty());
@@ -548,7 +548,7 @@ TEST_CASE_METHOD(CziBgrCreator2, "test_bgr2_read", "[Reader_read_bgr2]")
 
   using DI = pylibczi::DimIndex;
   pylibczi::Reader::DimsShape ansDims{
-    { { DI::S, { 0, 1 } }, { DI::C, { 0, 7 } }, { DI::Y, { 0, 81 } }, { DI::X, { 0, 147 } }, { DI::A, { 0, 2 } } }
+    { { DI::S, { 0, 1 } }, { DI::C, { 0, 7 } }, { DI::Y, { 0, 81 } }, { DI::X, { 0, 147 } }, { DI::A, { 0, 3 } } }
   };
   auto dims = czi->readDimsRange();
   REQUIRE(!dims.empty());
@@ -568,7 +568,7 @@ TEST_CASE_METHOD(CziBgrCreator2, "test_bgr2_flatten", "[Reader_read_flatten_bgr2
   using pDI = pylibczi::DimIndex;
   auto dims = czi->readDimsRange();
   pylibczi::Reader::DimsShape ans = {
-    { { pDI::S, { 0, 1 } }, { pDI::C, { 0, 7 } }, { pDI::Y, { 0, 81 } }, { pDI::X, { 0, 147 } }, { pDI::A, { 0, 2 } } }
+    { { pDI::S, { 0, 1 } }, { pDI::C, { 0, 7 } }, { pDI::Y, { 0, 81 } }, { pDI::X, { 0, 147 } }, { pDI::A, { 0, 3 } } }
   };
 
   REQUIRE(dims == ans);
