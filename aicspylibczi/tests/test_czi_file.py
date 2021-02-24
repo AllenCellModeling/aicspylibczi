@@ -305,7 +305,5 @@ def test_bgr_plane_data_x(data_dir, fname, p_index, ans_file):
     with open(data_dir/fname, 'rb') as fp:
         czi = CziFile(czi_filename=fp)
         img, dims = czi.read_image()
-        print(dims)
-        print(img.shape)
         assert img[0, :, :, p_index].shape == ans.shape
         np.testing.assert_array_almost_equal(img[0, :, :, p_index], ans)
