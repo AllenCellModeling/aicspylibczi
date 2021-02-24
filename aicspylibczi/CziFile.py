@@ -366,7 +366,7 @@ class CziFile(object):
         Read the subblocks in the CZI file and for any subblocks that match all the constraints in kwargs return
         that data. This allows you to select channels/scenes/time-points/Z-slices etc. Note if passed a BGR image
         then the dims of the object will returned by this function and the implicit BGR will be expanded into an
-        A dimension. A is samples per pixel and will only be present for BGR images. This is logically more cosistent
+        A dimension. A is samples per pixel and will only be present for BGR images. This is logically more consistent
         than mixing the samples into the channels as was done before aicspylibczi-3.0.0.
 
         Parameters
