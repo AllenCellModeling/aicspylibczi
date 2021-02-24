@@ -454,7 +454,7 @@ TEST_CASE_METHOD(CziBgrCreator, "test_bgr_flatten", "[Reader_read_flatten_bgr]")
   REQUIRE(pr.size() == 1);
 
   std::vector<std::pair<char, size_t>> dimsTwo = pr.getShape();
-  std::vector<std::pair<char, size_t>> dimsTwoAns = {{'T', 1}, {'Y', 624}, {'X', 924}, {'A', 3}};
+  std::vector<std::pair<char, size_t>> dimsTwoAns = { { 'T', 1 }, { 'Y', 624 }, { 'X', 924 }, { 'A', 3 } };
   REQUIRE(dimsTwo == dimsTwoAns);
   for (const auto& x : pr) {
     REQUIRE(x->shape()[0] == 624);
@@ -468,16 +468,16 @@ TEST_CASE_METHOD(CziBgrCreator, "test_bgr_flatten", "[Reader_read_flatten_bgr]")
   REQUIRE(pr.front()->pixelType() == libCZI::PixelType::Gray8);
 
   // [7, 6, 5, 6, 6, 7, 7, 7, 7, 7]
-  //  auto timage = pylibczi::ImageFactory::getDerived<uint8_t>(pr.front());
-  //  uint8_t *tmp = timage->getRawPtr();
-  //  std::vector<uint8_t> data(tmp, tmp+10);
-  //  auto planeZero = planeZeroFirstTen();
-  //  auto planeOne = planeOneFirstTen();
+  auto timage = pylibczi::ImageFactory::getDerived<uint8_t>(pr.front());
+  uint8_t* tmp = timage->getRawPtr();
+  std::vector<uint8_t> data(tmp, tmp + 40);
+  auto planeZero = planeZeroFirstTen();
+  auto planeOne = planeOneFirstTen();
   // check data values
-  //  for( size_t i = 0; i < 10; i++){
-  //    REQUIRE(data[i] == planeZero[i]);
-  //    REQUIRE( (uint8_t)((*timage)[{i, 0, 1}]) == planeOne[i] );
-  //  }
+  for (size_t i = 0; i < 10; i++) {
+    REQUIRE(data[3 * i] == planeZero[i]);
+    REQUIRE(data[3 * i + 1] == planeOne[i]);
+  }
 }
 
 TEST_CASE_METHOD(CziMCreator, "test_reader_mosaic_subblockinforect", "[Reader_Mosaic_SubblockInfo_Rect]")
