@@ -17,6 +17,6 @@ TEST_CASE("constants_dimension", "[constants_DimMap]")
   std::vector<DI> output = { DI::B, DI::V, DI::H, DI::I,       DI::S,       DI::R,
                              DI::T, DI::C, DI::Z, DI::invalid, DI::invalid, DI::invalid };
   pairedForEach(input.begin(), input.end(), output.begin(), [](DMI in_, DI expected_) {
-    REQUIRE(DimIndexToDimensionIndex(in_) == expected_);
+    REQUIRE(dimIndexToDimensionIndex(in_) == expected_);
   });
 }

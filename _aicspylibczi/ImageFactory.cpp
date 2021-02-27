@@ -169,8 +169,8 @@ ImageFactory::constructImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_
 
   shape.emplace_back(size_.h);
   shape.emplace_back(size_.w);
-  if (samples_per_pixel == 3)
-    shape.emplace_back(3);
+  if (samples_per_pixel > 1)
+    shape.emplace_back(samples_per_pixel);
 
   auto imageFactoryFunction = s_pixelToImageConstructor[pixelType];
   std::shared_ptr<Image> image =

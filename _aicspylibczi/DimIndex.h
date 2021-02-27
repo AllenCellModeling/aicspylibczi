@@ -52,7 +52,7 @@ DimIndex
 dimensionIndexToDimIndex(libCZI::DimensionIndex index_);
 
 libCZI::DimensionIndex
-DimIndexToDimensionIndex(DimIndex dim_index_);
+dimIndexToDimensionIndex(DimIndex dim_index_);
 
 }
 

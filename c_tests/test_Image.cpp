@@ -67,23 +67,6 @@ TEST_CASE_METHOD(CziImageCreator, "test_image_nothrow", "[Image_Cast_Nothrow]")
   REQUIRE_NOTHROW(ImageFactory::getDerived<uint16_t>(img));
 }
 
-class CziRgbImageCreator
-{
-  std::unique_ptr<Reader> m_czi;
-
-public:
-  CziRgbImageCreator()
-    : m_czi(new pylibczi::Reader(L"resources/RGB-8bit.czi"))
-  {}
-  std::shared_ptr<Image> get()
-  {
-    auto cDims = libCZI::CDimCoordinate{ { libCZI::DimensionIndex::B, 0 }, { libCZI::DimensionIndex::C, 0 } };
-    auto imgCont = m_czi->readSelected(cDims, -1, 1);
-    auto imVec = imgCont.first->images();
-    return imVec.front();
-  }
-};
-
 TEST_CASE("test_image_accessors", "[Image_operator[]]")
 {
   libCZI::CDimCoordinate cdim{ { libCZI::DimensionIndex::S, 1 }, { libCZI::DimensionIndex::C, 1 } };

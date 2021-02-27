@@ -85,7 +85,7 @@ charToDimIndex(char c_)
 }
 
 libCZI::DimensionIndex
-DimIndexToDimensionIndex(DimIndex dim_index_)
+dimIndexToDimensionIndex(DimIndex dim_index_)
 {
   return libCZI::Utils::CharToDimension(dimIndexToChar(dim_index_));
 }
