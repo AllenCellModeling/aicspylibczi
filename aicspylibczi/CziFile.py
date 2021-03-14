@@ -192,6 +192,15 @@ class CziFile(object):
         ssorter, bbox = self.reader.read_mosaic_tile_bounding_box(plane_constraints, m_index)
         return bbox
 
+    def get_mosaic_scene_bounding_box(self, index: int = 0):
+        """
+
+        :param index:
+        :return:
+        """
+        return self.reader.read_mosaic_scene_bounding_box(index)
+
+
 #update docstring
     def get_all_mosaic_tile_bounding_boxes(self, index: int = -1):
         """
