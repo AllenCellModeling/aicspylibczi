@@ -91,6 +91,34 @@ def test_scene_height_width(data_dir, fname, idx, expected):
         data = czi.scene_height_by_width(idx)
         assert data == expected
 
+#  non-mosaic bbox functions
+def test_get_tile_bounding_box(data_dir, fname, idx, expected):
+    with open(data_dir / fname, 'rb') as fp:
+        czi = CziFile(czi_filename=fp)
+        ans = czi.get_tile_bounding_boxes(idx)
+        assert ans == expected
+
+def test_get_scene_bounding_box(data_dir, fname, idx, expected):
+    czi = CziFile(czi_filename=data_dir/fname)
+    ans = czi.get_all_mosaic_tile_bounding_boxes(index=idx)
+    assert ans == expected
+
+#  mosaic bbox functions
+def test_get_mosaic_tile_bounding_boxes(data_dir, fname, idx, expected):
+    czi = CziFile(czi_filename=data_dir/fname)
+    ans = czi.get_all_mosaic_tile_bounding_boxes(index=idx)
+    assert ans == expected
+
+def test_get_mosaic_scene_bounding_box(data_dir, fname, idx, expected):
+    czi = CziFile(czi_filename=data_dir/fname)
+    ans = czi.get_all_mosaic_tile_bounding_boxes(index=idx)
+    assert ans == expected
+
+def test_get_mosaic_boinding_box(data_dir, fname, idx, expected):
+    czi = CziFile(czi_filename=data_dir/fname)
+    ans = czi.get_all_mosaic_tile_bounding_boxes(index=idx)
+    assert ans == expected
+
 
 @pytest.mark.parametrize("fname, idx, expected", [
     ('s_1_t_1_c_1_z_1.czi', -1, (39856, 39272, 475, 325)),

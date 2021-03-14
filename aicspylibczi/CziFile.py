@@ -142,7 +142,7 @@ class CziFile(object):
         """
         return self.reader.pixel_type()
 
-    def scene_bounding_box(self, index: int = -1):
+    def get_scene_bounding_box(self, index: int = 0):
         """
         Get the bounding box of the raw collected data (pyramid 0) from the czifile. if not specified it defaults to
         the first scene
@@ -158,31 +158,42 @@ class CziFile(object):
             (x0, y0, w, h) for the specified scene
 
         """
-        bbox = self.reader.read_scene_wh(index)
+        bbox = self.reader.read_scene_bounding_box(index)
         ans = (bbox.x, bbox.y, bbox.w, bbox.h)
         return ans
 
-    def scene_height_by_width(self, index: int = -1):
+    def get_all_tile_bounding_boxes(self, **kwargs):
         """
-        Get the size of the scene (Y, X) / (height, width) for the specified Scene. The default is to return
-        the size of the first Scene but Zeiss allows scenes to be different sizes thought it is unlikely to encounter.
-        This module will warn you on instantiation if the scenes have inconsistent width and height.
 
-        Parameters
-        ----------
-        index
-            specifies the index of the Scene to get the height and width of
-
-        Returns
-        -------
-        tuple
-            (height, width) tuple of the Specified scene.
-
+        :param kwargs:
+        :return:
         """
-        box = self.reader.read_scene_wh(index)
-        return (box.h, box.w)
+        plane_constraints = self.czilib.DimCoord()
+        [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
+        m_index = self._get_m_index_from_kwargs(kwargs)
+        return self.reader.read_all_tile_bounding_boxes(plane_constraints, m_index)
 
-    def mosaic_scene_bounding_boxes(self, index: int = -1):
+    def get_all_scene_bounding_boxes(self):
+        """
+
+        :return:
+        """
+        return self.reader.read_all_scene_bounding_boxes()
+
+    def get_mosaic_tile_bounding_box(self, **kwargs):
+        """
+
+        :param kwargs:
+        :return:
+        """
+        plane_constraints = self.czilib.DimCoord()
+        [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
+        m_index = self._get_m_index_from_kwargs(kwargs)
+        ssorter, bbox = self.reader.read_mosaic_tile_bounding_box(plane_constraints, m_index)
+        return bbox
+
+#update docstring
+    def get_all_mosaic_tile_bounding_boxes(self, index: int = -1):
         """
         Get the bounding boxes of the raw collected data (pyramid 0) from the mosaic czifile.
         This retrieves all pyramid 0 bounding boxes if the scene is not defined in the file or if the user
@@ -199,8 +210,24 @@ class CziFile(object):
             List[(x0, y0, w, h)] for the specified scene
 
         """
-        bboxes = self.reader.read_mosaic_scene_boxes(index, True)
-        return [(bb.x, bb.y, bb.w, bb.h) for bb in bboxes]
+        bboxes = self.reader.read_all_mosaic_tile_bounding_boxes(index)
+        return bboxes  # [(bb.x, bb.y, bb.w, bb.h) for bb in bboxes]
+
+    def get_all_mosaic_scene_bounding_boxes(self):
+        """
+
+        :return:
+        """
+        scene_dict = self.reader.read_all_mosaic_scene_bounding_boxes()
+        return scene_dict
+
+    def get_mosaic_size(self):
+        """
+
+        :return:
+        """
+        bbox = self.reader.read_mosaic_bounding_box()
+        return (bbox.x, bbox.y, bbox.w, bbox.h)
 
     @property
     def size(self):

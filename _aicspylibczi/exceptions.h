@@ -143,6 +143,44 @@ public:
   {}
 };
 
+class IsMosaicException : public std::runtime_error
+{
+public:
+  explicit IsMosaicException(const std::string& message_)
+  : std::runtime_error("This file is a mosaic file but was assumed not to be. " + message_)
+  {}
+};
+
+class IsNotMosaicException : public std::runtime_error
+{
+public:
+  explicit IsNotMosaicException(const std::string& message_)
+    : std::runtime_error("This file is not a mosaic file but was assumed to be. " + message_)
+  {}
+};
+
+class SceneIndexException : public std::runtime_error
+{
+public:
+  explicit SceneIndexException(unsigned int scene_index_,
+                                std::map<int, libCZI::BoundingBoxes>::const_iterator scenes_begin_,
+                                std::map<int, libCZI::BoundingBoxes>::const_iterator scenes_end_)
+  : std::runtime_error("")
+  {
+    std::stringstream msg, valid_scenes;
+
+    // the scene indexs can be non-sequential so construct the list from the iterators
+    std::for_each(scenes_begin_, scenes_end_, [&valid_scenes](const std::map< int,libCZI::BoundingBoxes >::value_type &bbox_pair_){
+      valid_scenes << " " << bbox_pair_.first << ",";
+    });
+    std::string valid_scenes_str = valid_scenes.str();
+    if(!valid_scenes_str.empty()) valid_scenes_str.pop_back();
+
+    msg << "Scene Index Not Valid: " << scene_index_ << " ∉ [" << valid_scenes_str << " ]" << std::endl;
+    static_cast<std::runtime_error&>(*this) = std::runtime_error(msg.str());
+  }
+};
+
 }
 
 #endif //_PYLIBCZI_EXCEPTIONS_H

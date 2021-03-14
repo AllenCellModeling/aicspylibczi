@@ -89,6 +89,11 @@ class Reader
 
 public:
   // was vector
+  using TileBBoxMap = std::map<SubblockSortable, libCZI::IntRect>;
+  using TilePair = std::pair<const SubblockSortable, libCZI::IntRect>;
+  using SceneBBoxMap = std::map<unsigned int, libCZI::IntRect>;
+  using ScenePair = std::pair<const unsigned int, libCZI::IntRect>;
+
   using SubblockIndexVec = std::set<std::pair<SubblockSortable, int>>;
   using DimIndexRangeMap = std::map<DimIndex, std::pair<int, int>>;
   using Shape = std::vector<std::pair<char, size_t>>;
@@ -220,7 +225,7 @@ public:
    * @param index_m_ Must be set to select the tile of the mosaic file
    * @return an IntRect {x, y, w, h}
    */
-  libCZI::IntRect readSubblockRect(libCZI::CDimCoordinate& plane_coord_, int index_m_ = -1);
+  // libCZI::IntRect readSubblockRect(libCZI::CDimCoordinate& plane_coord_, int index_m_ = -1);
 
   /*!
    * @brief If the czi file is a mosaic tiled image this function can be used to reconstruct it into an image.
@@ -267,7 +272,7 @@ public:
    * returned.
    * @return an IntRect {x, y, w, h}
    */
-  libCZI::IntRect mosaicShape() const { return m_statistics.boundingBoxLayer0Only; }
+  //libCZI::IntRect mosaicShape() const { return m_statistics.boundingBoxLayer0Only; }
 
   /*!
    * @brief get the shape of the loaded images
@@ -277,26 +282,36 @@ public:
    */
   static Shape getShape(pylibczi::ImageVector& images_, bool is_mosaic_) { return images_.getShape(); }
 
-  /*!
-   * @brief get the pyramid 0 (acquired data) shape
-   * @param scene_index_ specifies scene but defaults to the first scene,
-   * Scenes can have different sizes
-   * @return std::vector<libCZI::IntRect> containing (x0, y0, w, h)
-   */
-  libCZI::IntRect getSceneYXSize(int scene_index_ = -1)
-  {
-    std::vector<libCZI::IntRect> matches = getAllSceneYXSize(scene_index_);
-    return matches.front();
-  }
+
 
   /*!
-   * @brief get the pyramid 0 (acquired data) shape
-   * @param scene_index_ specifies scene but defaults to the first scene,
-   * Scenes can have different sizes
-   * @param get_all_matches_ if true return all matching bounding boxes
-   * @return std::vector<libCZI::IntRect> containing (x0, y0, w, h)
+   * @brief get the bounding box of the
+   * @return
    */
-  std::vector<libCZI::IntRect> getAllSceneYXSize(int scene_index_ = -1, bool get_all_matches_ = false);
+  TilePair tileBoundingBox(libCZI::CDimCoordinate &plane_coord_);
+
+  TileBBoxMap tileBoundingBoxes(libCZI::CDimCoordinate &plane_coord_);
+
+  /*!
+   * @brief get the scene bounding box
+   *
+   */
+  libCZI::IntRect sceneBoundingBox(unsigned int scene_index_=0);
+
+  SceneBBoxMap allSceneBoundingBoxes();
+
+
+
+
+  libCZI::IntRect mosaicBoundingBox() const;
+
+  TilePair mosaicTileBoundingBox(libCZI::CDimCoordinate &plane_coord_, int index_m_);
+
+  TileBBoxMap mosaicTileBoundingBoxes(libCZI::CDimCoordinate& plane_coord_);
+
+  libCZI::IntRect mosaicSceneBoundingBox(unsigned int scene_index_);
+
+  SceneBBoxMap allMosaicSceneBoundingBoxes();
 
   std::string pixelType()
   {
@@ -316,9 +331,30 @@ private:
 
   static bool isValidRegion(const libCZI::IntRect& in_box_, const libCZI::IntRect& czi_box_);
 
+  TileBBoxMap tileBoundingBoxesWith(SubblockSortable &subblocksToFind_);
+
   void checkSceneShapes();
 
   libCZI::PixelType getFirstPixelType();
+
+  /*!
+  * @brief get the pyramid 0 (acquired data) shape
+  * @param scene_index_ specifies scene but defaults to the first scene,
+  * Scenes can have different sizes
+  * @param get_all_matches_ if true return all matching bounding boxes
+  * @return std::vector<libCZI::IntRect> containing (x0, y0, w, h)
+  */
+  std::vector<libCZI::IntRect> getAllSceneYXSize(int scene_index_ = -1, bool get_all_matches_ = false);
+
+  /*
+   * This is a remnant of 2.x I would like to factor it out but will do so at a later point.
+   * It should be replaceable with the tile function but may require some munging.
+   */
+  libCZI::IntRect getSceneYXSize(int scene_index_ = -1)
+  {
+    std::vector<libCZI::IntRect> matches = getAllSceneYXSize(scene_index_);
+    return matches.front();
+  }
 };
 
 }

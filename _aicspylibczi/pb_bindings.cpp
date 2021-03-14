@@ -43,14 +43,19 @@ PYBIND11_MODULE(_aicspylibczi, m)
     .def("read_dims", &pylibczi::Reader::readDimsRange)
     .def("read_dims_string", &pylibczi::Reader::dimsString)
     .def("read_dims_sizes", &pylibczi::Reader::dimSizes)
-    .def("read_scene_wh", &pylibczi::Reader::getSceneYXSize)
-    .def("read_mosaic_scene_boxes", &pylibczi::Reader::getAllSceneYXSize)
     .def("read_meta", &pylibczi::Reader::readMeta)
     .def("read_selected", &pylibczi::Reader::readSelected)
-    .def("mosaic_shape", &pylibczi::Reader::mosaicShape)
     .def("read_meta_from_subblock", &pylibczi::Reader::readSubblockMeta)
-    .def("read_rect_from_subblock", &pylibczi::Reader::readSubblockRect)
     .def("read_mosaic", &pylibczi::Reader::readMosaic)
+    .def("read_tile_bounding_box", &pylibczi::Reader::tileBoundingBox)
+    .def("read_scene_bounding_box", &pylibczi::Reader::sceneBoundingBox)
+    .def("read_all_tile_bounding_boxes", &pylibczi::Reader::tileBoundingBoxes)
+    .def("read_all_scene_bounding_boxes", &pylibczi::Reader::allSceneBoundingBoxes)
+    .def("read_mosaic_bounding_box", &pylibczi::Reader::mosaicBoundingBox)
+    .def("read_mosaic_tile_bounding_box", &pylibczi::Reader::mosaicTileBoundingBox)
+    .def("read_mosaic_scene_bounding_box", &pylibczi::Reader::mosaicSceneBoundingBox)
+    .def("read_all_mosaic_tile_bounding_boxes",&pylibczi::Reader::mosaicTileBoundingBoxes)
+    .def("read_all_mosaic_scene_bounding_boxes", &pylibczi::Reader::allMosaicSceneBoundingBoxes)
     .def("pixel_type", &pylibczi::Reader::pixelType);
 
   py::class_<pylibczi::IndexMap>(m, "IndexMap")
@@ -67,4 +72,8 @@ PYBIND11_MODULE(_aicspylibczi, m)
     .def_readwrite("y", &libCZI::IntRect::y)
     .def_readwrite("w", &libCZI::IntRect::w)
     .def_readwrite("h", &libCZI::IntRect::h);
+
+  py::class_<pylibczi::SubblockSortable>(m, "TileInfo")
+    .def_property_readonly("dims", &pylibczi::SubblockSortable::cDims)
+    .def_property_readonly("m_index", &pylibczi::SubblockSortable::mIndex);
 }

@@ -32,6 +32,8 @@ public:
 
   const libCZI::CDimCoordinate* coordinatePtr() const { return &m_planeCoordinate; }
 
+  libCZI::CDimCoordinate cDims() const { return m_planeCoordinate; }
+
   int mIndex() const { return m_indexM; }
 
   libCZI::PixelType pixelType(void) const { return m_pixelType; }

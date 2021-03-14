@@ -1,5 +1,6 @@
 
-set(UNIT_TEST_SOURCE_LIST test_Reader.cpp test_Iterator.cpp test_Image.cpp test_DimIndex.cpp test_main.cpp ../_aicspylibczi/pb_helpers.cpp)
+set(UNIT_TEST_SOURCE_LIST test_Reader.cpp test_boundingboxes.cpp test_Iterator.cpp test_Image.cpp test_DimIndex.cpp
+        test_main.cpp ../_aicspylibczi/pb_helpers.cpp)
 set(TARGET_NAME test_libczi_c++_extension)
 set(TARGET_EXE libczi+py)
 add_compile_definitions(_STATICLIBBUILD)

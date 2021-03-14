@@ -390,7 +390,7 @@ TEST_CASE_METHOD(CziMCreator, "test_mosaic_readScaled", "[Reader_mosaic_readScal
 TEST_CASE_METHOD(CziMCreator, "test_mosaic_shape", "[Reader_mosaic_shape]")
 {
   auto czi = get();
-  auto bbox = czi->mosaicShape();
+  auto bbox = czi->mosaicBoundingBox();
   REQUIRE(bbox.w == 1756);
   REQUIRE(bbox.h == 624);
 }
@@ -488,15 +488,16 @@ TEST_CASE_METHOD(CziMCreator, "test_reader_mosaic_subblockinforect", "[Reader_Mo
 
   libCZI::CDimCoordinate dm;
   for (int m_index = 0; m_index < 2; m_index++) {
-    auto rect = czi->readSubblockRect(dm, m_index);
+    auto rect = czi->mosaicTileBoundingBox(dm, m_index);
+    //auto rect = czi->readSubblockRect(dm, m_index);
     auto answer = answers[m_index];
-    REQUIRE(rect.x == answer.x);
-    REQUIRE(rect.y == answer.y);
-    REQUIRE(rect.w == answer.w);
-    REQUIRE(rect.h == answer.h);
+    REQUIRE(rect.second.x == answer.x);
+    REQUIRE(rect.second.y == answer.y);
+    REQUIRE(rect.second.w == answer.w);
+    REQUIRE(rect.second.h == answer.h);
   }
   int invalid_m = 2;
-  REQUIRE_THROWS_AS(czi->readSubblockRect(dm, invalid_m), pylibczi::CDimCoordinatesOverspecifiedException);
+  REQUIRE_THROWS_AS(czi->mosaicTileBoundingBox(dm, invalid_m), pylibczi::CDimCoordinatesOverspecifiedException);
 }
 
 TEST_CASE_METHOD(CziCreator2, "test_reader_subblockinforect", "[Reader_Std_SubblockInfo_Rect]")
@@ -509,16 +510,16 @@ TEST_CASE_METHOD(CziCreator2, "test_reader_subblockinforect", "[Reader_Std_Subbl
 
   for (int s_index = 0; s_index < 3; s_index++) {
     libCZI::CDimCoordinate dm{ { libCZI::DimensionIndex::S, s_index } };
-    auto rect = czi->readSubblockRect(dm);
+    auto rects = czi->tileBoundingBoxes(dm); // readSubblockRect(dm);
     auto ans = answers[s_index];
-    REQUIRE(rect.x == ans.x);
-    REQUIRE(rect.y == ans.y);
-    REQUIRE(rect.w == ans.w);
-    REQUIRE(rect.h == ans.h);
+    REQUIRE(rects.begin()->second.x == ans.x);
+    REQUIRE(rects.begin()->second.y == ans.y);
+    REQUIRE(rects.begin()->second.w == ans.w);
+    REQUIRE(rects.begin()->second.h == ans.h);
   }
 
   libCZI::CDimCoordinate invalid_dim{ { libCZI::DimensionIndex::S, 5 } };
-  REQUIRE_THROWS_AS(czi->readSubblockRect(invalid_dim), pylibczi::CDimCoordinatesOverspecifiedException);
+  REQUIRE_THROWS_AS(czi->tileBoundingBoxes(invalid_dim), pylibczi::CDimCoordinatesOverspecifiedException);
 }
 
 // Test multichannel BGR
@@ -606,13 +607,19 @@ TEST_CASE_METHOD(CziCreator5, "test_multiscene_mosaic_bboxes", "[Reader_mosaic_b
   auto czi = get();
   auto dSizes = czi->dimSizes();
 
-  auto ans = czi->getAllSceneYXSize(0, true);
-  assert(ans.size() == 4); // 2 channels * 44 m_index
+  //auto ans = czi->getAllSceneYXSize(0, true);
+  libCZI::CDimCoordinate cDim = libCZI::CDimCoordinate{ { libCZI::DimensionIndex::S, 0 } };
+  auto ans = czi->tileBoundingBoxes(cDim);
+  REQUIRE(ans.size() == 4); // 2 channels * 44 m_index
   // 495643, 354924, 256, 256
-  assert(ans[2].x == 495643);
-  assert(ans[2].y == 354924);
-  assert(ans[2].w == 256);
-  assert(ans[2].h == 256);
+  pylibczi::Reader::TileBBoxMap::const_iterator ansItt = ans.begin();
+  ansItt++;
+  ansItt++;
+  REQUIRE(ansItt->second.x == 495643);
+  REQUIRE(ansItt->second.y == 354924);
+  REQUIRE(ansItt->second.w == 256);
+  REQUIRE(ansItt->second.h == 256);
+  REQUIRE(ansItt->first.mIndex() == 2);
 }
 
 TEST_CASE_METHOD(CziCreatorOrder, "test_image_overspeced", "[Reader_image_overspeced]")
