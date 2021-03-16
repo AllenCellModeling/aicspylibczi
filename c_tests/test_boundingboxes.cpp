@@ -60,9 +60,9 @@ TEST_CASE_METHOD(CziFile, "test_read_tile_bbox", "[Reader_read_tile_bbox]")
                                        { libCZI::DimensionIndex::Z, 0}
                                       };
   std::vector<libCZI::IntRect> expectedRect{
-    {.x=39850, .y= 35568, .w=475, .h=325},
-    {.x=44851, .y= 35568, .w=475, .h=325},
-    {.x=39850, .y= 39272, .w=475, .h=325}
+    {39850, 35568, 475, 325},
+    {44851, 35568, 475, 325},
+    {39850, 39272, 475, 325}
   };
 
   Reader::TilePair ans = czi->tileBoundingBox(cDims);
@@ -102,7 +102,7 @@ TEST_CASE_METHOD(CziNoScene1, "test_read_tile2_bbox", "[Reader_read_tile2_bbox]"
                                        { libCZI::DimensionIndex::C, 0 },
                                        { libCZI::DimensionIndex::Z, 0}
   };
-  libCZI::IntRect expectedRect{.x=39856, .y=39272, .w=475, .h=325};
+  libCZI::IntRect expectedRect{ 39856, 39272, 475, 325};
   Reader::TilePair ans = czi->tileBoundingBox(cDims);
 
   REQUIRE(ans.second.x == expectedRect.x);
@@ -126,7 +126,7 @@ TEST_CASE_METHOD(CziNoScene2, "test_read_tile3_bbox", "[Reader_read_tile3_bbox]"
                                        { libCZI::DimensionIndex::C, 0 },
                                        { libCZI::DimensionIndex::Z, 0}
   };
-  libCZI::IntRect expectedRect{.w=924, .h=624};
+  libCZI::IntRect expectedRect{ 0, 0, 924, 624};
   Reader::TilePair ans = czi->tileBoundingBox(cDims);
 
   REQUIRE(ans.second.x == expectedRect.x);
@@ -149,7 +149,7 @@ TEST_CASE_METHOD(CziMFile, "test_read_mosaic_bbox", "[Reader_read_mosaic_bbox]")
                                        { libCZI::DimensionIndex::S, 0 },
                                        { libCZI::DimensionIndex::C, 0 },
                                        { libCZI::DimensionIndex::Z, 0 } };
-  libCZI::IntRect expectedRect{.w=1756, .h=624};
+  libCZI::IntRect expectedRect{ 0, 0, 1756, 624};
   libCZI::IntRect intRect = czi->mosaicBoundingBox();
 
   REQUIRE(intRect.x == expectedRect.x);
@@ -166,7 +166,7 @@ TEST_CASE_METHOD(CziMFile, "test_read_mosaic_tile_bbox", "[Reader_read_mosaic_ti
                                        { libCZI::DimensionIndex::C, 0 },
                                        { libCZI::DimensionIndex::Z, 0 } };
   {
-    libCZI::IntRect expectedRect{ .w = 924, .h = 624 };
+    libCZI::IntRect expectedRect{ 0, 0,  924, 624 };
     Reader::TilePair ans = czi->mosaicTileBoundingBox(cDims, 0);
 
     REQUIRE(ans.second.x == expectedRect.x);
@@ -175,7 +175,7 @@ TEST_CASE_METHOD(CziMFile, "test_read_mosaic_tile_bbox", "[Reader_read_mosaic_ti
     REQUIRE(ans.second.h == expectedRect.h);
   }
   {
-    libCZI::IntRect expectedRect{ .x = 832, .w = 924, .h = 624 };
+    libCZI::IntRect expectedRect{ 832, 0, 924, 624 };
     Reader::TilePair ans = czi->mosaicTileBoundingBox(cDims, 1);
 
     REQUIRE(ans.second.x == expectedRect.x);
