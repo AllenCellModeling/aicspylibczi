@@ -12,6 +12,7 @@ CZI files and meta-data. We only support 64bit architectures currently if you de
 The first example show how to work with a standard CZI file (Single or Multe-Scene). The second example shows how to work with a Mosaic CZI file.
 
 #### Example 1:  Read in a czi and select a portion of the image to display
+
 ```python
 import numpy as np
 from aicspylibczi import CziFile
@@ -22,14 +23,15 @@ pth = Path('20190610_S02-02.czi')
 czi = CziFile(pth)
 
 # Get the shape of the data, the coordinate pairs are (start index, size)
-dimensions = czi.dims_shape()  #  [{'X': (0, 1900), 'Y': (0, 1300), 'Z': (0, 60), 'C': (0, 4), 'S': (0, 40), 'B': (0, 1)}]
+dimensions = czi.get_dims_shape()  # [{'X': (0, 1900), 'Y': (0, 1300), 'Z': (0, 60), 'C': (0, 4), 'S': (0, 40), 'B': (0, 1)}]
 
-czi.dims  #  BSCZYX
+czi.dims  # BSCZYX
 
-czi.size  #  (1, 40, 4, 60, 1300, 1900)
+czi.size  # (1, 40, 4, 60, 1300, 1900)
 
 # Load the image slice I want from the file
 img, shp = czi.read_image(S=13, Z=16)
+
 
 # shp = [('B', 1), ('S', 1), ('C', 4), ('Z', 1), ('Y', 1300), ('X', 1900)]  # List[(Dimension, size), ...] 
 # img.shape = (1, 1, 4, 1, 1300, 1900)   # numpy.ndarray
@@ -37,10 +39,11 @@ img, shp = czi.read_image(S=13, Z=16)
 # define helper functions
 def norm_by(x, min_, max_):
     norms = np.percentile(x, [min_, max_])
-    i2 = np.clip((x - norms[0])/(norms[1]-norms[0]), 0, 1)
+    i2 = np.clip((x - norms[0]) / (norms[1] - norms[0]), 0, 1)
     return i2
 
-def recolor(im): # transform from rgb to cyan-magenta-yellow
+
+def recolor(im):  # transform from rgb to cyan-magenta-yellow
     im_shape = np.array(im.shape)
     color_transform = np.array([[1, 1, 0], [0, 1, 1], [1, 0, 1]]).T
     im_reshape = im.reshape([np.prod(im_shape[0:2]), im_shape[2]]).T
@@ -49,18 +52,20 @@ def recolor(im): # transform from rgb to cyan-magenta-yellow
     im = im_recolored.reshape(im_shape)
     return im
 
-#normalize, combine into RGB and transform to CMY
-c1 = (norm_by(img[0, 0, 0, 0, 0:750, 250:1000], 50, 99.8)*255).astype(np.uint8)
-c2 = (norm_by(img[0, 0, 1, 0, 0:750, 250:1000], 50, 99.8)*255).astype(np.uint8)
-c3 = (norm_by(img[0, 0, 2, 0, 0:750, 250:1000], 0, 100)*255).astype(np.uint8)
+
+# normalize, combine into RGB and transform to CMY
+c1 = (norm_by(img[0, 0, 0, 0, 0:750, 250:1000], 50, 99.8) * 255).astype(np.uint8)
+c2 = (norm_by(img[0, 0, 1, 0, 0:750, 250:1000], 50, 99.8) * 255).astype(np.uint8)
+c3 = (norm_by(img[0, 0, 2, 0, 0:750, 250:1000], 0, 100) * 255).astype(np.uint8)
 rgb = np.stack((c1, c2, c3), axis=2)
 cmy = np.clip(recolor(rgb), 0, 255)
 
 # plot using matplotlib¶
-plt.figure(figsize=(10,10))
+plt.figure(figsize=(10, 10))
 plt.imshow(cmy)
 plt.axis('off')
 ```
+
 ![Cardio Image](images/cardio.png)
 
 #### Example 2:  Read in a mosaic file 
@@ -70,27 +75,27 @@ import aicspylibczi
 import pathlib
 from PIL import Image
 
-
 mosaic_file = pathlib.Path('mosaic_test.czi')
 czi = aicspylibczi.CziFile(mosaic_file)
 
 # Get the shape of the data
-dimensions = czi.dims   #  'STCZMYX'
+dimensions = czi.dims  # 'STCZMYX'
 
 czi.size  # (1, 1, 1, 1, 2, 624, 924)
 
-czi.dims_shape()  # [{'X': (0, 924), 'Y': (0, 624), 'Z': (0, 1), 'C': (0, 1), 'T': (0, 1), 'M': (0, 2), 'S': (0, 1)}]
+czi.get_dims_shape()  # [{'X': (0, 924), 'Y': (0, 624), 'Z': (0, 1), 'C': (0, 1), 'T': (0, 1), 'M': (0, 2), 'S': (0, 1)}]
 
 czi.is_mosaic()  # True 
- # Mosaic files ignore the S dimension and use an internal mIndex to reconstruct, the scale factor allows one to generate a manageable image
-mosaic_data = czi.read_mosaic(C=0, scale_factor=1) 
+# Mosaic files ignore the S dimension and use an internal mIndex to reconstruct, the scale factor allows one to generate a manageable image
+mosaic_data = czi.read_mosaic(C=0, scale_factor=1)
 
-mosaic_data.shape  #  (1, 1, 624, 1756)
- # the C channel has been specified S & M are used internally for position so this is (T, Z, Y, X)
+mosaic_data.shape  # (1, 1, 624, 1756)
+# the C channel has been specified S & M are used internally for position so this is (T, Z, Y, X)
 
-normed_mosaic_data = norm_by(mosaic_data[0, 0, :, :], 5, 98)*255
+normed_mosaic_data = norm_by(mosaic_data[0, 0, :, :], 5, 98) * 255
 img = Image.fromarray(normed_mosaic_data.astype(np.uint8))
 ```
+
 ![Mosaic Image](images/mosaic.png)
 
 ## Installation

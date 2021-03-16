@@ -331,7 +331,7 @@ def test_read_image_args(data_dir, fname, args, expected):
 def test_read_image_two(data_dir, fname, exp_str, exp_dict):
     czi = CziFile(str(data_dir / fname))
     dims = czi.dims
-    dim_dict = czi.dims_shape()
+    dim_dict = czi.get_dims_shape()
     assert dims == exp_str
     assert dim_dict == exp_dict
 
@@ -424,7 +424,7 @@ def test_read_unified_subblock_meta(data_dir, fname, expected):
 def test_image_shape(data_dir, fname, expects):
     with open(data_dir / fname, "rb") as fp:
         czi = CziFile(czi_filename=fp)
-        shape = czi.dims_shape()
+        shape = czi.get_dims_shape()
         assert shape == expects
 
 
