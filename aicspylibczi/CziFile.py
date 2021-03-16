@@ -47,16 +47,21 @@ class CziFile(object):
     # X  # The X-dimension
     # Y  # The Y-dimension
     ####
-    ZISRAW_DIMS = {'Z', 'C', 'T', 'R', 'S', 'I', 'H', 'V', 'B'}
+    ZISRAW_DIMS = {"Z", "C", "T", "R", "S", "I", "H", "V", "B"}
 
-    def __init__(self, czi_filename: types.FileLike, metafile_out: types.PathLike = '',
-                 verbose: bool = False):
+    def __init__(
+        self,
+        czi_filename: types.FileLike,
+        metafile_out: types.PathLike = "",
+        verbose: bool = False,
+    ):
         # Convert to BytesIO (bytestream)
         self._bytes = self.convert_to_buffer(czi_filename)
         self.metafile_out = metafile_out
         self.czifile_verbose = verbose
 
         import _aicspylibczi
+
         self.czilib = _aicspylibczi
         self.reader = self.czilib.Reader(self._bytes)
 
@@ -142,13 +147,15 @@ class CziFile(object):
         """
         return self.reader.pixel_type()
 
-
     def get_tile_bounding_box(self, **kwargs):
         plane_constraints = self.czilib.DimCoord()
-        [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
+        [
+            plane_constraints.set_dim(k, v)
+            for (k, v) in kwargs.items()
+            if k in CziFile.ZISRAW_DIMS
+        ]
         dims, bbox = self.reader.read_tile_bounding_box(plane_constraints)
         return bbox
-
 
     def get_scene_bounding_box(self, index: int = 0):
         """
@@ -176,7 +183,11 @@ class CziFile(object):
         :return:
         """
         plane_constraints = self.czilib.DimCoord()
-        [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
+        [
+            plane_constraints.set_dim(k, v)
+            for (k, v) in kwargs.items()
+            if k in CziFile.ZISRAW_DIMS
+        ]
         m_index = self._get_m_index_from_kwargs(kwargs)
         return self.reader.read_all_tile_bounding_boxes(plane_constraints, m_index)
 
@@ -194,9 +205,15 @@ class CziFile(object):
         :return:
         """
         plane_constraints = self.czilib.DimCoord()
-        [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
+        [
+            plane_constraints.set_dim(k, v)
+            for (k, v) in kwargs.items()
+            if k in CziFile.ZISRAW_DIMS
+        ]
         m_index = self._get_m_index_from_kwargs(kwargs)
-        ssorter, bbox = self.reader.read_mosaic_tile_bounding_box(plane_constraints, m_index)
+        ssorter, bbox = self.reader.read_mosaic_tile_bounding_box(
+            plane_constraints, m_index
+        )
         return bbox
 
     def get_mosaic_scene_bounding_box(self, index: int = 0):
@@ -207,8 +224,7 @@ class CziFile(object):
         """
         return self.reader.read_mosaic_scene_bounding_box(index)
 
-
-#update docstring
+    # update docstring
     def get_all_mosaic_tile_bounding_boxes(self, **kwargs):
         """
         Get the bounding boxes of the raw collected data (pyramid 0) from the mosaic czifile.
@@ -227,7 +243,11 @@ class CziFile(object):
 
         """
         plane_constraints = self.czilib.DimCoord()
-        [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
+        [
+            plane_constraints.set_dim(k, v)
+            for (k, v) in kwargs.items()
+            if k in CziFile.ZISRAW_DIMS
+        ]
         # no m_index parameter
         bboxes = self.reader.read_all_mosaic_tile_bounding_boxes(plane_constraints)
         return bboxes  # [(bb.x, bb.y, bb.w, bb.h) for bb in bboxes]
@@ -323,8 +343,8 @@ class CziFile(object):
             self.meta_root = etree.fromstring(meta_str)
 
         if self.metafile_out:
-            metastr = etree.tostring(self.meta_root, pretty_print=True).decode('utf-8')
-            with open(self.metafile_out, 'w') as file:
+            metastr = etree.tostring(self.meta_root, pretty_print=True).decode("utf-8")
+            with open(self.metafile_out, "w") as file:
                 file.write(metastr)
         return self.meta_root
 
@@ -358,7 +378,11 @@ class CziFile(object):
             an lxml document containing the requested subblock metadata.
         """
         plane_constraints = self.czilib.DimCoord()
-        [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
+        [
+            plane_constraints.set_dim(k, v)
+            for (k, v) in kwargs.items()
+            if k in CziFile.ZISRAW_DIMS
+        ]
         m_index = self._get_m_index_from_kwargs(kwargs)
         subblock_meta = self.reader.read_meta_from_subblock(plane_constraints, m_index)
         if not unified_xml:
@@ -368,8 +392,8 @@ class CziFile(object):
             new_element = etree.Element("Subblock")
             for dim, number in pair[0].items():
                 new_element.set(dim, str(number))
-            if 'S' not in pair[0]:
-                new_element.set('S', "0")
+            if "S" not in pair[0]:
+                new_element.set("S", "0")
             new_element.append(etree.XML(pair[1]))
             root.append(new_element)
         return root
@@ -402,7 +426,11 @@ class CziFile(object):
 
         """
         plane_constraints = self.czilib.DimCoord()
-        [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
+        [
+            plane_constraints.set_dim(k, v)
+            for (k, v) in kwargs.items()
+            if k in CziFile.ZISRAW_DIMS
+        ]
         m_index = self._get_m_index_from_kwargs(kwargs)
         rect = self.reader.read_rect_from_subblock(plane_constraints, m_index)
         return (rect.x, rect.y, rect.w, rect.h)
@@ -447,7 +475,11 @@ class CziFile(object):
         not match the m_index that is being used in libCZI or displayed in Zeiss' Zen software.
         """
         plane_constraints = self.czilib.DimCoord()
-        [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
+        [
+            plane_constraints.set_dim(k, v)
+            for (k, v) in kwargs.items()
+            if k in CziFile.ZISRAW_DIMS
+        ]
         m_index = self._get_m_index_from_kwargs(kwargs)
         cores = self._get_cores_from_kwargs(kwargs)
 
@@ -491,14 +523,18 @@ class CziFile(object):
             (1, height, width)
         """
         plane_constraints = self.czilib.DimCoord()
-        [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
+        [
+            plane_constraints.set_dim(k, v)
+            for (k, v) in kwargs.items()
+            if k in CziFile.ZISRAW_DIMS
+        ]
 
         if region is None:
             region = self.czilib.IntRect()
             region.w = -1
             region.h = -1
         else:
-            assert (len(region) == 4)
+            assert len(region) == 4
             tmp = self.czilib.IntRect()
             tmp.x = region[0]
             tmp.y = region[1]
@@ -511,17 +547,17 @@ class CziFile(object):
 
     def _get_m_index_from_kwargs(self, kwargs):
         m_index = -1
-        if 'M' in kwargs:
+        if "M" in kwargs:
             if not self.is_mosaic():
                 raise self.czilib.PylibCZI_CDimCoordinatesOverspecifiedException(
                     "M Dimension is specified but the file is not a mosaic file!"
                 )
-            m_index = kwargs.get('M')
+            m_index = kwargs.get("M")
         return m_index
 
     @staticmethod
     def _get_cores_from_kwargs(kwargs):
         cores = multiprocessing.cpu_count() - 1
-        if 'cores' in kwargs:
-            cores = kwargs.get('cores')
+        if "cores" in kwargs:
+            cores = kwargs.get("cores")
         return cores
