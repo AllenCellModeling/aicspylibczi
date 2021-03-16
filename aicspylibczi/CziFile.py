@@ -142,6 +142,14 @@ class CziFile(object):
         """
         return self.reader.pixel_type()
 
+
+    def get_tile_bounding_box(self, **kwargs):
+        plane_constraints = self.czilib.DimCoord()
+        [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
+        dims, bbox = self.reader.read_tile_bounding_box(plane_constraints)
+        return bbox
+
+
     def get_scene_bounding_box(self, index: int = 0):
         """
         Get the bounding box of the raw collected data (pyramid 0) from the czifile. if not specified it defaults to
@@ -159,8 +167,7 @@ class CziFile(object):
 
         """
         bbox = self.reader.read_scene_bounding_box(index)
-        ans = (bbox.x, bbox.y, bbox.w, bbox.h)
-        return ans
+        return bbox
 
     def get_all_tile_bounding_boxes(self, **kwargs):
         """
@@ -202,7 +209,7 @@ class CziFile(object):
 
 
 #update docstring
-    def get_all_mosaic_tile_bounding_boxes(self, index: int = -1):
+    def get_all_mosaic_tile_bounding_boxes(self, **kwargs):
         """
         Get the bounding boxes of the raw collected data (pyramid 0) from the mosaic czifile.
         This retrieves all pyramid 0 bounding boxes if the scene is not defined in the file or if the user
@@ -219,7 +226,10 @@ class CziFile(object):
             List[(x0, y0, w, h)] for the specified scene
 
         """
-        bboxes = self.reader.read_all_mosaic_tile_bounding_boxes(index)
+        plane_constraints = self.czilib.DimCoord()
+        [plane_constraints.set_dim(k, v) for (k, v) in kwargs.items() if k in CziFile.ZISRAW_DIMS]
+        # no m_index parameter
+        bboxes = self.reader.read_all_mosaic_tile_bounding_boxes(plane_constraints)
         return bboxes  # [(bb.x, bb.y, bb.w, bb.h) for bb in bboxes]
 
     def get_all_mosaic_scene_bounding_boxes(self):
@@ -230,13 +240,13 @@ class CziFile(object):
         scene_dict = self.reader.read_all_mosaic_scene_bounding_boxes()
         return scene_dict
 
-    def get_mosaic_size(self):
+    def get_mosaic_bounding_box(self):
         """
 
         :return:
         """
         bbox = self.reader.read_mosaic_bounding_box()
-        return (bbox.x, bbox.y, bbox.w, bbox.h)
+        return bbox
 
     @property
     def size(self):
@@ -443,24 +453,6 @@ class CziFile(object):
 
         image, shape = self.reader.read_selected(plane_constraints, m_index, cores)
         return image, shape
-
-    def read_mosaic_size(self):
-        """
-        Get the size of the entire mosaic image, if it's not a mosaic image return (0, 0, -1, -1)
-
-        Returns
-        -------
-        (int, int, int, int)
-            (x0, y0, w, h) the bounding box of the mosaic image
-
-        """
-        if not self.reader.is_mosaic():
-            ans = self.czilib.IntRect()
-            ans.x = ans.y = 0
-            ans.w = ans.h = -1
-        else:
-            ans = self.reader.mosaic_shape()
-        return (ans.x, ans.y, ans.w, ans.h)
 
     def read_mosaic(self, region: Tuple = None, scale_factor: float = 1.0, **kwargs):
         """

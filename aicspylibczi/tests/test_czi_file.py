@@ -76,54 +76,66 @@ def test_read_dims_sizes(data_dir, fname, expected):
         data = czi.size
         assert data == expected
 
+#  non-mosaic bbox functions
 
 @pytest.mark.parametrize("fname, idx, expected", [
-    ('s_1_t_1_c_1_z_1.czi', -1, (325, 475)),
-    ('s_1_t_1_c_1_z_1.czi', 0, (325, 475)),
-    ('s_3_t_1_c_3_z_5.czi', -1, (325, 475)),
-    ('s_3_t_1_c_3_z_5.czi', 0, (325, 475)),
-    ('s_3_t_1_c_3_z_5.czi', 1, (325, 475)),
-    ('s_3_t_1_c_3_z_5.czi', 2, (325, 475)),
+    ('s_1_t_1_c_1_z_1.czi', 0, (39856, 39272, 475, 325)),
+    ('s_3_t_1_c_3_z_5.czi', 0, (39850, 35568, 475, 325)),
+    ('s_3_t_1_c_3_z_5.czi', 1, (44851, 35568, 475, 325)),
+    ('s_3_t_1_c_3_z_5.czi', 2, (39850, 39272, 475, 325)),
 ])
-def test_scene_height_width(data_dir, fname, idx, expected):
+def test_scene_bounding_box(data_dir, fname, idx, expected):
     with open(data_dir / fname, 'rb') as fp:
         czi = CziFile(czi_filename=fp)
-        data = czi.scene_height_by_width(idx)
-        assert data == expected
+        data = czi.get_scene_bounding_box(idx)
+        assert data.x == expected[0]
+        assert data.y == expected[1]
+        assert data.w == expected[2]
+        assert data.h == expected[3]
 
-#  non-mosaic bbox functions
+
+@pytest.mark.parametrize("fname, idx, expected", [
+    ('s_3_t_1_c_3_z_5.czi', 0, (39850, 35568, 475, 325)),
+    ('s_3_t_1_c_3_z_5.czi', 1, (44851, 35568, 475, 325)),
+    ('s_3_t_1_c_3_z_5.czi', 2, (39850, 39272, 475, 325)),
+])
 def test_get_tile_bounding_box(data_dir, fname, idx, expected):
     with open(data_dir / fname, 'rb') as fp:
         czi = CziFile(czi_filename=fp)
-        ans = czi.get_tile_bounding_boxes(idx)
-        assert ans == expected
+        bbox = czi.get_tile_bounding_box(S=idx, C=0, Z=0)
+        bbox2 = czi.get_scene_bounding_box(idx)
+        print(bbox)
+        print(bbox2)
+        assert bbox.x == expected[0]
+        assert bbox.y == expected[1]
+        assert bbox.w == expected[2]
+        assert bbox.h == expected[3]
+        assert bbox.x == bbox2.x
+        assert bbox.y == bbox2.y
+        assert bbox.w == bbox2.w
+        assert bbox.h == bbox2.h
 
-def test_get_scene_bounding_box(data_dir, fname, idx, expected):
-    czi = CziFile(czi_filename=data_dir/fname)
-    ans = czi.get_all_mosaic_tile_bounding_boxes(index=idx)
-    assert ans == expected
+
 
 #  mosaic bbox functions
-def test_get_mosaic_tile_bounding_boxes(data_dir, fname, idx, expected):
-    czi = CziFile(czi_filename=data_dir/fname)
-    ans = czi.get_all_mosaic_tile_bounding_boxes(index=idx)
-    assert ans == expected
-
-def test_get_mosaic_scene_bounding_box(data_dir, fname, idx, expected):
-    czi = CziFile(czi_filename=data_dir/fname)
-    ans = czi.get_all_mosaic_tile_bounding_boxes(index=idx)
-    assert ans == expected
-
-def test_get_mosaic_boinding_box(data_dir, fname, idx, expected):
-    czi = CziFile(czi_filename=data_dir/fname)
-    ans = czi.get_all_mosaic_tile_bounding_boxes(index=idx)
-    assert ans == expected
+# def test_get_mosaic_tile_bounding_boxes(data_dir, fname, idx, expected):
+#     czi = CziFile(czi_filename=data_dir/fname)
+#     ans = czi.get_all_mosaic_tile_bounding_boxes(index=idx)
+#     assert ans == expected
+#
+# def test_get_mosaic_scene_bounding_box(data_dir, fname, idx, expected):
+#     czi = CziFile(czi_filename=data_dir/fname)
+#     ans = czi.get_all_mosaic_tile_bounding_boxes(index=idx)
+#     assert ans == expected
+#
+# def test_get_mosaic_boinding_box(data_dir, fname, idx, expected):
+#     czi = CziFile(czi_filename=data_dir/fname)
+#     ans = czi.get_all_mosaic_tile_bounding_boxes(index=idx)
+#     assert ans == expected
 
 
 @pytest.mark.parametrize("fname, idx, expected", [
-    ('s_1_t_1_c_1_z_1.czi', -1, (39856, 39272, 475, 325)),
     ('s_1_t_1_c_1_z_1.czi', 0, (39856, 39272,  475, 325)),
-    ('s_3_t_1_c_3_z_5.czi', -1, (39850, 35568, 475, 325)),
     ('s_3_t_1_c_3_z_5.czi', 0, (39850, 35568, 475, 325)),
     ('s_3_t_1_c_3_z_5.czi', 1, (44851, 35568, 475, 325)),
     ('s_3_t_1_c_3_z_5.czi', 2, (39850, 39272, 475, 325)),
@@ -131,8 +143,11 @@ def test_get_mosaic_boinding_box(data_dir, fname, idx, expected):
 def test_scene_bbox(data_dir, fname, idx, expected):
     with open(data_dir / fname, 'rb') as fp:
         czi = CziFile(czi_filename=fp)
-        data = czi.scene_bounding_box(idx)
-        assert data == expected
+        data = czi.get_scene_bounding_box(idx)
+        assert data.x == expected[0]
+        assert data.y == expected[1]
+        assert data.w == expected[2]
+        assert data.h == expected[3]
 
 
 @pytest.mark.parametrize("fname, expected", [
@@ -154,14 +169,15 @@ def test_destructor(data_dir, fname, expected):
 
 
 @pytest.mark.parametrize("fname, expected", [
-    ('s_1_t_1_c_1_z_1.czi', (0, 0, -1, -1)),
-    ('s_3_t_1_c_3_z_5.czi', (0, 0, -1, -1)),
     ('mosaic_test.czi', (0, 0, 1756, 624)),  # it's not 2*X because they overlap
 ])
 def test_mosaic_size(data_dir, fname, expected):
     czi = CziFile(str(data_dir / fname))
-    ans = czi.read_mosaic_size()
-    assert ans == expected
+    ans = czi.get_mosaic_bounding_box()
+    assert ans.x == expected[0]
+    assert ans.y == expected[1]
+    assert ans.w == expected[2]
+    assert ans.h == expected[3]
 
 
 @pytest.mark.parametrize("fname, expected", [
@@ -272,9 +288,9 @@ def test_image_shape(data_dir, fname, expects):
 def test_mosaic_image(data_dir, fname, unscaled_size, expects):
     with open(data_dir / fname, 'rb') as fp:
         czi = CziFile(czi_filename=fp)
-        sze = czi.read_mosaic_size()
-        assert sze[2] == unscaled_size[2]
-        assert sze[3] == unscaled_size[3]
+        sze = czi.get_mosaic_bounding_box()
+        assert sze.w == unscaled_size[2]
+        assert sze.h == unscaled_size[3]
         img = czi.read_mosaic(scale_factor=0.1, C=0)
         assert img.shape[0] == 1
         assert img.shape[1] == unscaled_size[3]//10
@@ -287,8 +303,8 @@ def test_mosaic_image(data_dir, fname, unscaled_size, expects):
 def test_two_mosaic_image(data_dir, fname, expects):
     with open(data_dir / fname, 'rb') as fp:
         czi = CziFile(czi_filename=fp)
-        sze = czi.read_mosaic_size()
-        rgion = (sze[0], sze[1], int(sze[2]/2), int(sze[3]/2))
+        sze = czi.get_mosaic_bounding_box()
+        rgion = (sze.x, sze.y, int(sze.w/2), int(sze.h/2))
         img = czi.read_mosaic(region=rgion, C=0, M=0)
         assert img.shape == expects
 
@@ -303,27 +319,40 @@ def test_two_mosaic_image(data_dir, fname, expects):
 def test_subblock_rect(data_dir, fname, s_index, m_index, expected):
     with open(data_dir / fname, 'rb') as fp:
         czi = CziFile(czi_filename=fp)
-        args = {'S': s_index} if m_index < 0 else {'S': s_index, 'M': m_index}
-        data = czi.read_subblock_rect(**args)
-        assert data == expected
+        ans = None
+        if m_index < 0:
+            ans = czi.get_scene_bounding_box(s_index)
+            ans2 = czi.get_tile_bounding_box(S=s_index, C=0, Z=0)
+            assert ans == ans2
+        else:
+            ans = czi.get_mosaic_tile_bounding_box(S=s_index, M=m_index)
+
+        assert ans.x == expected[0]
+        assert ans.y == expected[1]
+        assert ans.w == expected[2]
+        assert ans.h == expected[3]
 
 
 def test_cores_arg():
     assert CziFile._get_cores_from_kwargs({'cores': 4}) == 4
 
 
-@pytest.mark.parametrize("fname, s_index, m_index, expected", [
-    ('s_3_t_1_c_3_z_5.czi', 0, -1, [(39850, 35568, 475, 325)]),
-    ('mosaic_test.czi', 0, 0, [(0, 0, 924, 624), (832, 0, 924, 624)]),
-    ('Multiscene_CZI_3Scenes.czi', 0, 0, [(495412, 354694, 256, 256), (495643, 354694, 256, 256),
+@pytest.mark.parametrize("fname, c_dims, expected", [
+    ('mosaic_test.czi', {'S': 0, 'M':0}, [(0, 0, 924, 624), (832, 0, 924, 624)]),
+    ('Multiscene_CZI_3Scenes.czi', {'S': 0, 'M': 0}, [(495412, 354694, 256, 256), (495643, 354694, 256, 256),
                                           (495643, 354924, 256, 256), (495412, 354924, 256, 256)])
 ])
-def test_mosaic_subblock_rect(data_dir, fname, s_index, m_index, expected):
+def test_mosaic_subblock_rect(data_dir, fname, c_dims, expected):
     with open(data_dir / fname, 'rb') as fp:
         czi = CziFile(czi_filename=fp)
-        data = czi.mosaic_scene_bounding_boxes(s_index)
-        assert data == expected
-
+        data = czi.get_all_mosaic_tile_bounding_boxes(**c_dims)
+        print(data)
+        assert len(data) == len(expected)
+        for idx, (key, rect) in enumerate(data.items()):
+            assert rect.x == expected[idx][0]
+            assert rect.y == expected[idx][1]
+            assert rect.w == expected[idx][2]
+            assert rect.h == expected[idx][3]
 
 @pytest.mark.parametrize("fname, p_index, ans_file", [
     ("RGB-8bit.czi", 1, "RGB-8bit_Gplane.npy")

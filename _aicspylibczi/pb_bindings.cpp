@@ -68,12 +68,15 @@ PYBIND11_MODULE(_aicspylibczi, m)
 
   py::class_<libCZI::IntRect>(m, "IntRect")
     .def(py::init<>())
+    .def("__eq__", [](const libCZI::IntRect &a, const libCZI::IntRect b){
+          return (a.x == b.x && a.y == b.y && a.w == b.w && a.h == b.h);})
     .def_readwrite("x", &libCZI::IntRect::x)
     .def_readwrite("y", &libCZI::IntRect::y)
     .def_readwrite("w", &libCZI::IntRect::w)
     .def_readwrite("h", &libCZI::IntRect::h);
 
   py::class_<pylibczi::SubblockSortable>(m, "TileInfo")
-    .def_property_readonly("dims", &pylibczi::SubblockSortable::cDims)
+ //   .def(py::init<pylibczi::SubblockSortable>())
+    .def_property_readonly("dimension_coordinates", &pylibczi::SubblockSortable::getDimsAsChars)
     .def_property_readonly("m_index", &pylibczi::SubblockSortable::mIndex);
 }
