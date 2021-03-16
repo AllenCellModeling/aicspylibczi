@@ -54,7 +54,7 @@ PYBIND11_MODULE(_aicspylibczi, m)
     .def("read_mosaic_bounding_box", &pylibczi::Reader::mosaicBoundingBox)
     .def("read_mosaic_tile_bounding_box", &pylibczi::Reader::mosaicTileBoundingBox)
     .def("read_mosaic_scene_bounding_box", &pylibczi::Reader::mosaicSceneBoundingBox)
-    .def("read_all_mosaic_tile_bounding_boxes",&pylibczi::Reader::mosaicTileBoundingBoxes)
+    .def("read_all_mosaic_tile_bounding_boxes", &pylibczi::Reader::mosaicTileBoundingBoxes)
     .def("read_all_mosaic_scene_bounding_boxes", &pylibczi::Reader::allMosaicSceneBoundingBoxes)
     .def("pixel_type", &pylibczi::Reader::pixelType);
 
@@ -68,15 +68,17 @@ PYBIND11_MODULE(_aicspylibczi, m)
 
   py::class_<libCZI::IntRect>(m, "IntRect")
     .def(py::init<>())
-    .def("__eq__", [](const libCZI::IntRect &a, const libCZI::IntRect b){
-          return (a.x == b.x && a.y == b.y && a.w == b.w && a.h == b.h);})
+    .def("__eq__",
+         [](const libCZI::IntRect& a, const libCZI::IntRect& b) {
+           return (a.x == b.x && a.y == b.y && a.w == b.w && a.h == b.h);
+         })
     .def_readwrite("x", &libCZI::IntRect::x)
     .def_readwrite("y", &libCZI::IntRect::y)
     .def_readwrite("w", &libCZI::IntRect::w)
     .def_readwrite("h", &libCZI::IntRect::h);
 
   py::class_<pylibczi::SubblockSortable>(m, "TileInfo")
- //   .def(py::init<pylibczi::SubblockSortable>())
+    //   .def(py::init<pylibczi::SubblockSortable>())
     .def_property_readonly("dimension_coordinates", &pylibczi::SubblockSortable::getDimsAsChars)
     .def_property_readonly("m_index", &pylibczi::SubblockSortable::mIndex);
 }

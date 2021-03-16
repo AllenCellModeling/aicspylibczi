@@ -272,7 +272,7 @@ public:
    * returned.
    * @return an IntRect {x, y, w, h}
    */
-  //libCZI::IntRect mosaicShape() const { return m_statistics.boundingBoxLayer0Only; }
+  // libCZI::IntRect mosaicShape() const { return m_statistics.boundingBoxLayer0Only; }
 
   /*!
    * @brief get the shape of the loaded images
@@ -282,30 +282,25 @@ public:
    */
   static Shape getShape(pylibczi::ImageVector& images_, bool is_mosaic_) { return images_.getShape(); }
 
-
-
   /*!
    * @brief get the bounding box of the
    * @return
    */
-  TilePair tileBoundingBox(libCZI::CDimCoordinate &plane_coord_);
+  TilePair tileBoundingBox(libCZI::CDimCoordinate& plane_coord_);
 
-  TileBBoxMap tileBoundingBoxes(libCZI::CDimCoordinate &plane_coord_);
+  TileBBoxMap tileBoundingBoxes(libCZI::CDimCoordinate& plane_coord_);
 
   /*!
    * @brief get the scene bounding box
    *
    */
-  libCZI::IntRect sceneBoundingBox(unsigned int scene_index_=0);
+  libCZI::IntRect sceneBoundingBox(unsigned int scene_index_ = 0);
 
   SceneBBoxMap allSceneBoundingBoxes();
 
-
-
-
   libCZI::IntRect mosaicBoundingBox() const;
 
-  TilePair mosaicTileBoundingBox(libCZI::CDimCoordinate &plane_coord_, int index_m_);
+  TilePair mosaicTileBoundingBox(libCZI::CDimCoordinate& plane_coord_, int index_m_);
 
   TileBBoxMap mosaicTileBoundingBoxes(libCZI::CDimCoordinate& plane_coord_);
 
@@ -331,19 +326,19 @@ private:
 
   static bool isValidRegion(const libCZI::IntRect& in_box_, const libCZI::IntRect& czi_box_);
 
-  TileBBoxMap tileBoundingBoxesWith(SubblockSortable &subblocksToFind_);
+  TileBBoxMap tileBoundingBoxesWith(SubblockSortable& subblocksToFind_);
 
   void checkSceneShapes();
 
   libCZI::PixelType getFirstPixelType();
 
   /*!
-  * @brief get the pyramid 0 (acquired data) shape
-  * @param scene_index_ specifies scene but defaults to the first scene,
-  * Scenes can have different sizes
-  * @param get_all_matches_ if true return all matching bounding boxes
-  * @return std::vector<libCZI::IntRect> containing (x0, y0, w, h)
-  */
+   * @brief get the pyramid 0 (acquired data) shape
+   * @param scene_index_ specifies scene but defaults to the first scene,
+   * Scenes can have different sizes
+   * @param get_all_matches_ if true return all matching bounding boxes
+   * @return std::vector<libCZI::IntRect> containing (x0, y0, w, h)
+   */
   std::vector<libCZI::IntRect> getAllSceneYXSize(int scene_index_ = -1, bool get_all_matches_ = false);
 
   /*

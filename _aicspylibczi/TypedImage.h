@@ -127,7 +127,7 @@ TypedImage<T>::loadImage(const std::shared_ptr<libCZI::IBitmapData>& bitmap_ptr_
   if (lckScoped.stride % size_.w == 0 && lckScoped.stride / size_.w == sizeof(T)) {
     // this is the vast majority of cases
     std::memcpy(m_array, lckScoped.ptrDataRoi, lckScoped.size);
-  } else if ( lckScoped.stride > size_.w * sizeof(T) ) {
+  } else if (lckScoped.stride > size_.w * sizeof(T)) {
     // This mostly handles scaled mosaic images
     size_t pixelsPerRow = samples_per_pixel_ * size_.w;
     size_t bytesPerRow = pixelsPerRow * sizeof(T);

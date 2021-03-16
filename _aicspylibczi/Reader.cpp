@@ -378,8 +378,8 @@ Reader::readSubblockMeta(libCZI::CDimCoordinate& plane_coord_, int index_m_)
   return metaSubblocks;
 }
 
-//libCZI::IntRect
-//Reader::readSubblockRect(libCZI::CDimCoordinate& plane_coord_, int index_m_)
+// libCZI::IntRect
+// Reader::readSubblockRect(libCZI::CDimCoordinate& plane_coord_, int index_m_)
 //{
 //  SubblockSortable subBlockToFind(&plane_coord_, index_m_, isMosaic());
 //  SubblockIndexVec matches = getMatches(subBlockToFind);
@@ -491,14 +491,13 @@ Reader::readMosaic(libCZI::CDimCoordinate plane_coord_, float scale_factor_, lib
   return imageFactory.transferMemoryContainer();
 }
 
-
 Reader::TilePair
-Reader::tileBoundingBox(libCZI::CDimCoordinate &plane_coord_)
+Reader::tileBoundingBox(libCZI::CDimCoordinate& plane_coord_)
 {
   SubblockSortable subblocksToFind(&plane_coord_, -1, false);
   TileBBoxMap ans = tileBoundingBoxesWith(subblocksToFind);
 
-  if( ans.size() > 1 )
+  if (ans.size() > 1)
     throw CDimCoordinatesUnderspecifiedException("More than 1 tile matched. Be more specific.");
 
   return *(ans.begin());
@@ -513,16 +512,16 @@ Reader::tileBoundingBoxes(libCZI::CDimCoordinate& plane_coord_)
 
 // private method
 Reader::TileBBoxMap
-Reader::tileBoundingBoxesWith(SubblockSortable &subblocksToFind_)
+Reader::tileBoundingBoxesWith(SubblockSortable& subblocksToFind_)
 {
   TileBBoxMap ans;
   SubblockIndexVec matches = getMatches(subblocksToFind_);
 
-  if( matches.size() == 0 )
+  if (matches.size() == 0)
     throw CDimCoordinatesOverspecifiedException("Tile dimensions overspecified, no matching tiles found.");
 
-  auto extractor = [&](const SubblockIndexVec::value_type &match_){
-    auto subblk = m_czireader->ReadSubBlock( match_.second );
+  auto extractor = [&](const SubblockIndexVec::value_type& match_) {
+    auto subblk = m_czireader->ReadSubBlock(match_.second);
     auto sbkInfo = subblk->GetSubBlockInfo();
     return TileBBoxMap::value_type(match_.first, sbkInfo.logicalRect);
   };
@@ -535,16 +534,14 @@ libCZI::IntRect
 Reader::sceneBoundingBox(unsigned int scene_index_)
 {
   // implicit Scene
-  if( m_statistics.sceneBoundingBoxes.size() == 0)
+  if (m_statistics.sceneBoundingBoxes.size() == 0)
     return m_statistics.boundingBoxLayer0Only;
 
   // explicit scenes
   auto found = m_statistics.sceneBoundingBoxes.find(scene_index_);
-  if(found == m_statistics.sceneBoundingBoxes.end())
-    throw SceneIndexException(scene_index_,
-                              m_statistics.sceneBoundingBoxes.begin(),
-                              m_statistics.sceneBoundingBoxes.end()
-                              );
+  if (found == m_statistics.sceneBoundingBoxes.end())
+    throw SceneIndexException(
+      scene_index_, m_statistics.sceneBoundingBoxes.begin(), m_statistics.sceneBoundingBoxes.end());
 
   return found->second.boundingBoxLayer0;
 }
@@ -553,14 +550,17 @@ Reader::SceneBBoxMap
 Reader::allSceneBoundingBoxes()
 {
   // implicit Scene
-  if( m_statistics.sceneBoundingBoxes.size() == 0)
-    return std::map< unsigned int, libCZI::IntRect >{{0, m_statistics.boundingBoxLayer0Only}};
+  if (m_statistics.sceneBoundingBoxes.size() == 0)
+    return std::map<unsigned int, libCZI::IntRect>{ { 0, m_statistics.boundingBoxLayer0Only } };
 
   SceneBBoxMap ans;
 
-  std::transform(m_statistics.sceneBoundingBoxes.begin(), m_statistics.sceneBoundingBoxes.end(),
-                 std::inserter(ans,end(ans)),[](const std::map<int, libCZI::BoundingBoxes>::value_type &bboxes_pair_){
-                   return std::map< unsigned int, libCZI::IntRect >::value_type(bboxes_pair_.first, bboxes_pair_.second.boundingBoxLayer0);
+  std::transform(m_statistics.sceneBoundingBoxes.begin(),
+                 m_statistics.sceneBoundingBoxes.end(),
+                 std::inserter(ans, end(ans)),
+                 [](const std::map<int, libCZI::BoundingBoxes>::value_type& bboxes_pair_) {
+                   return std::map<unsigned int, libCZI::IntRect>::value_type(bboxes_pair_.first,
+                                                                              bboxes_pair_.second.boundingBoxLayer0);
                  });
   return ans;
 }
@@ -568,33 +568,31 @@ Reader::allSceneBoundingBoxes()
 libCZI::IntRect
 Reader::mosaicBoundingBox() const
 {
-  if( !isMosaic() )
+  if (!isMosaic())
     throw IsNotMosaicException("Use the non-mosaic specific bounding box functions.");
 
   return m_statistics.boundingBoxLayer0Only;
 }
 
-
-
 Reader::TilePair
-Reader::mosaicTileBoundingBox(libCZI::CDimCoordinate &plane_coord_, int index_m_)
+Reader::mosaicTileBoundingBox(libCZI::CDimCoordinate& plane_coord_, int index_m_)
 {
-  if( !isMosaic() )
+  if (!isMosaic())
     throw IsNotMosaicException("Use the non-mosaic specific bounding box functions.");
 
   SubblockSortable subblocksToFind(&plane_coord_, index_m_, isMosaic());
   TileBBoxMap ans = tileBoundingBoxesWith(subblocksToFind);
 
-  if( ans.size() > 1 )
+  if (ans.size() > 1)
     throw CDimCoordinatesUnderspecifiedException("More than 1 tile matched. Be more specific.");
 
   return *(ans.begin());
 }
 
 Reader::TileBBoxMap
-Reader::mosaicTileBoundingBoxes(libCZI::CDimCoordinate &plane_coord_)
+Reader::mosaicTileBoundingBoxes(libCZI::CDimCoordinate& plane_coord_)
 {
-  if( !isMosaic() )
+  if (!isMosaic())
     throw IsNotMosaicException("Use the non-mosaic specific bounding box functions.");
 
   SubblockSortable subblocksToFind(&plane_coord_, -1, true);
@@ -604,19 +602,19 @@ Reader::mosaicTileBoundingBoxes(libCZI::CDimCoordinate &plane_coord_)
 libCZI::IntRect
 Reader::mosaicSceneBoundingBox(unsigned int scene_index_)
 {
-  if( !isMosaic() )
+  if (!isMosaic())
     throw IsNotMosaicException("Use the non-mosaic specific bounding box functions.");
 
   return sceneBoundingBox(scene_index_);
 }
 
 Reader::SceneBBoxMap
-Reader::allMosaicSceneBoundingBoxes(){
-  if( !isMosaic() )
+Reader::allMosaicSceneBoundingBoxes()
+{
+  if (!isMosaic())
     throw IsNotMosaicException("Use the non-mosaic specific bounding box functions.");
 
   return allSceneBoundingBoxes();
-
 }
 
 }
