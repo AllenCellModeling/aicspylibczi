@@ -50,10 +50,10 @@ class CziFile(object):
     ZISRAW_DIMS = {"Z", "C", "T", "R", "S", "I", "H", "V", "B"}
 
     def __init__(
-        self,
-        czi_filename: types.FileLike,
-        metafile_out: types.PathLike = "",
-        verbose: bool = False,
+            self,
+            czi_filename: types.FileLike,
+            metafile_out: types.PathLike = "",
+            verbose: bool = False,
     ):
         # Convert to BytesIO (bytestream)
         self._bytes = self.convert_to_buffer(czi_filename)
@@ -132,6 +132,10 @@ class CziFile(object):
              {'S': (1, 2), 'T': (0,6), 'X': (0, 475), 'Y': (0, 325), 'Z': (0, 4)},
              {'S': (2, 3), 'T': (0,7), 'X': (0, 475), 'Y': (0, 325), 'Z': (0, 4)}
             ]
+            For the same initial file but with an RGB pixel type the result would be
+            [
+             {'S': (0, 3), 'T': (0,7), 'X': (0, 475), 'Y': (0, 325), 'Z': (0, 4), 'A': (0,3)}
+            ].
 
         """
         return self.reader.read_dims()
@@ -144,10 +148,39 @@ class CziFile(object):
         Returns
         -------
         A string containing the name of the type of each pixel. If inconsistent it returns invalid.
+
         """
         return self.reader.pixel_type()
 
-    def get_tile_bounding_box(self, **kwargs):
+    def get_tile_bounding_box(self, **kwargs) -> BBox:
+        """
+        Get a single tile (subblock) bounding box (pyramid=0) for the specified dimensions.
+        For non-mosaic files.
+
+        Parameters
+        ----------
+        kwargs
+            The keywords below allow you to specify the dimensions that you wish to match. If you
+            under-specify the constraints you can easily end up with a massive image stack.
+                       Z = 1   # The Z-dimension.
+                       C = 2   # The C-dimension ("channel").
+                       T = 3   # The T-dimension ("time").
+                       R = 4   # The R-dimension ("rotation").
+                       S = 5   # The S-dimension ("scene").
+                       I = 6   # The I-dimension ("illumination").
+                       H = 7   # The H-dimension ("phase").
+                       V = 8   # The V-dimension ("view").
+
+        Returns
+        -------
+        bbox
+            A Bounding Box, bbox, of type BBox.
+            bbox.x = The x coordinate of the upper left corner of the bounding box.
+            bbox.y = The y coordinate of the upper left corner of the bounding box.
+            bbox.w = The width of the bounding box.
+            bbox.h = The height of the bounding box.
+
+        """
         plane_constraints = self.czilib.DimCoord()
         [
             plane_constraints.set_dim(k, v)
@@ -159,18 +192,22 @@ class CziFile(object):
 
     def get_scene_bounding_box(self, index: int = 0):
         """
-        Get the bounding box of the raw collected data (pyramid 0) from the czifile. if not specified it defaults to
-        the first scene
+        Get the bounding box (pyramid=0) for the specified scene. For non-mosaic files.
+        This should be equivalent to the results from get_tile_bounding_box but requiring only one arguments.
 
         Parameters
         ----------
         index
-             the scene index, omit and it defaults to the first one
+             the scene index, if omitted it defaults to Zero
 
         Returns
         -------
-        tuple
-            (x0, y0, w, h) for the specified scene
+        bbox
+             A Bounding Box, bbox, of type BBox.
+             bbox.x = The x coordinate of the upper left corner of the bounding box.
+             bbox.y = The y coordinate of the upper left corner of the bounding box.
+             bbox.w = The width of the bounding box.
+             bbox.h = The height of the bounding box.
 
         """
         bbox = self.reader.read_scene_bounding_box(index)
@@ -178,9 +215,35 @@ class CziFile(object):
 
     def get_all_tile_bounding_boxes(self, **kwargs):
         """
+        Get one or more tiles (subblocks) bounding boxes (pyramid=0) for the specified dimensions.
+        For non-mosaic files.
 
-        :param kwargs:
-        :return:
+        Parameters
+        ----------
+        kwargs
+            The keywords below allow you to specify the dimensions that you wish to match. If you
+            under-specify the constraints you can easily end up with a massive image stack.
+                       Z = 1   # The Z-dimension.
+                       C = 2   # The C-dimension ("channel").
+                       T = 3   # The T-dimension ("time").
+                       R = 4   # The R-dimension ("rotation").
+                       S = 5   # The S-dimension ("scene").
+                       I = 6   # The I-dimension ("illumination").
+                       H = 7   # The H-dimension ("phase").
+                       V = 8   # The V-dimension ("view").
+
+        Returns
+        -------
+        dict[tile_info, bbox]
+            A dictionary with keys of type TileInfo and values of type BBox.
+            For a key, ie tle, of type Tile:
+                tle.dimension_coordinates = A dictionary of Dimensions for the tile
+            For a value, ie bbox, of type BBox:
+                bbox.x = The x coordinate of the upper left corner of the bounding box.
+                bbox.y = The y coordinate of the upper left corner of the bounding box.
+                bbox.w = The width of the bounding box.
+                bbox.h = The height of the bounding box.
+
         """
         plane_constraints = self.czilib.DimCoord()
         [
@@ -193,16 +256,55 @@ class CziFile(object):
 
     def get_all_scene_bounding_boxes(self):
         """
+        Get one or more tiles (subblocks) bounding boxes (pyramid=0) for the specified dimensions.
+        For non-mosaic files.
 
-        :return:
+        Parameters
+        ----------
+
+        Returns
+        -------
+        dict[int, bbox]
+            A dictionary with keys of type Int and values of type BBox.
+            The integer key is the Scene Index.
+            For a value, ie bbox, of type BBox:
+                bbox.x = The x coordinate of the upper left corner of the bounding box.
+                bbox.y = The y coordinate of the upper left corner of the bounding box.
+                bbox.w = The width of the bounding box.
+                bbox.h = The height of the bounding box.
+
         """
         return self.reader.read_all_scene_bounding_boxes()
 
     def get_mosaic_tile_bounding_box(self, **kwargs):
         """
+        Get a single tile (subblock) bounding box (pyramid=0) for the specified dimensions.
+        For mosaic files.
 
-        :param kwargs:
-        :return:
+        Parameters
+        ----------
+        kwargs
+            The keywords below allow you to specify the dimensions that you wish to match. If you
+            under-specify the constraints you can easily end up with a massive image stack.
+                       Z = 1   # The Z-dimension.
+                       C = 2   # The C-dimension ("channel").
+                       T = 3   # The T-dimension ("time").
+                       R = 4   # The R-dimension ("rotation").
+                       S = 5   # The S-dimension ("scene").
+                       I = 6   # The I-dimension ("illumination").
+                       H = 7   # The H-dimension ("phase").
+                       V = 8   # The V-dimension ("view").
+                       M = 10  # The M_index, this is only valid for Mosaic files!
+
+        Returns
+        -------
+        bbox
+            A Bounding Box, bbox, of type BBox.
+            bbox.x = The x coordinate of the upper left corner of the bounding box.
+            bbox.y = The y coordinate of the upper left corner of the bounding box.
+            bbox.w = The width of the bounding box.
+            bbox.h = The height of the bounding box.
+
         """
         plane_constraints = self.czilib.DimCoord()
         [
@@ -218,28 +320,56 @@ class CziFile(object):
 
     def get_mosaic_scene_bounding_box(self, index: int = 0):
         """
-
-        :param index:
-        :return:
-        """
-        return self.reader.read_mosaic_scene_bounding_box(index)
-
-    # update docstring
-    def get_all_mosaic_tile_bounding_boxes(self, **kwargs):
-        """
-        Get the bounding boxes of the raw collected data (pyramid 0) from the mosaic czifile.
-        This retrieves all pyramid 0 bounding boxes if the scene is not defined in the file or if the user
-        calls the function with the default index value.
+        Get the bounding box (pyramid=0) for the specified scene. For mosaic files.
+        This is not equivalent to the results from get_mosaic_tile_bounding_box.
 
         Parameters
         ----------
         index
-             the scene index, omit and it defaults to all
+             the scene index, if omitted it defaults to Zero
 
         Returns
         -------
-        tuple
-            List[(x0, y0, w, h)] for the specified scene
+        bbox
+            A Bounding Box, bbox, of type BBox.
+            bbox.x = The x coordinate of the upper left corner of the bounding box.
+            bbox.y = The y coordinate of the upper left corner of the bounding box.
+            bbox.w = The width of the bounding box.
+            bbox.h = The height of the bounding box.
+
+        """
+        return self.reader.read_mosaic_scene_bounding_box(index)
+
+    def get_all_mosaic_tile_bounding_boxes(self, **kwargs):
+        """
+        Get one or more tiles (subblocks) bounding boxes (pyramid=0) for the specified dimensions.
+        For mosaic files.
+
+        Parameters
+        ----------
+        kwargs
+            The keywords below allow you to specify the dimensions that you wish to match. If you
+            under-specify the constraints you can easily end up with a massive image stack.
+                       Z = 1   # The Z-dimension.
+                       C = 2   # The C-dimension ("channel").
+                       T = 3   # The T-dimension ("time").
+                       R = 4   # The R-dimension ("rotation").
+                       S = 5   # The S-dimension ("scene").
+                       I = 6   # The I-dimension ("illumination").
+                       H = 7   # The H-dimension ("phase").
+                       V = 8   # The V-dimension ("view").
+
+        Returns
+        -------
+        dict[tile_info, bbox]
+            A dictionary with keys of type TileInfo and values of type BBox.
+            For a key, ie tle, of type Tile:
+                tle.dimension_coordinates = A dictionary of Dimensions for the tile
+            For a value, ie bbox, of type BBox:
+                bbox.x = The x coordinate of the upper left corner of the bounding box.
+                bbox.y = The y coordinate of the upper left corner of the bounding box.
+                bbox.w = The width of the bounding box.
+                bbox.h = The height of the bounding box.
 
         """
         plane_constraints = self.czilib.DimCoord()
@@ -254,16 +384,40 @@ class CziFile(object):
 
     def get_all_mosaic_scene_bounding_boxes(self):
         """
+        Get the scene (subblocks) bounding boxes (pyramid=0) for the specified dimensions.
+        For mosaic files.
 
-        :return:
+        Parameters
+        ----------
+
+        Returns
+        -------
+        dict[int, bbox]
+            A dictionary with keys of type Int and values of type BBox.
+            The integer key is the Scene Index.
+            For a value, ie bbox, of type BBox:
+                bbox.x = The x coordinate of the upper left corner of the bounding box.
+                bbox.y = The y coordinate of the upper left corner of the bounding box.
+                bbox.w = The width of the bounding box.
+                bbox.h = The height of the bounding box.
+
         """
         scene_dict = self.reader.read_all_mosaic_scene_bounding_boxes()
         return scene_dict
 
     def get_mosaic_bounding_box(self):
         """
+        Get the bounding box for the entire mosaic image.
 
-        :return:
+        Returns
+        -------
+        bbox
+            A Bounding Box, bbox, of type BBox.
+            bbox.x = The x coordinate of the upper left corner of the bounding box.
+            bbox.y = The y coordinate of the upper left corner of the bounding box.
+            bbox.w = The width of the bounding box.
+            bbox.h = The height of the bounding box.
+
         """
         bbox = self.reader.read_mosaic_bounding_box()
         return bbox
@@ -291,6 +445,7 @@ class CziFile(object):
         -------
         bool
             True | False ie is this a mosaic file
+
         """
         return self.reader.is_mosaic()
 
@@ -376,6 +531,7 @@ class CziFile(object):
             an array of tuples containing a dimension dictionary and the corresponding subblock metadata
         lxml.etree.Element if unified_xml is True
             an lxml document containing the requested subblock metadata.
+
         """
         plane_constraints = self.czilib.DimCoord()
         [
@@ -397,43 +553,6 @@ class CziFile(object):
             new_element.append(etree.XML(pair[1]))
             root.append(new_element)
         return root
-
-    # def read_subblock_rect(self, **kwargs):
-    #     """
-    #     Read the subblock specific coordinates. For non-mosaic files S only needs to be set, for mosaic files the
-    #     S and M Dimensions need to be specified. In both cases, if underspecified only the first match is returned.
-    #     If overspecified a PylibCZI_CDimCoordinatesOverspecifiedException is raised.
-    #
-    #     Parameters
-    #     ----------
-    #     kwargs
-    #         The keywords below allow you to specify the dimensions that you wish to match. If you
-    #         under-specify the constraints you can easily end up with a massive image stack.
-    #                    Z = 1   # The Z-dimension.
-    #                    C = 2   # The C-dimension ("channel").
-    #                    T = 3   # The T-dimension ("time").
-    #                    R = 4   # The R-dimension ("rotation").
-    #                    S = 5   # The S-dimension ("scene").
-    #                    I = 6   # The I-dimension ("illumination").
-    #                    H = 7   # The H-dimension ("phase").
-    #                    V = 8   # The V-dimension ("view").
-    #                    M = 10  # The M_index, this is only valid for Mosaic files and must be provided here!
-    #
-    #     Returns
-    #     -------
-    #     (int, int, int, int)
-    #         (x0, y0, w, h) the bounding box of the tile
-    #
-    #     """
-    #     plane_constraints = self.czilib.DimCoord()
-    #     [
-    #         plane_constraints.set_dim(k, v)
-    #         for (k, v) in kwargs.items()
-    #         if k in CziFile.ZISRAW_DIMS
-    #     ]
-    #     m_index = self._get_m_index_from_kwargs(kwargs)
-    #     rect = self.reader.read_rect_from_subblock(plane_constraints, m_index)
-    #     return (rect.x, rect.y, rect.w, rect.h)
 
     def read_image(self, **kwargs):
         """
@@ -473,6 +592,7 @@ class CziFile(object):
         The M Dimension is a representation of the m_index used inside libCZI. Unfortunately this can be sparsely
         packed for a given selection which causes problems when indexing memory. Consequently the M Dimension may
         not match the m_index that is being used in libCZI or displayed in Zeiss' Zen software.
+
         """
         plane_constraints = self.czilib.DimCoord()
         [
