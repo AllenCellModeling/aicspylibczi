@@ -152,7 +152,7 @@ class CziFile(object):
         """
         return self.reader.pixel_type()
 
-    def get_tile_bounding_box(self, **kwargs) -> BBox:
+    def get_tile_bounding_box(self, **kwargs):
         """
         Get a single tile (subblock) bounding box (pyramid=0) for the specified dimensions.
         For non-mosaic files.
