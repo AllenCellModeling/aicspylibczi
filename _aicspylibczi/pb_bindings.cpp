@@ -66,7 +66,7 @@ PYBIND11_MODULE(_aicspylibczi, m)
 
   py::class_<libCZI::CDimCoordinate>(m, "DimCoord").def(py::init<>()).def("set_dim", &libCZI::CDimCoordinate::Set);
 
-  py::class_<libCZI::IntRect>(m, "IntRect")
+  py::class_<libCZI::IntRect>(m, "BBox")
     .def(py::init<>())
     .def("__eq__",
          [](const libCZI::IntRect& a, const libCZI::IntRect& b) {

@@ -220,14 +220,6 @@ public:
   SubblockMetaVec readSubblockMeta(libCZI::CDimCoordinate& plane_coord_, int index_m_ = -1);
 
   /*!
-   * @brief provide the subblock info logicalRect coordinates
-   * @param plane_coord_ A structure containing the Dimension constraints
-   * @param index_m_ Must be set to select the tile of the mosaic file
-   * @return an IntRect {x, y, w, h}
-   */
-  // libCZI::IntRect readSubblockRect(libCZI::CDimCoordinate& plane_coord_, int index_m_ = -1);
-
-  /*!
    * @brief If the czi file is a mosaic tiled image this function can be used to reconstruct it into an image.
    * @param plane_coord_ A class constraining the data to an individual plane.
    * @param scale_factor_ (optional) The native size for mosaic files can be huge the scale factor allows one to get
@@ -254,7 +246,6 @@ public:
   ImagesContainerBase::ImagesContainerBasePtr readMosaic(libCZI::CDimCoordinate plane_coord_,
                                                          float scale_factor_ = 1.0,
                                                          libCZI::IntRect im_box_ = { 0, 0, -1, -1 });
-  // changed from {.w=-1, .h=-1} to above to support MSVC and GCC - lagging on C++14 std
 
   /*!
    * Convert the libCZI::DimensionIndex to a character
@@ -267,12 +258,6 @@ public:
 
   virtual ~Reader() { m_czireader->Close(); }
 
-  /*!
-   * Get the full size of the mosaic image without scaling. If you're selecting a sub-region it must be within the box
-   * returned.
-   * @return an IntRect {x, y, w, h}
-   */
-  // libCZI::IntRect mosaicShape() const { return m_statistics.boundingBoxLayer0Only; }
 
   /*!
    * @brief get the shape of the loaded images
