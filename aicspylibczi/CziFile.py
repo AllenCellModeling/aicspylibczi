@@ -181,12 +181,7 @@ class CziFile(object):
             bbox.h = The height of the bounding box.
 
         """
-        plane_constraints = self.czilib.DimCoord()
-        [
-            plane_constraints.set_dim(k, v)
-            for (k, v) in kwargs.items()
-            if k in CziFile.ZISRAW_DIMS
-        ]
+        plane_constraints = self._get_coords_from_kwargs(kwargs)
         dims, bbox = self.reader.read_tile_bounding_box(plane_constraints)
         return bbox
 
@@ -245,12 +240,7 @@ class CziFile(object):
                 bbox.h = The height of the bounding box.
 
         """
-        plane_constraints = self.czilib.DimCoord()
-        [
-            plane_constraints.set_dim(k, v)
-            for (k, v) in kwargs.items()
-            if k in CziFile.ZISRAW_DIMS
-        ]
+        plane_constraints = self._get_coords_from_kwargs(kwargs)
         m_index = self._get_m_index_from_kwargs(kwargs)
         return self.reader.read_all_tile_bounding_boxes(plane_constraints, m_index)
 
@@ -306,12 +296,7 @@ class CziFile(object):
             bbox.h = The height of the bounding box.
 
         """
-        plane_constraints = self.czilib.DimCoord()
-        [
-            plane_constraints.set_dim(k, v)
-            for (k, v) in kwargs.items()
-            if k in CziFile.ZISRAW_DIMS
-        ]
+        plane_constraints = self._get_coords_from_kwargs(kwargs)
         m_index = self._get_m_index_from_kwargs(kwargs)
         ssorter, bbox = self.reader.read_mosaic_tile_bounding_box(
             plane_constraints, m_index
@@ -372,12 +357,7 @@ class CziFile(object):
                 bbox.h = The height of the bounding box.
 
         """
-        plane_constraints = self.czilib.DimCoord()
-        [
-            plane_constraints.set_dim(k, v)
-            for (k, v) in kwargs.items()
-            if k in CziFile.ZISRAW_DIMS
-        ]
+        plane_constraints = self._get_coords_from_kwargs(kwargs)
         # no m_index parameter
         return self.reader.read_all_mosaic_tile_bounding_boxes(plane_constraints)
 
@@ -530,12 +510,7 @@ class CziFile(object):
             an lxml document containing the requested subblock metadata.
 
         """
-        plane_constraints = self.czilib.DimCoord()
-        [
-            plane_constraints.set_dim(k, v)
-            for (k, v) in kwargs.items()
-            if k in CziFile.ZISRAW_DIMS
-        ]
+        plane_constraints = self._get_coords_from_kwargs(kwargs)
         m_index = self._get_m_index_from_kwargs(kwargs)
         subblock_meta = self.reader.read_meta_from_subblock(plane_constraints, m_index)
         if not unified_xml:
@@ -591,12 +566,7 @@ class CziFile(object):
         not match the m_index that is being used in libCZI or displayed in Zeiss' Zen software.
 
         """
-        plane_constraints = self.czilib.DimCoord()
-        [
-            plane_constraints.set_dim(k, v)
-            for (k, v) in kwargs.items()
-            if k in CziFile.ZISRAW_DIMS
-        ]
+        plane_constraints = self._get_coords_from_kwargs(kwargs)
         m_index = self._get_m_index_from_kwargs(kwargs)
         cores = self._get_cores_from_kwargs(kwargs)
 
@@ -639,12 +609,7 @@ class CziFile(object):
         numpy.ndarray
             (1, height, width)
         """
-        plane_constraints = self.czilib.DimCoord()
-        [
-            plane_constraints.set_dim(k, v)
-            for (k, v) in kwargs.items()
-            if k in CziFile.ZISRAW_DIMS
-        ]
+        plane_constraints = self._get_coords_from_kwargs(kwargs)
 
         if region is None:
             region = self.czilib.BBox()
@@ -661,6 +626,15 @@ class CziFile(object):
         img = self.reader.read_mosaic(plane_constraints, scale_factor, region)
 
         return img
+
+    def _get_coords_from_kwargs(self, kwargs):
+        plane_constraints = self.czilib.DimCoord()
+        [
+        plane_constraints.set_dim(k, v)
+        for (k, v) in kwargs.items()
+        if k in CziFile.ZISRAW_DIMS
+        ]
+        return plane_constraints
 
     def _get_m_index_from_kwargs(self, kwargs):
         m_index = -1
