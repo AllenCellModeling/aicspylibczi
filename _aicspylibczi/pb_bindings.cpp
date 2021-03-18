@@ -56,7 +56,7 @@ PYBIND11_MODULE(_aicspylibczi, m)
     .def("read_mosaic_scene_bounding_box", &pylibczi::Reader::mosaicSceneBoundingBox)
     .def("read_all_mosaic_tile_bounding_boxes", &pylibczi::Reader::mosaicTileBoundingBoxes)
     .def("read_all_mosaic_scene_bounding_boxes", &pylibczi::Reader::allMosaicSceneBoundingBoxes)
-    .def("pixel_type", &pylibczi::Reader::pixelType);
+    .def_property_readonly("pixel_type", &pylibczi::Reader::pixelType);
 
   py::class_<pylibczi::IndexMap>(m, "IndexMap")
     .def(py::init<>())
