@@ -163,8 +163,6 @@ def test_get_tile_bounding_box(data_dir, fname, idx, expected):
         czi = CziFile(czi_filename=fp)
         bbox = czi.get_tile_bounding_box(S=idx, C=0, Z=0)
         bbox2 = czi.get_scene_bounding_box(idx)
-        print(bbox)
-        print(bbox2)
         assert bbox.x == expected[0]
         assert bbox.y == expected[1]
         assert bbox.w == expected[2]
@@ -173,23 +171,6 @@ def test_get_tile_bounding_box(data_dir, fname, idx, expected):
         assert bbox.y == bbox2.y
         assert bbox.w == bbox2.w
         assert bbox.h == bbox2.h
-
-
-#  mosaic bbox functions
-# def test_get_mosaic_tile_bounding_boxes(data_dir, fname, idx, expected):
-#     czi = CziFile(czi_filename=data_dir/fname)
-#     ans = czi.get_all_mosaic_tile_bounding_boxes(index=idx)
-#     assert ans == expected
-#
-# def test_get_mosaic_scene_bounding_box(data_dir, fname, idx, expected):
-#     czi = CziFile(czi_filename=data_dir/fname)
-#     ans = czi.get_all_mosaic_tile_bounding_boxes(index=idx)
-#     assert ans == expected
-#
-# def test_get_mosaic_boinding_box(data_dir, fname, idx, expected):
-#     czi = CziFile(czi_filename=data_dir/fname)
-#     ans = czi.get_all_mosaic_tile_bounding_boxes(index=idx)
-#     assert ans == expected
 
 
 @pytest.mark.parametrize(
@@ -518,7 +499,6 @@ def test_mosaic_subblock_rect(data_dir, fname, c_dims, expected):
     with open(data_dir / fname, "rb") as fp:
         czi = CziFile(czi_filename=fp)
         data = czi.get_all_mosaic_tile_bounding_boxes(**c_dims)
-        print(data)
         assert len(data) == len(expected)
         for idx, (key, rect) in enumerate(data.items()):
             assert rect.x == expected[idx][0]
