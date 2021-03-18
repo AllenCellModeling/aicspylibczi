@@ -606,7 +606,6 @@ TEST_CASE_METHOD(CziCreator5, "test_multiscene_mosaic_bboxes", "[Reader_mosaic_b
   auto czi = get();
   auto dSizes = czi->dimSizes();
 
-  //auto ans = czi->getAllSceneYXSize(0, true);
   libCZI::CDimCoordinate cDim = libCZI::CDimCoordinate{ { libCZI::DimensionIndex::S, 0 } };
   auto ans = czi->tileBoundingBoxes(cDim);
   REQUIRE(ans.size() == 4); // 2 channels * 44 m_index
