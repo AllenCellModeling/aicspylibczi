@@ -150,7 +150,7 @@ class CziFile(object):
         A string containing the name of the type of each pixel. If inconsistent it returns invalid.
 
         """
-        return self.reader.pixel_type()
+        return self.reader.pixel_type
 
     def get_tile_bounding_box(self, **kwargs):
         """
