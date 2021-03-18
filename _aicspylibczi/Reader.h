@@ -315,6 +315,27 @@ private:
 
   void checkSceneShapes();
 
+  /*!
+  * @brief get the pyramid 0 (acquired data) shape
+  * @param scene_index_ specifies scene but defaults to the first scene,
+  * Scenes can have different sizes
+  * @return std::vector<libCZI::IntRect> containing (x0, y0, w, h)
+  */
+  libCZI::IntRect getSceneYXSize(int scene_index_ = -1)
+  {
+    std::vector<libCZI::IntRect> matches = getAllSceneYXSize(scene_index_);
+    return matches.front();
+  }
+
+  /*!
+   * @brief get the pyramid 0 (acquired data) shape
+   * @param scene_index_ specifies scene but defaults to the first scene,
+   * Scenes can have different sizes
+   * @param get_all_matches_ if true return all matching bounding boxes
+   * @return std::vector<libCZI::IntRect> containing (x0, y0, w, h)
+   */
+  std::vector<libCZI::IntRect> getAllSceneYXSize(int scene_index_ = -1, bool get_all_matches_ = false);
+
   libCZI::PixelType getFirstPixelType();
 
 };
