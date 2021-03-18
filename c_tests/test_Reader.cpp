@@ -489,7 +489,6 @@ TEST_CASE_METHOD(CziMCreator, "test_reader_mosaic_subblockinforect", "[Reader_Mo
   libCZI::CDimCoordinate dm;
   for (int m_index = 0; m_index < 2; m_index++) {
     auto rect = czi->mosaicTileBoundingBox(dm, m_index);
-    //auto rect = czi->readSubblockRect(dm, m_index);
     auto answer = answers[m_index];
     REQUIRE(rect.second.x == answer.x);
     REQUIRE(rect.second.y == answer.y);
@@ -510,7 +509,7 @@ TEST_CASE_METHOD(CziCreator2, "test_reader_subblockinforect", "[Reader_Std_Subbl
 
   for (int s_index = 0; s_index < 3; s_index++) {
     libCZI::CDimCoordinate dm{ { libCZI::DimensionIndex::S, s_index } };
-    auto rects = czi->tileBoundingBoxes(dm); // readSubblockRect(dm);
+    auto rects = czi->tileBoundingBoxes(dm);
     auto ans = answers[s_index];
     REQUIRE(rects.begin()->second.x == ans.x);
     REQUIRE(rects.begin()->second.y == ans.y);
