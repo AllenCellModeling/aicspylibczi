@@ -379,8 +379,7 @@ class CziFile(object):
             if k in CziFile.ZISRAW_DIMS
         ]
         # no m_index parameter
-        bboxes = self.reader.read_all_mosaic_tile_bounding_boxes(plane_constraints)
-        return bboxes  # [(bb.x, bb.y, bb.w, bb.h) for bb in bboxes]
+        return self.reader.read_all_mosaic_tile_bounding_boxes(plane_constraints)
 
     def get_all_mosaic_scene_bounding_boxes(self):
         """
@@ -402,8 +401,7 @@ class CziFile(object):
                 bbox.h = The height of the bounding box.
 
         """
-        scene_dict = self.reader.read_all_mosaic_scene_bounding_boxes()
-        return scene_dict
+        return self.reader.read_all_mosaic_scene_bounding_boxes()
 
     def get_mosaic_bounding_box(self):
         """
@@ -419,8 +417,7 @@ class CziFile(object):
             bbox.h = The height of the bounding box.
 
         """
-        bbox = self.reader.read_mosaic_bounding_box()
-        return bbox
+        return self.reader.read_mosaic_bounding_box()
 
     @property
     def size(self):
@@ -650,12 +647,12 @@ class CziFile(object):
         ]
 
         if region is None:
-            region = self.czilib.IntRect()
+            region = self.czilib.BBox()
             region.w = -1
             region.h = -1
         else:
             assert len(region) == 4
-            tmp = self.czilib.IntRect()
+            tmp = self.czilib.BBox()
             tmp.x = region[0]
             tmp.y = region[1]
             tmp.w = region[2]
