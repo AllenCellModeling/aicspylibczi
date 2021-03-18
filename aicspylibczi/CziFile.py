@@ -50,10 +50,10 @@ class CziFile(object):
     ZISRAW_DIMS = {"Z", "C", "T", "R", "S", "I", "H", "V", "B"}
 
     def __init__(
-            self,
-            czi_filename: types.FileLike,
-            metafile_out: types.PathLike = "",
-            verbose: bool = False,
+        self,
+        czi_filename: types.FileLike,
+        metafile_out: types.PathLike = "",
+        verbose: bool = False,
     ):
         # Convert to BytesIO (bytestream)
         self._bytes = self.convert_to_buffer(czi_filename)
@@ -630,9 +630,9 @@ class CziFile(object):
     def _get_coords_from_kwargs(self, kwargs):
         plane_constraints = self.czilib.DimCoord()
         [
-        plane_constraints.set_dim(k, v)
-        for (k, v) in kwargs.items()
-        if k in CziFile.ZISRAW_DIMS
+            plane_constraints.set_dim(k, v)
+            for (k, v) in kwargs.items()
+            if k in CziFile.ZISRAW_DIMS
         ]
         return plane_constraints
 
