@@ -268,29 +268,57 @@ public:
   static Shape getShape(pylibczi::ImageVector& images_, bool is_mosaic_) { return images_.getShape(); }
 
   /*!
-   * @brief get the bounding box of the
-   * @return
+   * @brief get a tile bouinding box
+   * @param plane_coord_ = dims to specify 1 tile
+   * @return the tile bounding box
    */
   TilePair tileBoundingBox(libCZI::CDimCoordinate& plane_coord_);
 
+  /*!
+   * @brief return a map selected bounding boxes
+   * @param plane_coord_ = to constrain the matches (empty would match everything in the file)
+   * @return a map with keys of dims and values of bounding box.
+   */
   TileBBoxMap tileBoundingBoxes(libCZI::CDimCoordinate& plane_coord_);
 
   /*!
-   * @brief get the scene bounding box
-   *
+   * @brief get a scene bounding box
    */
   libCZI::IntRect sceneBoundingBox(unsigned int scene_index_ = 0);
 
+  /*!
+   * @brief get all scene bounding boxes
+   */
   SceneBBoxMap allSceneBoundingBoxes();
 
+  /*!
+   * @brief get the bounding box for the entire mosaic image
+   */
   libCZI::IntRect mosaicBoundingBox() const;
 
+  /*!
+   * @brief get the bounding box for 1 tile
+   * @param plane_coord_ = the dims to define the single coordinate
+   * @param index_m_ = the m_index to specify the tile
+   * @return IntRect with x, y, w, h.
+   */
   TilePair mosaicTileBoundingBox(libCZI::CDimCoordinate& plane_coord_, int index_m_);
 
+  /*!
+   * @brief get multible bounding boxes from the CZI
+   * @param plane_coord_ = the dim constraints
+   * @return a map of Subblock selectable keys with bounding box values (IntRects)
+   */
   TileBBoxMap mosaicTileBoundingBoxes(libCZI::CDimCoordinate& plane_coord_);
 
+  /*!
+   * @brief get a scene bounding box for the specified scene_index
+   */
   libCZI::IntRect mosaicSceneBoundingBox(unsigned int scene_index_);
 
+  /*!
+   * @brief get all scene bounding boxes a map with keys scene_index and values of bounding boxes (IntRect).
+   */
   SceneBBoxMap allMosaicSceneBoundingBoxes();
 
   std::string pixelType()
