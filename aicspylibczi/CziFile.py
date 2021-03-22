@@ -249,9 +249,6 @@ class CziFile(object):
         Get one or more tiles (subblocks) bounding boxes (pyramid=0) for the specified dimensions.
         For non-mosaic files.
 
-        Parameters
-        ----------
-
         Returns
         -------
         dict[int, bbox]
@@ -365,9 +362,6 @@ class CziFile(object):
         """
         Get the scene (subblocks) bounding boxes (pyramid=0) for the specified dimensions.
         For mosaic files.
-
-        Parameters
-        ----------
 
         Returns
         -------
@@ -587,7 +581,7 @@ class CziFile(object):
         Parameters
         ----------
         region
-            A rectangle specifying the extraction box (x0, y0, width, height) specified in pixels
+            A bounding box specifying the extraction box (x0, y0, width, height) specified in pixels
         scale_factor
             The amount to scale the data by, 0.1 would mean an image 1/10 the height and width of native, if you
             get distortions it seems to be due to a bug in Zeiss's libCZI I'm trying to track it down but for now
