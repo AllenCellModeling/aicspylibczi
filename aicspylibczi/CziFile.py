@@ -231,8 +231,8 @@ class CziFile(object):
         -------
         dict[tile_info, bbox]
             A dictionary with keys of type TileInfo and values of type BBox.
-            For a key, ie tle, of type Tile:
-                tle.dimension_coordinates = A dictionary of Dimensions for the tile
+            For a key, ie tile, of type Tile:
+                tile.dimension_coordinates = A dictionary of Dimensions for the tile
             For a value, ie bbox, of type BBox:
                 bbox.x = The x coordinate of the upper left corner of the bounding box.
                 bbox.y = The y coordinate of the upper left corner of the bounding box.
