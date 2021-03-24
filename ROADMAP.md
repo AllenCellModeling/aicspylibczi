@@ -18,7 +18,7 @@ into the module that the direct bindings.
 Our goal with the 3.* API changes is:
  
  * Unify the function/property naming conventions
- * Modify the library to support Samples, the A channel for RGB/BGR images
+ * Modify the library to support sAmples, the A dimension for RGB/BGR images
  * Enable reading of attachment data
  * Provide sufficient information to enable `aicspylibczi` to load a mosaic image as a dask.ndarray
  * Enable automated benchmark scripts
@@ -38,7 +38,7 @@ to represent `sAmples`.
 ## Enable reading of attachment data
 Attachments can be embedded in subblocks along with the image. This data can take 
 numerous forms, a small jpeg, datetime values, etc. Retrieval of this information
-will be enabled but likely after the initial release. 
+will be implemented after the initial release. 
 
 ## Provide enable dask friendly tile reconstruction for mosaic files.
 `aicsimageio` leverages dask to enable working with very large images.
