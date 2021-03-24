@@ -242,7 +242,7 @@ class CziFile(object):
         """
         plane_constraints = self._get_coords_from_kwargs(kwargs)
         m_index = self._get_m_index_from_kwargs(kwargs)
-        return self.reader.read_all_tile_bounding_boxes(plane_constraints, m_index)
+        return self.reader.read_all_tile_bounding_boxes(plane_constraints)
 
     def get_all_scene_bounding_boxes(self):
         """

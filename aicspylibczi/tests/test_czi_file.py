@@ -465,7 +465,15 @@ def test_subblock_rect(data_dir, fname, s_index, m_index, expected):
         if m_index < 0:
             ans = czi.get_scene_bounding_box(s_index)
             ans2 = czi.get_tile_bounding_box(S=s_index, C=0, Z=0)
+            ans3 = czi.get_all_scene_bounding_boxes()
+            ans4t = czi.get_all_tile_bounding_boxes(S=s_index, C=0, Z=0)
             assert ans == ans2
+            assert ans == ans3[s_index]
+            ans4 = list(ans4t.values())
+            assert ans.x == ans4[0].x
+            assert ans.y == ans4[0].y
+            assert ans.w == ans4[0].w
+            assert ans.h == ans4[0].h
         else:
             ans = czi.get_mosaic_tile_bounding_box(S=s_index, M=m_index)
 
