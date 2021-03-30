@@ -33,7 +33,6 @@ You can either clone the public repository:
 .. code-block:: console
 
     $ git clone --recurse-submodules https://github.com/AllenCellModeling/aicspylibczi
-    $ git checkout release/aicspylibczi
 
 Once you have a copy of the source, you can install it with:
 
@@ -43,4 +42,4 @@ Once you have a copy of the source, you can install it with:
 
 
 .. _Github repo: https://github.com/AllenCellModeling/aicspylibczi
-.. _tarball: https://github.com/AllenCellModeling/aicspylibczi/tarball/master
+.. _tarball: https://github.com/AllenCellModeling/aicspylibczi/tarball/main

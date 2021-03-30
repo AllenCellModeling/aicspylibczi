@@ -3,8 +3,7 @@ name: Docs
 on:
   push:
     branches:
-      - master
-      - release/aicspylibczi
+      - main
 
 jobs:
   docs:
@@ -34,6 +33,6 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          BASE_BRANCH: master
+          BASE_BRANCH: main
           BRANCH: gh-pages
           FOLDER: cmake_build_debug/docs/html
