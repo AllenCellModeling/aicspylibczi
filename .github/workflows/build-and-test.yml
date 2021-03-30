@@ -1,0 +1,107 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - "*"
+  schedule:
+    # <minute [0,59]> <hour [0,23]> <day of the month [1,31]> <month of the year [1,12]> <day of the week [0,6]>
+    # https://pubs.opengroup.org/onlinepubs/9699919799/utilities/crontab.html#tag_20_25_07
+    # Run every Monday at 18:00:00 UTC (Monday at 10:00:00 PST)
+    - cron: "0 18 * * 1"
+
+jobs:
+  test-python:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.7, 3.8, 3.9]
+        os: [
+          ubuntu-latest,
+          windows-latest,
+          macOS-10.15,
+          macOS-11.0,
+        ]
+    
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          submodules: true
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .[test]
+      - name: Test with pytest
+        run: |
+          pytest --cov-report xml --cov=aicspylibczi aicspylibczi/tests/
+      - name: Upload codecov
+        uses: codecov/codecov-action@v1
+
+  lint-python:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+    - name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.9
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install .[test]
+    - name: Lint with flake8
+      run: |
+        flake8 aicspylibczi --count --verbose --show-source --statistics
+
+  test-cpp:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.7, 3.8, 3.9]
+        os: [
+          ubuntu-latest,
+          windows-latest,
+          macOS-10.15,
+          macOS-11.0,
+        ]
+        compiler: [llvm, gnu]
+
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          submodules: true
+      
+      - name: Build and Test w/ llvm
+        if: matrix.compiler == 'llvm'
+        env:
+          CC: clang
+          CXX: clang++
+          RUN_TESTS: true
+        run: |
+          mkdir ./cmake-build-debug
+          cd cmake-build-debug
+          cmake ../
+          cmake --build . --target test_libczi_c++_extension
+        shell: bash
+      
+      - name: Build and Test w/ GNU
+        if: matrix.compiler == 'gnu'
+        env:
+          CC: gcc
+          CXX: g++
+          RUN_TESTS: true
+        run: |
+          mkdir ./cmake-build-debug
+          cd cmake-build-debug
+          cmake ../
+          cmake --build . --target test_libczi_c++_extension
+        shell: bash    
