@@ -1,6 +1,6 @@
 # aicspylibczi
 
-[![Build and Test](https://github.com/AllenCellModeling/aicspylibczi/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/AllenCellModeling/aicspylibczi/actions/workflows/build-and-test.yml)
+[![Build Main](https://github.com/AllenCellModeling/aicspylibczi/actions/workflows/build-main.yml/badge.svg)](https://github.com/AllenCellModeling/aicspylibczi/actions/workflows/build-main.yml)
 [![codecov](https://codecov.io/gh/AllenCellModeling/aicspylibczi/branch/main/graph/badge.svg)](https://codecov.io/gh/AllenCellModeling/aicspylibczi)
 [![License: BSD3/GPLv3](https://img.shields.io/badge/License-BSD3/GPLv3-blue.svg)](https://github.com/AllenCellModeling/aicspylibczi/blob/main/LICENSE)
 
