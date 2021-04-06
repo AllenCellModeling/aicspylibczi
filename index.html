@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Welcome to aicspylibczi’s documentation! &mdash; aicspylibczi 2.8.0 documentation</title>
+  <title>Welcome to aicspylibczi’s documentation! &mdash; aicspylibczi 3.0.0.dev0 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                2.8.0
+                3.0.0.dev0
               </div>
             
           
@@ -212,14 +212,15 @@ CZI files and meta-data. We only support 64bit architectures currently if you de
 <span class="n">czi</span> <span class="o">=</span> <span class="n">CziFile</span><span class="p">(</span><span class="n">pth</span><span class="p">)</span>
 
 <span class="c1"># Get the shape of the data, the coordinate pairs are (start index, size)</span>
-<span class="n">dimensions</span> <span class="o">=</span> <span class="n">czi</span><span class="o">.</span><span class="n">dims_shape</span><span class="p">()</span>  <span class="c1">#  [{&#39;X&#39;: (0, 1900), &#39;Y&#39;: (0, 1300), &#39;Z&#39;: (0, 60), &#39;C&#39;: (0, 4), &#39;S&#39;: (0, 40), &#39;B&#39;: (0, 1)}]</span>
+<span class="n">dimensions</span> <span class="o">=</span> <span class="n">czi</span><span class="o">.</span><span class="n">get_dims_shape</span><span class="p">()</span>  <span class="c1"># [{&#39;X&#39;: (0, 1900), &#39;Y&#39;: (0, 1300), &#39;Z&#39;: (0, 60), &#39;C&#39;: (0, 4), &#39;S&#39;: (0, 40), &#39;B&#39;: (0, 1)}]</span>
 
-<span class="n">czi</span><span class="o">.</span><span class="n">dims</span>  <span class="c1">#  BSCZYX</span>
+<span class="n">czi</span><span class="o">.</span><span class="n">dims</span>  <span class="c1"># BSCZYX</span>
 
-<span class="n">czi</span><span class="o">.</span><span class="n">size</span>  <span class="c1">#  (1, 40, 4, 60, 1300, 1900)</span>
+<span class="n">czi</span><span class="o">.</span><span class="n">size</span>  <span class="c1"># (1, 40, 4, 60, 1300, 1900)</span>
 
 <span class="c1"># Load the image slice I want from the file</span>
 <span class="n">img</span><span class="p">,</span> <span class="n">shp</span> <span class="o">=</span> <span class="n">czi</span><span class="o">.</span><span class="n">read_image</span><span class="p">(</span><span class="n">S</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span> <span class="n">Z</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+
 
 <span class="c1"># shp = [(&#39;B&#39;, 1), (&#39;S&#39;, 1), (&#39;C&#39;, 4), (&#39;Z&#39;, 1), (&#39;Y&#39;, 1300), (&#39;X&#39;, 1900)]  # List[(Dimension, size), ...]</span>
 <span class="c1"># img.shape = (1, 1, 4, 1, 1300, 1900)   # numpy.ndarray</span>
@@ -227,10 +228,11 @@ CZI files and meta-data. We only support 64bit architectures currently if you de
 <span class="c1"># define helper functions</span>
 <span class="k">def</span> <span class="nf">norm_by</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">min_</span><span class="p">,</span> <span class="n">max_</span><span class="p">):</span>
     <span class="n">norms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">[</span><span class="n">min_</span><span class="p">,</span> <span class="n">max_</span><span class="p">])</span>
-    <span class="n">i2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">norms</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="n">norms</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">norms</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">i2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">norms</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">norms</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">norms</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">i2</span>
 
-<span class="k">def</span> <span class="nf">recolor</span><span class="p">(</span><span class="n">im</span><span class="p">):</span> <span class="c1"># transform from rgb to cyan-magenta-yellow</span>
+
+<span class="k">def</span> <span class="nf">recolor</span><span class="p">(</span><span class="n">im</span><span class="p">):</span>  <span class="c1"># transform from rgb to cyan-magenta-yellow</span>
     <span class="n">im_shape</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
     <span class="n">color_transform</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span><span class="o">.</span><span class="n">T</span>
     <span class="n">im_reshape</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">im_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]),</span> <span class="n">im_shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]])</span><span class="o">.</span><span class="n">T</span>
@@ -239,15 +241,16 @@ CZI files and meta-data. We only support 64bit architectures currently if you de
     <span class="n">im</span> <span class="o">=</span> <span class="n">im_recolored</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">im_shape</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">im</span>
 
-<span class="c1">#normalize, combine into RGB and transform to CMY</span>
-<span class="n">c1</span> <span class="o">=</span> <span class="p">(</span><span class="n">norm_by</span><span class="p">(</span><span class="n">img</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">750</span><span class="p">,</span> <span class="mi">250</span><span class="p">:</span><span class="mi">1000</span><span class="p">],</span> <span class="mi">50</span><span class="p">,</span> <span class="mf">99.8</span><span class="p">)</span><span class="o">*</span><span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
-<span class="n">c2</span> <span class="o">=</span> <span class="p">(</span><span class="n">norm_by</span><span class="p">(</span><span class="n">img</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">750</span><span class="p">,</span> <span class="mi">250</span><span class="p">:</span><span class="mi">1000</span><span class="p">],</span> <span class="mi">50</span><span class="p">,</span> <span class="mf">99.8</span><span class="p">)</span><span class="o">*</span><span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
-<span class="n">c3</span> <span class="o">=</span> <span class="p">(</span><span class="n">norm_by</span><span class="p">(</span><span class="n">img</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">750</span><span class="p">,</span> <span class="mi">250</span><span class="p">:</span><span class="mi">1000</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span><span class="o">*</span><span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+
+<span class="c1"># normalize, combine into RGB and transform to CMY</span>
+<span class="n">c1</span> <span class="o">=</span> <span class="p">(</span><span class="n">norm_by</span><span class="p">(</span><span class="n">img</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">750</span><span class="p">,</span> <span class="mi">250</span><span class="p">:</span><span class="mi">1000</span><span class="p">],</span> <span class="mi">50</span><span class="p">,</span> <span class="mf">99.8</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+<span class="n">c2</span> <span class="o">=</span> <span class="p">(</span><span class="n">norm_by</span><span class="p">(</span><span class="n">img</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">750</span><span class="p">,</span> <span class="mi">250</span><span class="p">:</span><span class="mi">1000</span><span class="p">],</span> <span class="mi">50</span><span class="p">,</span> <span class="mf">99.8</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+<span class="n">c3</span> <span class="o">=</span> <span class="p">(</span><span class="n">norm_by</span><span class="p">(</span><span class="n">img</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">750</span><span class="p">,</span> <span class="mi">250</span><span class="p">:</span><span class="mi">1000</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
 <span class="n">rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">c3</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">cmy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">recolor</span><span class="p">(</span><span class="n">rgb</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
 
 <span class="c1"># plot using matplotlib¶</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">cmy</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
 </pre></div>
@@ -261,25 +264,24 @@ CZI files and meta-data. We only support 64bit architectures currently if you de
 <span class="kn">import</span> <span class="nn">pathlib</span>
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
 
-
 <span class="n">mosaic_file</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s1">&#39;mosaic_test.czi&#39;</span><span class="p">)</span>
 <span class="n">czi</span> <span class="o">=</span> <span class="n">aicspylibczi</span><span class="o">.</span><span class="n">CziFile</span><span class="p">(</span><span class="n">mosaic_file</span><span class="p">)</span>
 
 <span class="c1"># Get the shape of the data</span>
-<span class="n">dimensions</span> <span class="o">=</span> <span class="n">czi</span><span class="o">.</span><span class="n">dims</span>   <span class="c1">#  &#39;STCZMYX&#39;</span>
+<span class="n">dimensions</span> <span class="o">=</span> <span class="n">czi</span><span class="o">.</span><span class="n">dims</span>  <span class="c1"># &#39;STCZMYX&#39;</span>
 
 <span class="n">czi</span><span class="o">.</span><span class="n">size</span>  <span class="c1"># (1, 1, 1, 1, 2, 624, 924)</span>
 
-<span class="n">czi</span><span class="o">.</span><span class="n">dims_shape</span><span class="p">()</span>  <span class="c1"># [{&#39;X&#39;: (0, 924), &#39;Y&#39;: (0, 624), &#39;Z&#39;: (0, 1), &#39;C&#39;: (0, 1), &#39;T&#39;: (0, 1), &#39;M&#39;: (0, 2), &#39;S&#39;: (0, 1)}]</span>
+<span class="n">czi</span><span class="o">.</span><span class="n">get_dims_shape</span><span class="p">()</span>  <span class="c1"># [{&#39;X&#39;: (0, 924), &#39;Y&#39;: (0, 624), &#39;Z&#39;: (0, 1), &#39;C&#39;: (0, 1), &#39;T&#39;: (0, 1), &#39;M&#39;: (0, 2), &#39;S&#39;: (0, 1)}]</span>
 
 <span class="n">czi</span><span class="o">.</span><span class="n">is_mosaic</span><span class="p">()</span>  <span class="c1"># True</span>
- <span class="c1"># Mosaic files ignore the S dimension and use an internal mIndex to reconstruct, the scale factor allows one to generate a manageable image</span>
+<span class="c1"># Mosaic files ignore the S dimension and use an internal mIndex to reconstruct, the scale factor allows one to generate a manageable image</span>
 <span class="n">mosaic_data</span> <span class="o">=</span> <span class="n">czi</span><span class="o">.</span><span class="n">read_mosaic</span><span class="p">(</span><span class="n">C</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="n">mosaic_data</span><span class="o">.</span><span class="n">shape</span>  <span class="c1">#  (1, 1, 624, 1756)</span>
- <span class="c1"># the C channel has been specified S &amp; M are used internally for position so this is (T, Z, Y, X)</span>
+<span class="n">mosaic_data</span><span class="o">.</span><span class="n">shape</span>  <span class="c1"># (1, 1, 624, 1756)</span>
+<span class="c1"># the C channel has been specified S &amp; M are used internally for position so this is (T, Z, Y, X)</span>
 
-<span class="n">normed_mosaic_data</span> <span class="o">=</span> <span class="n">norm_by</span><span class="p">(</span><span class="n">mosaic_data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">98</span><span class="p">)</span><span class="o">*</span><span class="mi">255</span>
+<span class="n">normed_mosaic_data</span> <span class="o">=</span> <span class="n">norm_by</span><span class="p">(</span><span class="n">mosaic_data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">98</span><span class="p">)</span> <span class="o">*</span> <span class="mi">255</span>
 <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">normed_mosaic_data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">))</span>
 </pre></div>
 </div>
