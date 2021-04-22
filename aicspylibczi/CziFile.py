@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import BinaryIO, Tuple, Union
 
 import numpy as np
-from lxml import etree
+import xml.etree.ElementTree as ET
 
 from . import types
 
@@ -459,16 +459,16 @@ class CziFile(object):
 
         Returns
         -------
-        str
-            An lxml.etree of the metadata as a string
+        xml.etree.ElementTree.Element
+            The root element of the metadata tree
 
         """
         if self.meta_root is None:
             meta_str = self.reader.read_meta()
-            self.meta_root = etree.fromstring(meta_str)
+            self.meta_root = ET.fromstring(meta_str)
 
         if self.metafile_out:
-            metastr = etree.tostring(self.meta_root, pretty_print=True).decode("utf-8")
+            metastr = ET.tostring(self.meta_root, pretty_print=True).decode("utf-8")
             with open(self.metafile_out, "w") as file:
                 file.write(metastr)
         return self.meta_root
@@ -499,8 +499,8 @@ class CziFile(object):
         -------
         [(dict, str)] if unified_xml is False
             an array of tuples containing a dimension dictionary and the corresponding subblock metadata
-        lxml.etree.Element if unified_xml is True
-            an lxml document containing the requested subblock metadata.
+        xml.etree.ElementTree.Element if unified_xml is True
+            an xml document containing the requested subblock metadata.
 
         """
         plane_constraints = self._get_coords_from_kwargs(kwargs)
@@ -508,14 +508,14 @@ class CziFile(object):
         subblock_meta = self.reader.read_meta_from_subblock(plane_constraints, m_index)
         if not unified_xml:
             return subblock_meta
-        root = etree.Element("Subblocks")
+        root = ET.Element("Subblocks")
         for pair in subblock_meta:
-            new_element = etree.Element("Subblock")
+            new_element = ET.Element("Subblock")
             for dim, number in pair[0].items():
                 new_element.set(dim, str(number))
             if "S" not in pair[0]:
                 new_element.set("S", "0")
-            new_element.append(etree.XML(pair[1]))
+            new_element.append(ET.XML(pair[1]))
             root.append(new_element)
         return root
 

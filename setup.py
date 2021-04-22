@@ -15,7 +15,6 @@ with open("README.md") as readme_file:
 
 requirements = [
     "numpy>=1.14.1",
-    "lxml",
 ]
 
 test_requirements = [
