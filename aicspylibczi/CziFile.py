@@ -468,7 +468,7 @@ class CziFile(object):
             self.meta_root = ET.fromstring(meta_str)
 
         if self.metafile_out:
-            metastr = ET.tostring(self.meta_root, pretty_print=True).decode("utf-8")
+            metastr = ET.tostring(self.meta_root).decode("utf-8")
             with open(self.metafile_out, "w") as file:
                 file.write(metastr)
         return self.meta_root
