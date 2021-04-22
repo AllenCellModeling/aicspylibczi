@@ -378,7 +378,6 @@ def test_read_unified_subblock_meta(data_dir, fname, expected):
         czi = CziFile(czi_filename=fp)
         data = czi.read_subblock_metadata(unified_xml=True)
         ans = ET.tostring(data, encoding='utf8', method='xml')
-        print(ans)
         assert expected == ans
 
 
