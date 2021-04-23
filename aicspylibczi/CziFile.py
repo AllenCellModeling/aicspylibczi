@@ -18,7 +18,6 @@ class CziFile(object):
       |  czi_filename (str): Filename of czifile to access.
 
     Kwargs:
-      |  metafile_out (str): Filename of xml file to optionally export czi meta data to.
       |  verbose (bool): Print information and times during czi file access.
 
     .. note::
@@ -52,12 +51,10 @@ class CziFile(object):
     def __init__(
         self,
         czi_filename: types.FileLike,
-        metafile_out: types.PathLike = "",
         verbose: bool = False,
     ):
         # Convert to BytesIO (bytestream)
         self._bytes = self.convert_to_buffer(czi_filename)
-        self.metafile_out = metafile_out
         self.czifile_verbose = verbose
 
         import _aicspylibczi
@@ -467,10 +464,6 @@ class CziFile(object):
             meta_str = self.reader.read_meta()
             self.meta_root = ET.fromstring(meta_str)
 
-        if self.metafile_out:
-            metastr = ET.tostring(self.meta_root).decode("utf-8")
-            with open(self.metafile_out, "w") as file:
-                file.write(metastr)
         return self.meta_root
 
     def read_subblock_metadata(self, unified_xml: bool = False, **kwargs):
