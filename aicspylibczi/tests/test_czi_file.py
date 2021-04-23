@@ -78,7 +78,7 @@ def test_conversion_types(in_, out_):
     ],
 )
 def test_metadata(data_dir, fname, xp_query, expected):
-    czi = CziFile(str(data_dir / fname), metafile_out="tmp.txt")
+    czi = CziFile(str(data_dir / fname))
     meta = czi.meta
     vs = meta.find(xp_query)
     assert int(vs.text) == expected
