@@ -433,20 +433,13 @@ class CziFile(object):
             return io.BytesIO(file)
 
         # Set bytes
-        elif isinstance(file, io.BytesIO):
-            return file
-
-        elif isinstance(file, io.BufferedReader):
-            return file
-
-        # Special case for ndarray because already in memory
-        elif isinstance(file, np.ndarray):
+        elif isinstance(file, (io.BytesIO, io.BufferedReader, io.IOBase, np.ndarray)):
             return file
 
         # Raise
         else:
             raise TypeError(
-                f"Reader only accepts types: [str, pathlib.Path, bytes, io.BytesIO], received: {type(file)}"
+                f"Reader only accepts types: [str, pathlib.Path, bytes, io.BytesIO, io.IOBase], received: {type(file)}"
             )
 
     @property
