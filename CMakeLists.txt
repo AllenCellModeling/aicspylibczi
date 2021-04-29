@@ -54,7 +54,8 @@ set(PYLIBCZI_C_SRC _aicspylibczi/Reader.cpp _aicspylibczi/IndexMap.cpp _aicspyli
 
 set(PYLIBCZI_PYBIND11 _aicspylibczi/pb_bindings.cpp _aicspylibczi/pb_helpers.h _aicspylibczi/pb_helpers.cpp _aicspylibczi/pb_caster_ImagesContainer.h
         _aicspylibczi/pb_caster_BytesIO.h _aicspylibczi/pb_caster_libCZI_DimensionIndex.h _aicspylibczi/CSimpleStreamImplFromFd.h
-        _aicspylibczi/CSimpleStreamImplFromFd.cpp _aicspylibczi/pb_caster_DimIndex.h)
+        _aicspylibczi/CSimpleStreamImplFromFd.cpp _aicspylibczi/pb_caster_DimIndex.h _aicspylibczi/RemoteIStream.h
+        _aicspylibczi/RemoteIStream.cpp _aicspylibczi/pb_caster_AbstractBufferedFile.h)
 
 set(TARGET_ONE libczi_c++_extension)
 set(TARGET_TWO _aicspylibczi)

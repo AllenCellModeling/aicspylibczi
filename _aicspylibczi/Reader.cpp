@@ -3,6 +3,7 @@
 #include <thread>
 #include <tuple>
 #include <utility>
+#include <unistd.h>
 
 #include "ImageFactory.h"
 #include "ImagesContainer.h"
@@ -16,11 +17,22 @@
 namespace pylibczi {
 
 // this ISteam type needs to be threadsafe like StreamImplLockingRead the examples in libCZI are not threadsafe
-Reader::Reader(std::shared_ptr<libCZI::IStream> istream_)
+Reader::Reader(std::shared_ptr<pb_helpers::RemoteIStream> remote_i_stream_)
   : m_czireader(new CCZIReader)
   , m_specifyScene(true)
 {
-  m_czireader->Open(std::move(istream_));
+  m_czireader->Open(std::move(remote_i_stream_));
+  m_statistics = m_czireader->GetStatistics();
+  m_pixelType = libCZI::PixelType::Invalid; // get the pixeltype of the first readable subblock
+
+  checkSceneShapes();
+}
+
+Reader::Reader(std::shared_ptr<pb_helpers::CSimpleStreamImplFromFd> fd_stream_)
+  : m_czireader(new CCZIReader)
+  , m_specifyScene(true)
+{
+  m_czireader->Open(std::move(fd_stream_));
   m_statistics = m_czireader->GetStatistics();
   m_pixelType = libCZI::PixelType::Invalid; // get the pixeltype of the first readable subblock
 
@@ -364,9 +376,11 @@ Reader::readSubblockMeta(libCZI::CDimCoordinate& plane_coord_, int index_m_)
   SubblockMetaVec metaSubblocks;
   metaSubblocks.setMosaic(isMosaic());
 
+  std::cout << "finding subblock matches" << std::endl;
   SubblockSortable subBlockToFind(&plane_coord_, index_m_, isMosaic());
   SubblockIndexVec matches = getMatches(subBlockToFind);
 
+  std::cout << "metadata matches found" << std::endl;
   for_each(matches.begin(), matches.end(), [&](const SubblockIndexVec::value_type& match_) {
     size_t metaSize = 0;
     auto subblock = m_czireader->ReadSubBlock(match_.second);

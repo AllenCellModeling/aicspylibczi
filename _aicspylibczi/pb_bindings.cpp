@@ -7,7 +7,8 @@
 #include "inc_libCZI.h"
 
 // the below headers are crucial otherwise the custom casts aren't recognized
-#include "pb_caster_BytesIO.h"
+#include "pb_caster_AbstractBufferedFile.h"
+//#include "pb_caster_BytesIO.h"
 #include "pb_caster_DimIndex.h"
 #include "pb_caster_ImagesContainer.h"
 #include "pb_caster_SubblockMetaVec.h"
@@ -37,7 +38,7 @@ PYBIND11_MODULE(_aicspylibczi, m)
     m, "PylibCZI_CDimCoordinatesUnderspecifiedException");
 
   py::class_<pylibczi::Reader>(m, "Reader")
-    .def(py::init<std::shared_ptr<libCZI::IStream>>())
+    .def(py::init<std::shared_ptr<pb_helpers::RemoteIStream>>())
     .def("is_mosaic", &pylibczi::Reader::isMosaic)
     .def("has_consistent_shape", &pylibczi::Reader::shapeIsConsistent)
     .def("read_dims", &pylibczi::Reader::readDimsRange)

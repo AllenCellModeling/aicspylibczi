@@ -11,6 +11,8 @@
 
 #include "DimIndex.h"
 #include "Image.h"
+#include "RemoteIStream.h"
+#include "CSimpleStreamImplFromFd.h"
 #include "ImagesContainer.h"
 #include "IndexMap.h"
 #include "SubblockMetaVec.h"
@@ -110,7 +112,10 @@ public:
    *
    * @param f_in_ A C-style FILE pointer to the CZI file
    */
-  explicit Reader(std::shared_ptr<libCZI::IStream> istream_);
+
+  // explicit Reader(std::shared_ptr<libCZI::IStream> istream_);
+  explicit Reader(std::shared_ptr<pb_helpers::RemoteIStream> remote_i_stream_);
+  explicit Reader(std::shared_ptr<pb_helpers::CSimpleStreamImplFromFd> fd_stream_);
 
   /*!
    * @brief A convenience function for testing or use by C++ developers

@@ -1,7 +1,7 @@
-#ifndef _PYLIBCZI_PB_CASTER_BYTESIO_H
-#define _PYLIBCZI_PB_CASTER_BYTESIO_H
+#ifndef _PYLIBCZI_PB_CASTER_IOBASE_H
+#define _PYLIBCZI_PB_CASTER_IOBASE_H
 
-#include "CSimpleStreamImplFromFd.h"
+#include "RemoteIStream.h"
 #include <cstdio>
 #include <iostream>
 #include <pybind11/pybind11.h>
@@ -9,7 +9,7 @@
 namespace pybind11 {
 namespace detail {
 template<>
-struct type_caster<std::shared_ptr<pb_helpers::CSimpleStreamImplFromFd> >
+struct type_caster<std::shared_ptr<pb_helpers::RemoteIStream> >
 {
 public:
   /**
@@ -17,7 +17,7 @@ public:
    * function signatures and declares a local variable
    * 'value' of type (FILE *)
    */
-PYBIND11_TYPE_CASTER(std::shared_ptr<pb_helpers::CSimpleStreamImplFromFd>, _("IOBufferedReader"));
+PYBIND11_TYPE_CASTER(std::shared_ptr<pb_helpers::RemoteIStream>, _("AbstractBufferedFile"));
 
   /**
    * Conversion part 1 (Python->C++): convert a PyObject into a inty
@@ -27,17 +27,12 @@ PYBIND11_TYPE_CASTER(std::shared_ptr<pb_helpers::CSimpleStreamImplFromFd>, _("IO
   bool load(handle src_, bool)
   {
     /* Extract PyObject from handle */
-    std::cout << "IOBufferedReader IN" << std::endl;
-    PyObject* source = src_.ptr();
+    std::cout << "ABF IN\n-----------------------------" << std::endl;
 
-    /* Try converting into a Python integer value */
-    int fDesc = PyObject_AsFileDescriptor(source);
-    if (fDesc == -1) {
-      std::cout << "IOBufferedReader FAIL" << std::endl;
-      return false;
-    }
-    std::cout << "IOBufferedReader Out" << std::endl;
-    value = std::shared_ptr<pb_helpers::CSimpleStreamImplFromFd>(new pb_helpers::CSimpleStreamImplFromFd(fDesc));
+    //py::object source = py::cast<py::object>(src_);
+    value = std::shared_ptr<pb_helpers::RemoteIStream>(new pb_helpers::RemoteIStream(src_));
+    std::cout << "ABF OUT\n-----------------------------" << std::endl;
+
     return (value != nullptr && !PyErr_Occurred());
   }
 
@@ -48,7 +43,7 @@ PYBIND11_TYPE_CASTER(std::shared_ptr<pb_helpers::CSimpleStreamImplFromFd>, _("IO
    * ``return_value_policy::reference_internal``) and are generally
    * ignored by implicit casters.
    */
-  static handle cast(std::shared_ptr<pb_helpers::CSimpleStreamImplFromFd> src_, return_value_policy /* policy */, handle /* parent */)
+  static handle cast(std::shared_ptr<pb_helpers::RemoteIStream> src_, return_value_policy /* policy */, handle /* parent */)
   {
     /*
      * FROM Python docs https://docs.python.org/3/c-api/file.html
@@ -59,10 +54,10 @@ PYBIND11_TYPE_CASTER(std::shared_ptr<pb_helpers::CSimpleStreamImplFromFd>, _("IO
     std::cerr << "Conversion from libCZI::IStream to python file stream not defined" << std::endl;
     int fDesc = -1; // this is not implemented
     return PyFile_FromFd(fDesc, nullptr, "r", -1, nullptr, nullptr, nullptr,
-                         true); // true close fd on failure
+      true); // true close fd on failure
   }
 };
 }
 } // namespace pybind11::detail
 
-#endif //_PYLIBCZI_PB_CASTER_BYTESIO_H
+#endif

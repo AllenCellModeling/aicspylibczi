@@ -4,9 +4,12 @@ import io
 import multiprocessing
 from pathlib import Path
 from typing import BinaryIO, Tuple, Union
+import fsspec
 
 import numpy as np
 import xml.etree.ElementTree as ET
+
+from fsspec import AbstractFileSystem
 
 from . import types
 
@@ -50,17 +53,17 @@ class CziFile(object):
 
     def __init__(
         self,
-        czi_filename: types.FileLike,
+        czi_filename: types.PathLike,
         verbose: bool = False,
     ):
         # Convert to BytesIO (bytestream)
-        self._bytes = self.convert_to_buffer(czi_filename)
-        self.czifile_verbose = verbose
+        fs, path = CziFile.pathlike_to_fs(czi_filename)
 
         import _aicspylibczi
 
+        self.resource = fs.open(path) # holding onto resource to make sure it doesn't close till CziFile closes
         self.czilib = _aicspylibczi
-        self.reader = self.czilib.Reader(self._bytes)
+        self.reader = self.czilib.Reader(self.resource)
 
         self.meta_root = None
 
@@ -416,31 +419,53 @@ class CziFile(object):
         """
         return self.reader.is_mosaic()
 
+
     @staticmethod
-    def convert_to_buffer(file: types.FileLike) -> Union[BinaryIO, np.ndarray]:
-        if isinstance(file, (str, Path)):
-            # This will both fully expand and enforce that the filepath exists
-            f = Path(file).expanduser().resolve(strict=True)
+    def pathlike_to_fs(
+            uri: types.PathLike,
+            enforce_exists: bool = False,
+    ) -> Tuple[AbstractFileSystem, str]:
+        """
+        Find and return the appropriate filesystem and path from a path-like object.
 
-            # This will check if the above enforced filepath is a directory
-            if f.is_dir():
-                raise IsADirectoryError(f)
+        Parameters
+        ----------
+        uri: PathLike
+            The local or remote path or uri.
+        enforce_exists: bool
+            Check whether or not the resource exists, if not, raise FileNotFoundError.
 
-            return open(f, "rb")
+        Returns
+        -------
+        fs: AbstractFileSystem
+            The filesystem to operate on.
+        path: str
+            The full path to the target resource.
 
-        # Convert bytes
-        elif isinstance(file, bytes):
-            return io.BytesIO(file)
+        Raises
+        ------
+        FileNotFoundError
+            If enforce_exists is provided value True and the resource is not found or is
+            unavailable.
+        """
+        # Convert paths to string to be handled by url_to_fs
+        if isinstance(uri, Path):
+            uri = str(uri)
 
-        # Set bytes
-        elif isinstance(file, (io.BytesIO, io.BufferedReader, io.IOBase, np.ndarray)):
-            return file
+        # Get details
+        fs, path = fsspec.core.url_to_fs(uri)
 
-        # Raise
-        else:
-            raise TypeError(
-                f"Reader only accepts types: [str, pathlib.Path, bytes, io.BytesIO, io.IOBase], received: {type(file)}"
-            )
+        # Check file exists
+        if enforce_exists:
+            if not fs.exists(path):
+                raise FileNotFoundError(f"{fs.protocol}://{path}")
+
+        # Get and store details
+        # We do not return an AbstractBufferedFile (i.e. fs.open) as we do not want to have
+        # any open file buffers _after_ any API call. API calls must themselves call
+        # fs.open and complete their function during the context of the opened buffer.
+        return fs, path
+
 
     @property
     def meta(self):
