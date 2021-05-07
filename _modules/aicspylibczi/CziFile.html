@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>aicspylibczi.CziFile &mdash; aicspylibczi 3.0.0.dev0 documentation</title>
+  <title>aicspylibczi.CziFile &mdash; aicspylibczi 3.0.0 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                3.0.0.dev0
+                3.0.0
               </div>
             
           
@@ -184,7 +184,7 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">BinaryIO</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span>
+<span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">ET</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">types</span>
 
@@ -196,7 +196,6 @@
 <span class="sd">      |  czi_filename (str): Filename of czifile to access.</span>
 
 <span class="sd">    Kwargs:</span>
-<span class="sd">      |  metafile_out (str): Filename of xml file to optionally export czi meta data to.</span>
 <span class="sd">      |  verbose (bool): Print information and times during czi file access.</span>
 
 <span class="sd">    .. note::</span>
@@ -230,12 +229,10 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">czi_filename</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">FileLike</span><span class="p">,</span>
-        <span class="n">metafile_out</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">PathLike</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="c1"># Convert to BytesIO (bytestream)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bytes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_to_buffer</span><span class="p">(</span><span class="n">czi_filename</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">metafile_out</span> <span class="o">=</span> <span class="n">metafile_out</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">czifile_verbose</span> <span class="o">=</span> <span class="n">verbose</span>
 
         <span class="kn">import</span> <span class="nn">_aicspylibczi</span>
@@ -614,20 +611,13 @@
             <span class="k">return</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
 
         <span class="c1"># Set bytes</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">file</span>
-
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">BufferedReader</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">file</span>
-
-        <span class="c1"># Special case for ndarray because already in memory</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">BufferedReader</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">IOBase</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
             <span class="k">return</span> <span class="n">file</span>
 
         <span class="c1"># Raise</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Reader only accepts types: [str, pathlib.Path, bytes, io.BytesIO], received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Reader only accepts types: [str, pathlib.Path, bytes, io.BytesIO, io.IOBase], received: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span></div>
 
     <span class="nd">@property</span>
@@ -637,18 +627,14 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        str</span>
-<span class="sd">            An lxml.etree of the metadata as a string</span>
+<span class="sd">        xml.etree.ElementTree.Element</span>
+<span class="sd">            The root element of the metadata tree</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta_root</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">meta_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">read_meta</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">meta_root</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">meta_str</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meta_root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">meta_str</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">metafile_out</span><span class="p">:</span>
-            <span class="n">metastr</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta_root</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metafile_out</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
-                <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">metastr</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta_root</span>
 
 <div class="viewcode-block" id="CziFile.read_subblock_metadata"><a class="viewcode-back" href="../../aicspylibczi.html#aicspylibczi.CziFile.CziFile.read_subblock_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">read_subblock_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unified_xml</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -677,8 +663,8 @@
 <span class="sd">        -------</span>
 <span class="sd">        [(dict, str)] if unified_xml is False</span>
 <span class="sd">            an array of tuples containing a dimension dictionary and the corresponding subblock metadata</span>
-<span class="sd">        lxml.etree.Element if unified_xml is True</span>
-<span class="sd">            an lxml document containing the requested subblock metadata.</span>
+<span class="sd">        xml.etree.ElementTree.Element if unified_xml is True</span>
+<span class="sd">            an xml document containing the requested subblock metadata.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">plane_constraints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_coords_from_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
@@ -686,14 +672,14 @@
         <span class="n">subblock_meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">read_meta_from_subblock</span><span class="p">(</span><span class="n">plane_constraints</span><span class="p">,</span> <span class="n">m_index</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">unified_xml</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">subblock_meta</span>
-        <span class="n">root</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;Subblocks&quot;</span><span class="p">)</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;Subblocks&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">subblock_meta</span><span class="p">:</span>
-            <span class="n">new_element</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;Subblock&quot;</span><span class="p">)</span>
+            <span class="n">new_element</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;Subblock&quot;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">dim</span><span class="p">,</span> <span class="n">number</span> <span class="ow">in</span> <span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">new_element</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">number</span><span class="p">))</span>
             <span class="k">if</span> <span class="s2">&quot;S&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
                 <span class="n">new_element</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span>
-            <span class="n">new_element</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">etree</span><span class="o">.</span><span class="n">XML</span><span class="p">(</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">new_element</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ET</span><span class="o">.</span><span class="n">XML</span><span class="p">(</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
             <span class="n">root</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_element</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">root</span></div>
 

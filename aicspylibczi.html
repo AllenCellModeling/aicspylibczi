@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>aicspylibczi package &mdash; aicspylibczi 3.0.0.dev0 documentation</title>
+  <title>aicspylibczi package &mdash; aicspylibczi 3.0.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                3.0.0.dev0
+                3.0.0
               </div>
             
           
@@ -199,7 +199,7 @@
 <span id="aicspylibczi-czifile-module"></span><h2>aicspylibczi.CziFile module<a class="headerlink" href="#module-aicspylibczi.CziFile" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="aicspylibczi.CziFile.CziFile">
-<em class="property">class </em><code class="sig-prename descclassname">aicspylibczi.CziFile.</code><code class="sig-name descname">CziFile</code><span class="sig-paren">(</span><em class="sig-param">czi_filename: Union[str, pathlib.Path, bytes, BinaryIO, io.BufferedIOBase, _io.BufferedReader], metafile_out: Union[str, pathlib.Path] = '', verbose: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">aicspylibczi.CziFile.</code><code class="sig-name descname">CziFile</code><span class="sig-paren">(</span><em class="sig-param">czi_filename: Union[str, pathlib.Path, bytes, BinaryIO, io.BufferedIOBase, _io.BufferedReader], verbose: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Zeiss CZI file object.</p>
 <dl>
@@ -208,7 +208,6 @@
 </div>
 </dd>
 <dt>Kwargs:</dt><dd><div class="line-block">
-<div class="line">metafile_out (str): Filename of xml file to optionally export czi meta data to.</div>
 <div class="line">verbose (bool): Print information and times during czi file access.</div>
 </div>
 </dd>
@@ -579,10 +578,10 @@ bbox.h = The height of the bounding box.</p>
 <dd><p>Extract the metadata block from the czi file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>An lxml.etree of the metadata as a string</p>
+<dd class="field-odd"><p>The root element of the metadata tree</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>str</p>
+<dd class="field-even"><p>xml.etree.ElementTree.Element</p>
 </dd>
 </dl>
 </dd></dl>
@@ -715,7 +714,7 @@ M = 10  # The M_index, this is only valid for Mosaic files!</p>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><em>[(dict, str)] if unified_xml is False</em> – an array of tuples containing a dimension dictionary and the corresponding subblock metadata</p></li>
-<li><p><em>lxml.etree.Element if unified_xml is True</em> – an lxml document containing the requested subblock metadata.</p></li>
+<li><p><em>xml.etree.ElementTree.Element if unified_xml is True</em> – an xml document containing the requested subblock metadata.</p></li>
 </ul>
 </p>
 </dd>
@@ -762,7 +761,7 @@ the user needs to use dims_shape() to get the indexes.</p>
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-aicspylibczi" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="aicspylibczi.CziFile">
-<em class="property">class </em><code class="sig-prename descclassname">aicspylibczi.</code><code class="sig-name descname">CziFile</code><span class="sig-paren">(</span><em class="sig-param">czi_filename: Union[str, pathlib.Path, bytes, BinaryIO, io.BufferedIOBase, _io.BufferedReader], metafile_out: Union[str, pathlib.Path] = '', verbose: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">aicspylibczi.</code><code class="sig-name descname">CziFile</code><span class="sig-paren">(</span><em class="sig-param">czi_filename: Union[str, pathlib.Path, bytes, BinaryIO, io.BufferedIOBase, _io.BufferedReader], verbose: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Zeiss CZI file object.</p>
 <dl>
@@ -771,7 +770,6 @@ the user needs to use dims_shape() to get the indexes.</p>
 </div>
 </dd>
 <dt>Kwargs:</dt><dd><div class="line-block">
-<div class="line">metafile_out (str): Filename of xml file to optionally export czi meta data to.</div>
 <div class="line">verbose (bool): Print information and times during czi file access.</div>
 </div>
 </dd>
@@ -1142,10 +1140,10 @@ bbox.h = The height of the bounding box.</p>
 <dd><p>Extract the metadata block from the czi file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>An lxml.etree of the metadata as a string</p>
+<dd class="field-odd"><p>The root element of the metadata tree</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>str</p>
+<dd class="field-even"><p>xml.etree.ElementTree.Element</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1278,7 +1276,7 @@ M = 10  # The M_index, this is only valid for Mosaic files!</p>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><em>[(dict, str)] if unified_xml is False</em> – an array of tuples containing a dimension dictionary and the corresponding subblock metadata</p></li>
-<li><p><em>lxml.etree.Element if unified_xml is True</em> – an lxml document containing the requested subblock metadata.</p></li>
+<li><p><em>xml.etree.ElementTree.Element if unified_xml is True</em> – an xml document containing the requested subblock metadata.</p></li>
 </ul>
 </p>
 </dd>
