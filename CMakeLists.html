@@ -1,73 +1,34 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>set(CMAKE_VERBOSE_MAKEFILE ON) &mdash; aicspylibczi 3.0.2 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>set(CMAKE_VERBOSE_MAKEFILE ON) &mdash; aicspylibczi 3.0.2 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/language_data.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> aicspylibczi
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
                 3.0.2
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -75,19 +36,8 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="index.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
@@ -112,71 +62,30 @@
 </li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">aicspylibczi</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>set(CMAKE_VERBOSE_MAKEFILE ON)</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/CMakeLists.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <p>cmake_minimum_required(VERSION 2.8.12)</p>
 <p>LIST(APPEND CMAKE_MODULE_PATH “${CMAKE_CURRENT_SOURCE_DIR}/cmake”)</p>
 <p>find_package(Sphinx)</p>
@@ -191,18 +100,18 @@
 </dl>
 <p>endif ()</p>
 <p>project(PyDocs)</p>
-<div class="section" id="set-cmake-verbose-makefile-on">
+<section id="set-cmake-verbose-makefile-on">
 <h1>set(CMAKE_VERBOSE_MAKEFILE ON)<a class="headerlink" href="#set-cmake-verbose-makefile-on" title="Permalink to this headline">¶</a></h1>
-</div>
-<div class="section" id="configured-documentation-tools-and-intermediate-build-results">
+</section>
+<section id="configured-documentation-tools-and-intermediate-build-results">
 <h1>configured documentation tools and intermediate build results<a class="headerlink" href="#configured-documentation-tools-and-intermediate-build-results" title="Permalink to this headline">¶</a></h1>
 <p>set(BINARY_BUILD_DIR “${CMAKE_CURRENT_BINARY_DIR}/_build”)</p>
-</div>
-<div class="section" id="sphinx-cache-with-pickled-rest-documents">
+</section>
+<section id="sphinx-cache-with-pickled-rest-documents">
 <h1>Sphinx cache with pickled ReST documents<a class="headerlink" href="#sphinx-cache-with-pickled-rest-documents" title="Permalink to this headline">¶</a></h1>
 <p>set(SPHINX_CACHE_DIR “${CMAKE_CURRENT_BINARY_DIR}/_doctrees”)</p>
-</div>
-<div class="section" id="html-output-directory">
+</section>
+<section id="html-output-directory">
 <h1>HTML output directory<a class="headerlink" href="#html-output-directory" title="Permalink to this headline">¶</a></h1>
 <p>set(SPHINX_HTML_DIR “${CMAKE_CURRENT_BINARY_DIR}/html”)</p>
 <dl class="simple">
@@ -227,50 +136,34 @@ COMMENT “Building HTML documentation with Sphinx”
 <p>set(IMAGES ${CMAKE_SOURCE_DIR}/images/cardio.png ${CMAKE_SOURCE_DIR}/images/mosaic.png)</p>
 <p>add_custom_command(TARGET docs POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${IMAGES} ${IMAGE_DIR})</p>
 <p>file(TOUCH ${CMAKE_CURRENT_BINARY_DIR}/html/.nojekyll)</p>
-</div>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2019, Allen Institute for Cell Science.
-
-    </p>
+    <p>&#169; Copyright 2019, Allen Institute for Cell Science.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
