@@ -225,6 +225,8 @@ public:
    * @param scale_factor_ (optional) The native size for mosaic files can be huge the scale factor allows one to get
    * something back of a more reasonable size. The default is 0.1 meaning 10% of the native image.
    * @param im_box_ (optional) The {x0, y0, width, height} of a sub-region, the default is the whole image.
+   * @param backGroundColor_ (optional) {r, g, b} color value used when a pixel is outside of a subblock, the
+   * default is black { 0.0, 0.0, 0.0 }. Each color component is a float values between 0.0 and 1.0.
    * @return an ImagesContainerBasePtr containing the raw memory, a list of images, and a list of corresponding
    * dimensions
    *
@@ -245,7 +247,8 @@ public:
    */
   ImagesContainerBase::ImagesContainerBasePtr readMosaic(libCZI::CDimCoordinate plane_coord_,
                                                          float scale_factor_ = 1.0,
-                                                         libCZI::IntRect im_box_ = { 0, 0, -1, -1 });
+                                                         libCZI::IntRect im_box_ = { 0, 0, -1, -1 },
+							 libCZI::RgbFloatColor backGroundColor_ = { 0.0, 0.0, 0.0 });
 
   /*!
    * Convert the libCZI::DimensionIndex to a character

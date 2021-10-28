@@ -443,7 +443,7 @@ Reader::isValidRegion(const libCZI::IntRect& in_box_, const libCZI::IntRect& czi
 }
 
 ImagesContainerBase::ImagesContainerBasePtr
-Reader::readMosaic(libCZI::CDimCoordinate plane_coord_, float scale_factor_, libCZI::IntRect im_box_)
+Reader::readMosaic(libCZI::CDimCoordinate plane_coord_, float scale_factor_, libCZI::IntRect im_box_, libCZI::RgbFloatColor backGroundColor_)
 {
   // handle the case where the function was called with region=None (default to all)
   if (im_box_.w == -1 && im_box_.h == -1)
@@ -464,9 +464,14 @@ Reader::readMosaic(libCZI::CDimCoordinate plane_coord_, float scale_factor_, lib
   size_t bgrScaling = ImageFactory::numberOfSamples(m_pixelType);
   auto accessor = m_czireader->CreateSingleChannelScalingTileAccessor();
 
+  // Use default options except for backGroundColor (default is none)
+  libCZI::ISingleChannelScalingTileAccessor::Options options;
+  options.Clear();
+  options.backGroundColor = backGroundColor_;
+
   // multiTile accessor is not compatible with S, it composites the Scenes and the mIndexs together
   auto multiTileComposite = accessor->Get(im_box_, &plane_coord_, scale_factor_,
-                                          nullptr); // use default options
+                                         &options);
 
   libCZI::IntSize size = multiTileComposite->GetSize();
   size_t pixels_in_image = size.h * size.w * bgrScaling;

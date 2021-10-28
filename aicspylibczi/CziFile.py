@@ -552,7 +552,7 @@ class CziFile(object):
         image, shape = self.reader.read_selected(plane_constraints, m_index, cores)
         return image, shape
 
-    def read_mosaic(self, region: Tuple = None, scale_factor: float = 1.0, **kwargs):
+    def read_mosaic(self, region: Tuple = None, scale_factor: float = 1.0, background_color = None, **kwargs):
         """
         Reads a mosaic file and returns an image corresponding to the specified dimensions. If the file is more than
         a 2D sheet of pixels, meaning only one channel, z-slice, time-index, etc then the kwargs must specify the
@@ -571,6 +571,9 @@ class CziFile(object):
             The amount to scale the data by, 0.1 would mean an image 1/10 the height and width of native, if you
             get distortions it seems to be due to a bug in Zeiss's libCZI I'm trying to track it down but for now
             if you use scale_factor=1.0 it should work properly.
+        background_color
+            Background color used when pixel is outside of a sublock. If omitted, it defaults to black
+            (r,g,b)=(0.0,0.0,0.0). Each color component is a float value between 0.0 and 1.0.
         kwargs
             The keywords below allow you to specify the dimension plane that constrains the 2D data. If the
             constraints are underspecified the function will fail. ::
@@ -602,7 +605,21 @@ class CziFile(object):
             tmp.w = region[2]
             tmp.h = region[3]
             region = tmp
-        img = self.reader.read_mosaic(plane_constraints, scale_factor, region)
+
+        if background_color is None:
+            background_color = self.czilib.RgbFloat()
+            background_color.r = 0.0
+            background_color.g = 0.0
+            background_color.b = 0.0
+        else:
+            assert len(background_color) == 3
+            tmp = self.czilib.RgbFloat()
+            tmp.r = background_color[0]
+            tmp.g = background_color[1]
+            tmp.b = background_color[2]
+            background_color = tmp
+
+        img = self.reader.read_mosaic(plane_constraints, scale_factor, region, background_color)
 
         return img
 

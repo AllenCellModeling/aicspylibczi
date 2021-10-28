@@ -77,6 +77,12 @@ PYBIND11_MODULE(_aicspylibczi, m)
     .def_readwrite("w", &libCZI::IntRect::w)
     .def_readwrite("h", &libCZI::IntRect::h);
 
+  py::class_<libCZI::RgbFloatColor>(m, "RgbFloat")
+    .def(py::init<>())
+    .def_readwrite("r", &libCZI::RgbFloatColor::r)
+    .def_readwrite("g", &libCZI::RgbFloatColor::g)
+    .def_readwrite("b", &libCZI::RgbFloatColor::b);
+
   py::class_<pylibczi::SubblockSortable>(m, "TileInfo")
     //   .def(py::init<pylibczi::SubblockSortable>())
     .def_property_readonly("dimension_coordinates", &pylibczi::SubblockSortable::getDimsAsChars)
