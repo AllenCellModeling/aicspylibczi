@@ -431,7 +431,7 @@ def test_mosaic_image(data_dir, fname, unscaled_size, expects):
         sze = czi.get_mosaic_bounding_box()
         assert sze.w == unscaled_size[2]
         assert sze.h == unscaled_size[3]
-        img = czi.read_mosaic(scale_factor=0.1, C=0)
+        img = czi.read_mosaic(scale_factor=0.1, C=0, background_color=(1.0, 1.0, 1.0))
         assert img.shape[0] == 1
         assert img.shape[1] == unscaled_size[3] // 10
         assert img.shape[2] == unscaled_size[2] // 10
