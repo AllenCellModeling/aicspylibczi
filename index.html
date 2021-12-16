@@ -219,21 +219,20 @@ This will install the aicspylibczi python module and extension binaries (<a clas
 <ul>
 <li><p>libCZI requires a c++11 compatible compiler. Built &amp; Tested with clang.</p></li>
 <li><p>Development requirements are those required for libCZI: <strong>libpng</strong>, <strong>zlib</strong></p></li>
-<li><p>Install the package:
-.. code-block:: guess</p>
-<blockquote>
-<div><p>pip install .
-pip install -e .[dev] # for development (-e means editable so changes take effect when made)
-pip install .[all] # for everything including jupyter notebook to work with the Example_Usage above</p>
-</div></blockquote>
+<li><p>Install the package:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">.</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="o">.</span><span class="p">[</span><span class="n">dev</span><span class="p">]</span> <span class="c1"># for development (-e means editable so changes take effect when made)</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="o">.</span><span class="p">[</span><span class="nb">all</span><span class="p">]</span> <span class="c1"># for everything including jupyter notebook to work with the Example_Usage above</span>
+</pre></div>
+</div>
 </li>
 <li><p>libCZI is automatically built as a submodule and linked statically into aicspylibczi.</p></li>
 </ul>
 </li>
 <li><p>Note: If you get the message directly below on windows you need to set PYTHONHOME to be the folder the python.exe you are compiling against lives in.</p></li>
 </ul>
-<div class="highlight-guess notranslate"><div class="highlight"><pre><span></span>EXEC : Fatal Python error : initfsencoding: unable to load the file system codec ...
-ModuleNotFoundError: No module named &#39;encodings&#39;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EXEC</span> <span class="p">:</span> <span class="n">Fatal</span> <span class="n">Python</span> <span class="n">error</span> <span class="p">:</span> <span class="n">initfsencoding</span><span class="p">:</span> <span class="n">unable</span> <span class="n">to</span> <span class="n">load</span> <span class="n">the</span> <span class="n">file</span> <span class="n">system</span> <span class="n">codec</span> <span class="o">...</span>
+<span class="ne">ModuleNotFoundError</span><span class="p">:</span> <span class="n">No</span> <span class="n">module</span> <span class="n">named</span> <span class="s1">&#39;encodings&#39;</span>
 </pre></div>
 </div>
 </section>
