@@ -1,36 +1,80 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>aicspylibczi package &mdash; aicspylibczi 3.0.5 documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  
+  <title>aicspylibczi package &mdash; aicspylibczi 3.0.5 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
-  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
-    <script src="_static/js/theme.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Contributing" href="contributing.html" />
     <link rel="prev" title="aicspylibczi" href="modules.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
+
+          
             <a href="index.html" class="icon icon-home"> aicspylibczi
+          
+
+          
           </a>
+
+          
+            
+            
               <div class="version">
                 3.0.5
               </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -38,8 +82,19 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p><span class="caption-text">Contents:</span></p>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
@@ -50,9 +105,15 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">Package modules</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">aicspylibczi package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-aicspylibczi.CziFile">aicspylibczi.CziFile module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-aicspylibczi.CziFile">aicspylibczi.CziFile module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#aicspylibczi.CziFile.CziFile"><code class="docutils literal notranslate"><span class="pre">CziFile</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-aicspylibczi.types">aicspylibczi.types module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-aicspylibczi">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-aicspylibczi">Module contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#aicspylibczi.CziFile"><code class="docutils literal notranslate"><span class="pre">CziFile</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -64,44 +125,92 @@
 </li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">aicspylibczi</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
           <li><a href="modules.html">aicspylibczi</a> &raquo;</li>
+        
       <li>aicspylibczi package</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
+          
             <a href="_sources/aicspylibczi.rst.txt" rel="nofollow"> View page source</a>
+          
+        
       </li>
-  </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
-        <a href="modules.html" class="btn btn-neutral float-left" title="aicspylibczi" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    
+  </ul>
+
+  
+  <div class="rst-breadcrumbs-buttons" role="navigation" aria-label="breadcrumb navigation">
+      
         <a href="contributing.html" class="btn btn-neutral float-right" title="Contributing" accesskey="n">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+      
+      
+        <a href="modules.html" class="btn btn-neutral float-left" title="aicspylibczi" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
   </div>
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+            
   <section id="aicspylibczi-package">
-<h1>aicspylibczi package<a class="headerlink" href="#aicspylibczi-package" title="Permalink to this headline">¶</a></h1>
+<h1>aicspylibczi package<a class="headerlink" href="#aicspylibczi-package" title="Permalink to this heading">¶</a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="module-aicspylibczi.CziFile">
-<span id="aicspylibczi-czifile-module"></span><h2>aicspylibczi.CziFile module<a class="headerlink" href="#module-aicspylibczi.CziFile" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="aicspylibczi.CziFile.CziFile">
-<em class="property">class </em><code class="sig-prename descclassname">aicspylibczi.CziFile.</code><code class="sig-name descname">CziFile</code><span class="sig-paren">(</span><em class="sig-param">czi_filename: Union[str, pathlib.Path, bytes, BinaryIO, io.BufferedIOBase, _io.BufferedReader], verbose: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile" title="Permalink to this definition">¶</a></dt>
+<span id="aicspylibczi-czifile-module"></span><h2>aicspylibczi.CziFile module<a class="headerlink" href="#module-aicspylibczi.CziFile" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.CziFile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aicspylibczi.CziFile.</span></span><span class="sig-name descname"><span class="pre">CziFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">czi_filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">BinaryIO</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">BufferedIOBase</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">BufferedReader</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Zeiss CZI file object.</p>
 <dl>
@@ -118,26 +227,26 @@
 <p class="admonition-title">Note</p>
 <p>Utilizes compiled wrapper to libCZI for accessing the CZI file.</p>
 </div>
-<dl class="attribute">
-<dt id="aicspylibczi.CziFile.CziFile.ZISRAW_DIMS">
-<code class="sig-name descname">ZISRAW_DIMS</code><em class="property"> = {'B', 'C', 'H', 'I', 'R', 'S', 'T', 'V', 'Z'}</em><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.ZISRAW_DIMS" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.CziFile.ZISRAW_DIMS">
+<span class="sig-name descname"><span class="pre">ZISRAW_DIMS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'B',</span> <span class="pre">'C',</span> <span class="pre">'H',</span> <span class="pre">'I',</span> <span class="pre">'R',</span> <span class="pre">'S',</span> <span class="pre">'T',</span> <span class="pre">'V',</span> <span class="pre">'Z'}</span></em><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.ZISRAW_DIMS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.CziFile.convert_to_buffer">
-<em class="property">static </em><code class="sig-name descname">convert_to_buffer</code><span class="sig-paren">(</span><em class="sig-param">file: Union[str, pathlib.Path, bytes, BinaryIO, io.BufferedIOBase, _io.BufferedReader]</em><span class="sig-paren">)</span> &#x2192; Union[BinaryIO, numpy.ndarray]<a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.convert_to_buffer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.convert_to_buffer" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.CziFile.convert_to_buffer">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">convert_to_buffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">BinaryIO</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">BufferedIOBase</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">BufferedReader</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">BinaryIO</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.convert_to_buffer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.convert_to_buffer" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.CziFile.dims">
-<em class="property">property </em><code class="sig-name descname">dims</code><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.dims" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.CziFile.dims">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dims</span></span><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.dims" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the dimensions present the binary data (not the metadata)
 M, Y, X, A are included for completeness but can not be used as constraints.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A string containing Dimensions letters present, ie “BSTZYX”</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>str</p>
 </dd>
 </dl>
@@ -162,13 +271,13 @@ A - samples, BGR/RGB images only</p>
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.CziFile.get_all_mosaic_scene_bounding_boxes">
-<code class="sig-name descname">get_all_mosaic_scene_bounding_boxes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_all_mosaic_scene_bounding_boxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.get_all_mosaic_scene_bounding_boxes" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.CziFile.get_all_mosaic_scene_bounding_boxes">
+<span class="sig-name descname"><span class="pre">get_all_mosaic_scene_bounding_boxes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_all_mosaic_scene_bounding_boxes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.get_all_mosaic_scene_bounding_boxes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the scene (subblocks) bounding boxes (pyramid=0) for the specified dimensions.
 For mosaic files.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><p>A dictionary with keys of type Int and values of type BBox.
 The integer key is the Scene Index.
 For a value, ie bbox, of type BBox:</p>
@@ -180,19 +289,19 @@ bbox.h = The height of the bounding box.</p>
 </div></blockquote>
 </p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>dict[int, bbox]</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.CziFile.get_all_mosaic_tile_bounding_boxes">
-<code class="sig-name descname">get_all_mosaic_tile_bounding_boxes</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_all_mosaic_tile_bounding_boxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.get_all_mosaic_tile_bounding_boxes" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.CziFile.get_all_mosaic_tile_bounding_boxes">
+<span class="sig-name descname"><span class="pre">get_all_mosaic_tile_bounding_boxes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_all_mosaic_tile_bounding_boxes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.get_all_mosaic_tile_bounding_boxes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get one or more tiles (subblocks) bounding boxes (pyramid=0) for the specified dimensions.
 For mosaic files.</p>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>kwargs</strong> – The keywords below allow you to specify the dimensions that you wish to match. If you
 under-specify the constraints you can easily end up with a massive image stack.</p>
 <blockquote>
@@ -206,7 +315,7 @@ H = 7   # The H-dimension (“phase”).
 V = 8   # The V-dimension (“view”).</p>
 </div></blockquote>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><p>A dictionary with keys of type TileInfo and values of type BBox.
 For a key, ie tle, of type Tile:</p>
 <blockquote>
@@ -221,19 +330,19 @@ bbox.h = The height of the bounding box.</p>
 </dl>
 </p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dict[tile_info, bbox]</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.CziFile.get_all_scene_bounding_boxes">
-<code class="sig-name descname">get_all_scene_bounding_boxes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_all_scene_bounding_boxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.get_all_scene_bounding_boxes" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.CziFile.get_all_scene_bounding_boxes">
+<span class="sig-name descname"><span class="pre">get_all_scene_bounding_boxes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_all_scene_bounding_boxes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.get_all_scene_bounding_boxes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get one or more tiles (subblocks) bounding boxes (pyramid=0) for the specified dimensions.
 For non-mosaic files.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><p>A dictionary with keys of type Int and values of type BBox.
 The integer key is the Scene Index.
 For a value, ie bbox, of type BBox:</p>
@@ -245,19 +354,19 @@ bbox.h = The height of the bounding box.</p>
 </div></blockquote>
 </p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>dict[int, bbox]</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.CziFile.get_all_tile_bounding_boxes">
-<code class="sig-name descname">get_all_tile_bounding_boxes</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_all_tile_bounding_boxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.get_all_tile_bounding_boxes" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.CziFile.get_all_tile_bounding_boxes">
+<span class="sig-name descname"><span class="pre">get_all_tile_bounding_boxes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_all_tile_bounding_boxes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.get_all_tile_bounding_boxes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get one or more tiles (subblocks) bounding boxes (pyramid=0) for the specified dimensions.
 For non-mosaic files.</p>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>kwargs</strong> – The keywords below allow you to specify the dimensions that you wish to match. If you
 under-specify the constraints you can easily end up with a massive image stack.</p>
 <blockquote>
@@ -271,7 +380,7 @@ H = 7   # The H-dimension (“phase”).
 V = 8   # The V-dimension (“view”).</p>
 </div></blockquote>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><p>A dictionary with keys of type TileInfo and values of type BBox.
 For a key, ie tile, of type Tile:</p>
 <blockquote>
@@ -286,18 +395,18 @@ bbox.h = The height of the bounding box.</p>
 </dl>
 </p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dict[tile_info, bbox]</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.CziFile.get_dims_shape">
-<code class="sig-name descname">get_dims_shape</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_dims_shape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.get_dims_shape" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.CziFile.get_dims_shape">
+<span class="sig-name descname"><span class="pre">get_dims_shape</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_dims_shape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.get_dims_shape" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the dimensions for the opened file from the binary data (not the metadata)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><p>A list of dictionaries containing Dimension / depth. If the shape is consistent across Scenes then
 the list will have only one Dictionary. If the shape is inconsistent the the list will have a dictionary</p>
 <blockquote>
@@ -325,59 +434,59 @@ For the same initial file but with an RGB pixel type the result would be
 <p>].</p>
 </p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>list[dict]</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.CziFile.get_mosaic_bounding_box">
-<code class="sig-name descname">get_mosaic_bounding_box</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_mosaic_bounding_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.get_mosaic_bounding_box" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.CziFile.get_mosaic_bounding_box">
+<span class="sig-name descname"><span class="pre">get_mosaic_bounding_box</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_mosaic_bounding_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.get_mosaic_bounding_box" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the bounding box for the entire mosaic image.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A Bounding Box, bbox, of type BBox.
 bbox.x = The x coordinate of the upper left corner of the bounding box.
 bbox.y = The y coordinate of the upper left corner of the bounding box.
 bbox.w = The width of the bounding box.
 bbox.h = The height of the bounding box.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>bbox</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.CziFile.get_mosaic_scene_bounding_box">
-<code class="sig-name descname">get_mosaic_scene_bounding_box</code><span class="sig-paren">(</span><em class="sig-param">index: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_mosaic_scene_bounding_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.get_mosaic_scene_bounding_box" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.CziFile.get_mosaic_scene_bounding_box">
+<span class="sig-name descname"><span class="pre">get_mosaic_scene_bounding_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_mosaic_scene_bounding_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.get_mosaic_scene_bounding_box" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the bounding box (pyramid=0) for the specified scene. For mosaic files.
 This is not equivalent to the results from get_mosaic_tile_bounding_box.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>index</strong> – the scene index, if omitted it defaults to Zero</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A Bounding Box, bbox, of type BBox.
 bbox.x = The x coordinate of the upper left corner of the bounding box.
 bbox.y = The y coordinate of the upper left corner of the bounding box.
 bbox.w = The width of the bounding box.
 bbox.h = The height of the bounding box.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bbox</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.CziFile.get_mosaic_tile_bounding_box">
-<code class="sig-name descname">get_mosaic_tile_bounding_box</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_mosaic_tile_bounding_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.get_mosaic_tile_bounding_box" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.CziFile.get_mosaic_tile_bounding_box">
+<span class="sig-name descname"><span class="pre">get_mosaic_tile_bounding_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_mosaic_tile_bounding_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.get_mosaic_tile_bounding_box" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a single tile (subblock) bounding box (pyramid=0) for the specified dimensions.
 For mosaic files.</p>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>kwargs</strong> – The keywords below allow you to specify the dimensions that you wish to match. If you
 under-specify the constraints you can easily end up with a massive image stack.</p>
 <blockquote>
@@ -392,48 +501,48 @@ V = 8   # The V-dimension (“view”).
 M = 10  # The M_index, this is only valid for Mosaic files!</p>
 </div></blockquote>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A Bounding Box, bbox, of type BBox.
 bbox.x = The x coordinate of the upper left corner of the bounding box.
 bbox.y = The y coordinate of the upper left corner of the bounding box.
 bbox.w = The width of the bounding box.
 bbox.h = The height of the bounding box.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bbox</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.CziFile.get_scene_bounding_box">
-<code class="sig-name descname">get_scene_bounding_box</code><span class="sig-paren">(</span><em class="sig-param">index: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_scene_bounding_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.get_scene_bounding_box" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.CziFile.get_scene_bounding_box">
+<span class="sig-name descname"><span class="pre">get_scene_bounding_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_scene_bounding_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.get_scene_bounding_box" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the bounding box (pyramid=0) for the specified scene. For non-mosaic files.
 This should be equivalent to the results from get_tile_bounding_box but requiring only one arguments.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>index</strong> – the scene index, if omitted it defaults to Zero</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A Bounding Box, bbox, of type BBox.
 bbox.x = The x coordinate of the upper left corner of the bounding box.
 bbox.y = The y coordinate of the upper left corner of the bounding box.
 bbox.w = The width of the bounding box.
 bbox.h = The height of the bounding box.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bbox</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.CziFile.get_tile_bounding_box">
-<code class="sig-name descname">get_tile_bounding_box</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_tile_bounding_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.get_tile_bounding_box" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.CziFile.get_tile_bounding_box">
+<span class="sig-name descname"><span class="pre">get_tile_bounding_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_tile_bounding_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.get_tile_bounding_box" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a single tile (subblock) bounding box (pyramid=0) for the specified dimensions.
 For non-mosaic files.</p>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>kwargs</strong> – The keywords below allow you to specify the dimensions that you wish to match. If you
 under-specify the constraints you can easily end up with a massive image stack.</p>
 <blockquote>
@@ -447,71 +556,68 @@ H = 7   # The H-dimension (“phase”).
 V = 8   # The V-dimension (“view”).</p>
 </div></blockquote>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A Bounding Box, bbox, of type BBox.
 bbox.x = The x coordinate of the upper left corner of the bounding box.
 bbox.y = The y coordinate of the upper left corner of the bounding box.
 bbox.w = The width of the bounding box.
 bbox.h = The height of the bounding box.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bbox</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.CziFile.is_mosaic">
-<code class="sig-name descname">is_mosaic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.is_mosaic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.is_mosaic" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.CziFile.is_mosaic">
+<span class="sig-name descname"><span class="pre">is_mosaic</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.is_mosaic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.is_mosaic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test if the loaded file is a mosaic file</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>True | False ie is this a mosaic file</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.CziFile.meta">
-<em class="property">property </em><code class="sig-name descname">meta</code><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.meta" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.CziFile.meta">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">meta</span></span><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.meta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract the metadata block from the czi file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The root element of the metadata tree</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>xml.etree.ElementTree.Element</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.CziFile.pixel_type">
-<em class="property">property </em><code class="sig-name descname">pixel_type</code><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.pixel_type" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.CziFile.pixel_type">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pixel_type</span></span><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.pixel_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>The pixelType of the images. If the pixelType is different in the different subblocks it returns Invalid.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>A string containing the name of the type of each pixel. If inconsistent it returns invalid.</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A string containing the name of the type of each pixel. If inconsistent it returns invalid.</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.CziFile.read_image">
-<code class="sig-name descname">read_image</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.read_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.read_image" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.CziFile.read_image">
+<span class="sig-name descname"><span class="pre">read_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.read_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.read_image" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the subblocks in the CZI file and for any subblocks that match all the constraints in kwargs return
 that data. This allows you to select channels/scenes/time-points/Z-slices etc. Note if passed a BGR image
 then the dims of the object will returned by this function and the implicit BGR will be expanded into an
 A dimension. A is samples per pixel and will only be present for BGR images. This is logically more consistent
 than mixing the samples into the channels as was done before aicspylibczi-3.0.0.</p>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>**kwargs</strong> – The keywords below allow you to specify the dimensions that you wish to match. If you
 under-specify the constraints you can easily end up with a massive image stack.</p>
 <blockquote>
@@ -530,13 +636,13 @@ M = 10  # The M_index, this is only valid for Mosaic files!</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a tuple of (numpy.ndarray, a list of (Dimension, size)) the second element of the tuple is to make
 sure the numpy.ndarray is interpretable. An example of the list is
 [(‘S’, 1), (‘T’, 1), (‘C’, 2), (‘Z’, 25), (‘Y’, 1024), (‘X’, 1024)]
 so if you probed the numpy.ndarray with .shape you would get (1, 1, 2, 25, 1024, 1024).</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>(numpy.ndarray, [Dimension, Size])</p>
 </dd>
 </dl>
@@ -546,9 +652,9 @@ packed for a given selection which causes problems when indexing memory. Consequ
 not match the m_index that is being used in libCZI or displayed in Zeiss’ Zen software.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.CziFile.read_mosaic">
-<code class="sig-name descname">read_mosaic</code><span class="sig-paren">(</span><em class="sig-param">region: Tuple = None</em>, <em class="sig-param">scale_factor: float = 1.0</em>, <em class="sig-param">background_color: Tuple = None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.read_mosaic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.read_mosaic" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.CziFile.read_mosaic">
+<span class="sig-name descname"><span class="pre">read_mosaic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background_color</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.read_mosaic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.read_mosaic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads a mosaic file and returns an image corresponding to the specified dimensions. If the file is more than
 a 2D sheet of pixels, meaning only one channel, z-slice, time-index, etc then the kwargs must specify the
 dimension with more than one possible value.</p>
@@ -558,7 +664,7 @@ dimension with more than one possible value.</p>
 img = czi.read_mosaic(scale_factor=0.1, C=1)</p>
 </div></blockquote>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul>
 <li><p><strong>region</strong> – A bounding box specifying the extraction box (x0, y0, width, height) specified in pixels</p></li>
 <li><p><strong>scale_factor</strong> – The amount to scale the data by, 0.1 would mean an image 1/10 the height and width of native, if you
@@ -581,21 +687,21 @@ constraints are underspecified the function will fail.</p>
 </li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>(1, height, width)</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>numpy.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.CziFile.read_subblock_metadata">
-<code class="sig-name descname">read_subblock_metadata</code><span class="sig-paren">(</span><em class="sig-param">unified_xml: bool = False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.read_subblock_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.read_subblock_metadata" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.CziFile.read_subblock_metadata">
+<span class="sig-name descname"><span class="pre">read_subblock_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unified_xml</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.read_subblock_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.read_subblock_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the subblock specific metadata, ie time subblock was acquired / position at acquisition time etc.</p>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul>
 <li><p><strong>unified_xml</strong> (<em>bool</em>) – If True return a single unified xml tree containing the requested subblock.
 If False return a list of tuples (dims, xml)</p></li>
@@ -615,7 +721,7 @@ M = 10  # The M_index, this is only valid for Mosaic files!</p>
 </li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><em>[(dict, str)] if unified_xml is False</em> – an array of tuples containing a dimension dictionary and the corresponding subblock metadata</p></li>
 <li><p><em>xml.etree.ElementTree.Element if unified_xml is True</em> – an xml document containing the requested subblock metadata.</p></li>
@@ -625,31 +731,31 @@ M = 10  # The M_index, this is only valid for Mosaic files!</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.CziFile.shape_is_consistent">
-<em class="property">property </em><code class="sig-name descname">shape_is_consistent</code><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.shape_is_consistent" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.CziFile.shape_is_consistent">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shape_is_consistent</span></span><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.shape_is_consistent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query if the file shape is consistent across scenes.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>true if consistent, false the scenes have different dimension shapes</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.CziFile.size">
-<em class="property">property </em><code class="sig-name descname">size</code><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.size" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.CziFile.size">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#aicspylibczi.CziFile.CziFile.size" title="Permalink to this definition">¶</a></dt>
 <dd><p>This returns the Size of each dimension in the dims string. So if S had valid indexes of [0, 1, 2, 3, 4]
 the returned tuple would have a value of 5 in the same position as the S occurs in the dims string.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a tuple of dimension sizes. If the data has inconsistent shape the list will only contain -1 values and
 the user needs to use dims_shape() to get the indexes.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>tuple</p>
 </dd>
 </dl>
@@ -659,13 +765,13 @@ the user needs to use dims_shape() to get the indexes.</p>
 
 </section>
 <section id="module-aicspylibczi.types">
-<span id="aicspylibczi-types-module"></span><h2>aicspylibczi.types module<a class="headerlink" href="#module-aicspylibczi.types" title="Permalink to this headline">¶</a></h2>
+<span id="aicspylibczi-types-module"></span><h2>aicspylibczi.types module<a class="headerlink" href="#module-aicspylibczi.types" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="module-aicspylibczi">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-aicspylibczi" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="aicspylibczi.CziFile">
-<em class="property">class </em><code class="sig-prename descclassname">aicspylibczi.</code><code class="sig-name descname">CziFile</code><span class="sig-paren">(</span><em class="sig-param">czi_filename: Union[str, pathlib.Path, bytes, BinaryIO, io.BufferedIOBase, _io.BufferedReader], verbose: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile" title="Permalink to this definition">¶</a></dt>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-aicspylibczi" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">aicspylibczi.</span></span><span class="sig-name descname"><span class="pre">CziFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">czi_filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">BinaryIO</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">BufferedIOBase</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">BufferedReader</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Zeiss CZI file object.</p>
 <dl>
@@ -682,26 +788,26 @@ the user needs to use dims_shape() to get the indexes.</p>
 <p class="admonition-title">Note</p>
 <p>Utilizes compiled wrapper to libCZI for accessing the CZI file.</p>
 </div>
-<dl class="attribute">
-<dt id="aicspylibczi.CziFile.ZISRAW_DIMS">
-<code class="sig-name descname">ZISRAW_DIMS</code><em class="property"> = {'B', 'C', 'H', 'I', 'R', 'S', 'T', 'V', 'Z'}</em><a class="headerlink" href="#aicspylibczi.CziFile.ZISRAW_DIMS" title="Permalink to this definition">¶</a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.ZISRAW_DIMS">
+<span class="sig-name descname"><span class="pre">ZISRAW_DIMS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'B',</span> <span class="pre">'C',</span> <span class="pre">'H',</span> <span class="pre">'I',</span> <span class="pre">'R',</span> <span class="pre">'S',</span> <span class="pre">'T',</span> <span class="pre">'V',</span> <span class="pre">'Z'}</span></em><a class="headerlink" href="#aicspylibczi.CziFile.ZISRAW_DIMS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.convert_to_buffer">
-<em class="property">static </em><code class="sig-name descname">convert_to_buffer</code><span class="sig-paren">(</span><em class="sig-param">file: Union[str, pathlib.Path, bytes, BinaryIO, io.BufferedIOBase, _io.BufferedReader]</em><span class="sig-paren">)</span> &#x2192; Union[BinaryIO, numpy.ndarray]<a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.convert_to_buffer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.convert_to_buffer" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.convert_to_buffer">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">convert_to_buffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Path</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bytes</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">BinaryIO</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">BufferedIOBase</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">BufferedReader</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">BinaryIO</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.convert_to_buffer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.convert_to_buffer" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.dims">
-<em class="property">property </em><code class="sig-name descname">dims</code><a class="headerlink" href="#aicspylibczi.CziFile.dims" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.dims">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dims</span></span><a class="headerlink" href="#aicspylibczi.CziFile.dims" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the dimensions present the binary data (not the metadata)
 M, Y, X, A are included for completeness but can not be used as constraints.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A string containing Dimensions letters present, ie “BSTZYX”</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>str</p>
 </dd>
 </dl>
@@ -726,13 +832,13 @@ A - samples, BGR/RGB images only</p>
 </div>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.get_all_mosaic_scene_bounding_boxes">
-<code class="sig-name descname">get_all_mosaic_scene_bounding_boxes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_all_mosaic_scene_bounding_boxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.get_all_mosaic_scene_bounding_boxes" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.get_all_mosaic_scene_bounding_boxes">
+<span class="sig-name descname"><span class="pre">get_all_mosaic_scene_bounding_boxes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_all_mosaic_scene_bounding_boxes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.get_all_mosaic_scene_bounding_boxes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the scene (subblocks) bounding boxes (pyramid=0) for the specified dimensions.
 For mosaic files.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><p>A dictionary with keys of type Int and values of type BBox.
 The integer key is the Scene Index.
 For a value, ie bbox, of type BBox:</p>
@@ -744,19 +850,19 @@ bbox.h = The height of the bounding box.</p>
 </div></blockquote>
 </p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>dict[int, bbox]</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.get_all_mosaic_tile_bounding_boxes">
-<code class="sig-name descname">get_all_mosaic_tile_bounding_boxes</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_all_mosaic_tile_bounding_boxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.get_all_mosaic_tile_bounding_boxes" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.get_all_mosaic_tile_bounding_boxes">
+<span class="sig-name descname"><span class="pre">get_all_mosaic_tile_bounding_boxes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_all_mosaic_tile_bounding_boxes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.get_all_mosaic_tile_bounding_boxes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get one or more tiles (subblocks) bounding boxes (pyramid=0) for the specified dimensions.
 For mosaic files.</p>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>kwargs</strong> – The keywords below allow you to specify the dimensions that you wish to match. If you
 under-specify the constraints you can easily end up with a massive image stack.</p>
 <blockquote>
@@ -770,7 +876,7 @@ H = 7   # The H-dimension (“phase”).
 V = 8   # The V-dimension (“view”).</p>
 </div></blockquote>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><p>A dictionary with keys of type TileInfo and values of type BBox.
 For a key, ie tle, of type Tile:</p>
 <blockquote>
@@ -785,19 +891,19 @@ bbox.h = The height of the bounding box.</p>
 </dl>
 </p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dict[tile_info, bbox]</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.get_all_scene_bounding_boxes">
-<code class="sig-name descname">get_all_scene_bounding_boxes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_all_scene_bounding_boxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.get_all_scene_bounding_boxes" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.get_all_scene_bounding_boxes">
+<span class="sig-name descname"><span class="pre">get_all_scene_bounding_boxes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_all_scene_bounding_boxes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.get_all_scene_bounding_boxes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get one or more tiles (subblocks) bounding boxes (pyramid=0) for the specified dimensions.
 For non-mosaic files.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><p>A dictionary with keys of type Int and values of type BBox.
 The integer key is the Scene Index.
 For a value, ie bbox, of type BBox:</p>
@@ -809,19 +915,19 @@ bbox.h = The height of the bounding box.</p>
 </div></blockquote>
 </p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>dict[int, bbox]</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.get_all_tile_bounding_boxes">
-<code class="sig-name descname">get_all_tile_bounding_boxes</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_all_tile_bounding_boxes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.get_all_tile_bounding_boxes" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.get_all_tile_bounding_boxes">
+<span class="sig-name descname"><span class="pre">get_all_tile_bounding_boxes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_all_tile_bounding_boxes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.get_all_tile_bounding_boxes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get one or more tiles (subblocks) bounding boxes (pyramid=0) for the specified dimensions.
 For non-mosaic files.</p>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>kwargs</strong> – The keywords below allow you to specify the dimensions that you wish to match. If you
 under-specify the constraints you can easily end up with a massive image stack.</p>
 <blockquote>
@@ -835,7 +941,7 @@ H = 7   # The H-dimension (“phase”).
 V = 8   # The V-dimension (“view”).</p>
 </div></blockquote>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><p>A dictionary with keys of type TileInfo and values of type BBox.
 For a key, ie tile, of type Tile:</p>
 <blockquote>
@@ -850,18 +956,18 @@ bbox.h = The height of the bounding box.</p>
 </dl>
 </p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dict[tile_info, bbox]</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.get_dims_shape">
-<code class="sig-name descname">get_dims_shape</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_dims_shape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.get_dims_shape" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.get_dims_shape">
+<span class="sig-name descname"><span class="pre">get_dims_shape</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_dims_shape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.get_dims_shape" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the dimensions for the opened file from the binary data (not the metadata)</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p><p>A list of dictionaries containing Dimension / depth. If the shape is consistent across Scenes then
 the list will have only one Dictionary. If the shape is inconsistent the the list will have a dictionary</p>
 <blockquote>
@@ -889,59 +995,59 @@ For the same initial file but with an RGB pixel type the result would be
 <p>].</p>
 </p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>list[dict]</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.get_mosaic_bounding_box">
-<code class="sig-name descname">get_mosaic_bounding_box</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_mosaic_bounding_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.get_mosaic_bounding_box" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.get_mosaic_bounding_box">
+<span class="sig-name descname"><span class="pre">get_mosaic_bounding_box</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_mosaic_bounding_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.get_mosaic_bounding_box" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the bounding box for the entire mosaic image.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A Bounding Box, bbox, of type BBox.
 bbox.x = The x coordinate of the upper left corner of the bounding box.
 bbox.y = The y coordinate of the upper left corner of the bounding box.
 bbox.w = The width of the bounding box.
 bbox.h = The height of the bounding box.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>bbox</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.get_mosaic_scene_bounding_box">
-<code class="sig-name descname">get_mosaic_scene_bounding_box</code><span class="sig-paren">(</span><em class="sig-param">index: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_mosaic_scene_bounding_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.get_mosaic_scene_bounding_box" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.get_mosaic_scene_bounding_box">
+<span class="sig-name descname"><span class="pre">get_mosaic_scene_bounding_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_mosaic_scene_bounding_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.get_mosaic_scene_bounding_box" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the bounding box (pyramid=0) for the specified scene. For mosaic files.
 This is not equivalent to the results from get_mosaic_tile_bounding_box.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>index</strong> – the scene index, if omitted it defaults to Zero</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A Bounding Box, bbox, of type BBox.
 bbox.x = The x coordinate of the upper left corner of the bounding box.
 bbox.y = The y coordinate of the upper left corner of the bounding box.
 bbox.w = The width of the bounding box.
 bbox.h = The height of the bounding box.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bbox</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.get_mosaic_tile_bounding_box">
-<code class="sig-name descname">get_mosaic_tile_bounding_box</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_mosaic_tile_bounding_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.get_mosaic_tile_bounding_box" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.get_mosaic_tile_bounding_box">
+<span class="sig-name descname"><span class="pre">get_mosaic_tile_bounding_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_mosaic_tile_bounding_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.get_mosaic_tile_bounding_box" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a single tile (subblock) bounding box (pyramid=0) for the specified dimensions.
 For mosaic files.</p>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>kwargs</strong> – The keywords below allow you to specify the dimensions that you wish to match. If you
 under-specify the constraints you can easily end up with a massive image stack.</p>
 <blockquote>
@@ -956,48 +1062,48 @@ V = 8   # The V-dimension (“view”).
 M = 10  # The M_index, this is only valid for Mosaic files!</p>
 </div></blockquote>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A Bounding Box, bbox, of type BBox.
 bbox.x = The x coordinate of the upper left corner of the bounding box.
 bbox.y = The y coordinate of the upper left corner of the bounding box.
 bbox.w = The width of the bounding box.
 bbox.h = The height of the bounding box.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bbox</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.get_scene_bounding_box">
-<code class="sig-name descname">get_scene_bounding_box</code><span class="sig-paren">(</span><em class="sig-param">index: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_scene_bounding_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.get_scene_bounding_box" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.get_scene_bounding_box">
+<span class="sig-name descname"><span class="pre">get_scene_bounding_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_scene_bounding_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.get_scene_bounding_box" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the bounding box (pyramid=0) for the specified scene. For non-mosaic files.
 This should be equivalent to the results from get_tile_bounding_box but requiring only one arguments.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>index</strong> – the scene index, if omitted it defaults to Zero</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A Bounding Box, bbox, of type BBox.
 bbox.x = The x coordinate of the upper left corner of the bounding box.
 bbox.y = The y coordinate of the upper left corner of the bounding box.
 bbox.w = The width of the bounding box.
 bbox.h = The height of the bounding box.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bbox</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.get_tile_bounding_box">
-<code class="sig-name descname">get_tile_bounding_box</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_tile_bounding_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.get_tile_bounding_box" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.get_tile_bounding_box">
+<span class="sig-name descname"><span class="pre">get_tile_bounding_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.get_tile_bounding_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.get_tile_bounding_box" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a single tile (subblock) bounding box (pyramid=0) for the specified dimensions.
 For non-mosaic files.</p>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>kwargs</strong> – The keywords below allow you to specify the dimensions that you wish to match. If you
 under-specify the constraints you can easily end up with a massive image stack.</p>
 <blockquote>
@@ -1011,71 +1117,68 @@ H = 7   # The H-dimension (“phase”).
 V = 8   # The V-dimension (“view”).</p>
 </div></blockquote>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A Bounding Box, bbox, of type BBox.
 bbox.x = The x coordinate of the upper left corner of the bounding box.
 bbox.y = The y coordinate of the upper left corner of the bounding box.
 bbox.w = The width of the bounding box.
 bbox.h = The height of the bounding box.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bbox</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.is_mosaic">
-<code class="sig-name descname">is_mosaic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.is_mosaic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.is_mosaic" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.is_mosaic">
+<span class="sig-name descname"><span class="pre">is_mosaic</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.is_mosaic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.is_mosaic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test if the loaded file is a mosaic file</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>True | False ie is this a mosaic file</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.meta">
-<em class="property">property </em><code class="sig-name descname">meta</code><a class="headerlink" href="#aicspylibczi.CziFile.meta" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.meta">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">meta</span></span><a class="headerlink" href="#aicspylibczi.CziFile.meta" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract the metadata block from the czi file.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The root element of the metadata tree</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>xml.etree.ElementTree.Element</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.pixel_type">
-<em class="property">property </em><code class="sig-name descname">pixel_type</code><a class="headerlink" href="#aicspylibczi.CziFile.pixel_type" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.pixel_type">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pixel_type</span></span><a class="headerlink" href="#aicspylibczi.CziFile.pixel_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>The pixelType of the images. If the pixelType is different in the different subblocks it returns Invalid.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>A string containing the name of the type of each pixel. If inconsistent it returns invalid.</p>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A string containing the name of the type of each pixel. If inconsistent it returns invalid.</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.read_image">
-<code class="sig-name descname">read_image</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.read_image"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.read_image" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.read_image">
+<span class="sig-name descname"><span class="pre">read_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.read_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.read_image" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the subblocks in the CZI file and for any subblocks that match all the constraints in kwargs return
 that data. This allows you to select channels/scenes/time-points/Z-slices etc. Note if passed a BGR image
 then the dims of the object will returned by this function and the implicit BGR will be expanded into an
 A dimension. A is samples per pixel and will only be present for BGR images. This is logically more consistent
 than mixing the samples into the channels as was done before aicspylibczi-3.0.0.</p>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>**kwargs</strong> – The keywords below allow you to specify the dimensions that you wish to match. If you
 under-specify the constraints you can easily end up with a massive image stack.</p>
 <blockquote>
@@ -1094,13 +1197,13 @@ M = 10  # The M_index, this is only valid for Mosaic files!</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>a tuple of (numpy.ndarray, a list of (Dimension, size)) the second element of the tuple is to make
 sure the numpy.ndarray is interpretable. An example of the list is
 [(‘S’, 1), (‘T’, 1), (‘C’, 2), (‘Z’, 25), (‘Y’, 1024), (‘X’, 1024)]
 so if you probed the numpy.ndarray with .shape you would get (1, 1, 2, 25, 1024, 1024).</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>(numpy.ndarray, [Dimension, Size])</p>
 </dd>
 </dl>
@@ -1110,9 +1213,9 @@ packed for a given selection which causes problems when indexing memory. Consequ
 not match the m_index that is being used in libCZI or displayed in Zeiss’ Zen software.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.read_mosaic">
-<code class="sig-name descname">read_mosaic</code><span class="sig-paren">(</span><em class="sig-param">region: Tuple = None</em>, <em class="sig-param">scale_factor: float = 1.0</em>, <em class="sig-param">background_color: Tuple = None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.read_mosaic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.read_mosaic" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.read_mosaic">
+<span class="sig-name descname"><span class="pre">read_mosaic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background_color</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.read_mosaic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.read_mosaic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reads a mosaic file and returns an image corresponding to the specified dimensions. If the file is more than
 a 2D sheet of pixels, meaning only one channel, z-slice, time-index, etc then the kwargs must specify the
 dimension with more than one possible value.</p>
@@ -1122,7 +1225,7 @@ dimension with more than one possible value.</p>
 img = czi.read_mosaic(scale_factor=0.1, C=1)</p>
 </div></blockquote>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul>
 <li><p><strong>region</strong> – A bounding box specifying the extraction box (x0, y0, width, height) specified in pixels</p></li>
 <li><p><strong>scale_factor</strong> – The amount to scale the data by, 0.1 would mean an image 1/10 the height and width of native, if you
@@ -1145,21 +1248,21 @@ constraints are underspecified the function will fail.</p>
 </li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>(1, height, width)</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>numpy.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.read_subblock_metadata">
-<code class="sig-name descname">read_subblock_metadata</code><span class="sig-paren">(</span><em class="sig-param">unified_xml: bool = False</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.read_subblock_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#aicspylibczi.CziFile.read_subblock_metadata" title="Permalink to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.read_subblock_metadata">
+<span class="sig-name descname"><span class="pre">read_subblock_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unified_xml</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/aicspylibczi/CziFile.html#CziFile.read_subblock_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aicspylibczi.CziFile.read_subblock_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read the subblock specific metadata, ie time subblock was acquired / position at acquisition time etc.</p>
 <dl class="field-list">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul>
 <li><p><strong>unified_xml</strong> (<em>bool</em>) – If True return a single unified xml tree containing the requested subblock.
 If False return a list of tuples (dims, xml)</p></li>
@@ -1179,7 +1282,7 @@ M = 10  # The M_index, this is only valid for Mosaic files!</p>
 </li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><em>[(dict, str)] if unified_xml is False</em> – an array of tuples containing a dimension dictionary and the corresponding subblock metadata</p></li>
 <li><p><em>xml.etree.ElementTree.Element if unified_xml is True</em> – an xml document containing the requested subblock metadata.</p></li>
@@ -1189,31 +1292,31 @@ M = 10  # The M_index, this is only valid for Mosaic files!</p>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.shape_is_consistent">
-<em class="property">property </em><code class="sig-name descname">shape_is_consistent</code><a class="headerlink" href="#aicspylibczi.CziFile.shape_is_consistent" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.shape_is_consistent">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">shape_is_consistent</span></span><a class="headerlink" href="#aicspylibczi.CziFile.shape_is_consistent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query if the file shape is consistent across scenes.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>true if consistent, false the scenes have different dimension shapes</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>
 
-<dl class="method">
-<dt id="aicspylibczi.CziFile.size">
-<em class="property">property </em><code class="sig-name descname">size</code><a class="headerlink" href="#aicspylibczi.CziFile.size" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="aicspylibczi.CziFile.size">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">size</span></span><a class="headerlink" href="#aicspylibczi.CziFile.size" title="Permalink to this definition">¶</a></dt>
 <dd><p>This returns the Size of each dimension in the dims string. So if S had valid indexes of [0, 1, 2, 3, 4]
 the returned tuple would have a value of 5 in the same position as the S occurs in the dims string.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>a tuple of dimension sizes. If the data has inconsistent shape the list will only contain -1 values and
 the user needs to use dims_shape() to get the indexes.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>tuple</p>
 </dd>
 </dl>
@@ -1226,30 +1329,46 @@ the user needs to use dims_shape() to get the indexes.</p>
 
 
            </div>
+           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2019, Allen Institute for Cell Science.</p>
-  </div>
+    <p>
+        &#169; Copyright 2019, Allen Institute for Cell Science.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>
