@@ -1,9 +1,6 @@
 name: Docs
 
-on:
-  push:
-    branches:
-      - main
+on: [pull_request]
 
 jobs:
   docs:
@@ -29,10 +26,3 @@ jobs:
           cmake ..
           cmake --build . --target docs
         shell: bash
-      - name: Publish Docs
-        uses: JamesIves/github-pages-deploy-action@releases/v3
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BASE_BRANCH: main
-          BRANCH: gh-pages
-          FOLDER: cmake_build_debug/docs/html
