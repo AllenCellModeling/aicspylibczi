@@ -552,7 +552,13 @@ class CziFile(object):
         image, shape = self.reader.read_selected(plane_constraints, m_index, cores)
         return image, shape
 
-    def read_mosaic(self, region: Tuple = None, scale_factor: float = 1.0, background_color: Tuple = None, **kwargs):
+    def read_mosaic(
+        self,
+        region: Tuple = None,
+        scale_factor: float = 1.0,
+        background_color: Tuple = None,
+        **kwargs,
+    ):
         """
         Reads a mosaic file and returns an image corresponding to the specified dimensions. If the file is more than
         a 2D sheet of pixels, meaning only one channel, z-slice, time-index, etc then the kwargs must specify the
@@ -619,7 +625,9 @@ class CziFile(object):
             tmp.b = background_color[2]
             background_color = tmp
 
-        img = self.reader.read_mosaic(plane_constraints, scale_factor, region, background_color)
+        img = self.reader.read_mosaic(
+            plane_constraints, scale_factor, region, background_color
+        )
 
         return img
 

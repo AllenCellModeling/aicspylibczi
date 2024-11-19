@@ -185,18 +185,21 @@ Reader::sceneShape(int scene_index_)
         definedDims[dimensionIndexToDimIndex(di_)].emplace(val_);
         return true;
       });
-      if (isMosaic())
+      if (isMosaic()) {
         definedDims[DimIndex::M].emplace(x.first.mIndex());
+      }
     }
-    for (auto x : definedDims)
+    for (auto x : definedDims) {
       tbl.emplace(x.first, std::make_pair(*x.second.begin(), *x.second.rbegin() + 1));
+    }
 
     auto xySize = getSceneYXSize(scene_index_);
     tbl.emplace(DimIndex::Y, std::make_pair(0, xySize.h));
     tbl.emplace(DimIndex::X, std::make_pair(0, xySize.w));
   }
-  if (ImageFactory::numberOfSamples(m_pixelType) > 1)
+  if (ImageFactory::numberOfSamples(m_pixelType) > 1) {
     tbl.emplace(charToDimIndex('A'), std::make_pair(0, ImageFactory::numberOfSamples(m_pixelType)));
+  }
 
   return tbl;
 }
@@ -206,18 +209,11 @@ Reader::getAllSceneYXSize(int scene_index_, bool get_all_matches_)
 {
   std::vector<libCZI::IntRect> result;
   bool hasScene = m_statistics.dimBounds.IsValid(libCZI::DimensionIndex::S);
-  if (!isMosaic() && hasScene) {
-    int sStart(0), sSize(0);
-    m_statistics.dimBounds.TryGetInterval(libCZI::DimensionIndex::S, &sStart, &sSize);
-    if (scene_index_ >= sStart && (sStart + sSize - 1) >= scene_index_ && !m_statistics.sceneBoundingBoxes.empty()) {
-      result.emplace_back(m_statistics.sceneBoundingBoxes[scene_index_].boundingBoxLayer0);
-      return result;
-    }
-  }
 
   libCZI::CDimCoordinate scene_coord; // default constructor
-  if (hasScene && scene_index_ >= 0)
+  if (hasScene && scene_index_ >= 0) {
     scene_coord = libCZI::CDimCoordinate({ { libCZI::DimensionIndex::S, scene_index_ } });
+  }
   SubblockSortable subblocksToFind(&scene_coord, -1, false);
   SubblockIndexVec matches = getMatches(subblocksToFind);
 

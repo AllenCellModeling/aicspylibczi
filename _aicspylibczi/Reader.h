@@ -248,7 +248,7 @@ public:
   ImagesContainerBase::ImagesContainerBasePtr readMosaic(libCZI::CDimCoordinate plane_coord_,
                                                          float scale_factor_ = 1.0,
                                                          libCZI::IntRect im_box_ = { 0, 0, -1, -1 },
-							 libCZI::RgbFloatColor backGroundColor_ = { 0.0, 0.0, 0.0 });
+                                                         libCZI::RgbFloatColor backGroundColor_ = { 0.0, 0.0, 0.0 });
 
   /*!
    * Convert the libCZI::DimensionIndex to a character
@@ -260,7 +260,6 @@ public:
   bool shapeIsConsistent() const { return !m_specifyScene; }
 
   virtual ~Reader() { m_czireader->Close(); }
-
 
   /*!
    * @brief get the shape of the loaded images
@@ -347,15 +346,15 @@ private:
   void checkSceneShapes();
 
   /*!
-  * @brief get the pyramid 0 (acquired data) shape
-  * @param scene_index_ specifies scene but defaults to the first scene,
-  * Scenes can have different sizes
-  * @return std::vector<libCZI::IntRect> containing (x0, y0, w, h)
-  */
+   * @brief get the pyramid 0 (acquired data) shape
+   * @param scene_index_ specifies scene but defaults to the first scene,
+   * Scenes can have different sizes
+   * @return std::vector<libCZI::IntRect> containing (x0, y0, w, h)
+   */
   libCZI::IntRect getSceneYXSize(int scene_index_ = -1)
   {
     std::vector<libCZI::IntRect> matches = getAllSceneYXSize(scene_index_);
-    return matches.empty() ? libCZI::IntRect{ 0,0,0,0 } : matches.front();
+    return matches.empty() ? libCZI::IntRect{ 0, 0, 0, 0 } : matches.front();
   }
 
   /*!
@@ -368,7 +367,6 @@ private:
   std::vector<libCZI::IntRect> getAllSceneYXSize(int scene_index_ = -1, bool get_all_matches_ = false);
 
   libCZI::PixelType getFirstPixelType();
-
 };
 
 }
