@@ -46,7 +46,8 @@ extensions = [
 
 # Control napoleon
 napoleon_google_docstring = False
-napolean_include_init_with_doc = True
+napoleon_numpy_docstring = True
+napoleon_include_init_with_doc = True
 napoleon_use_ivar = True
 napoleon_use_param = False
 
@@ -61,7 +62,7 @@ templates_path = ["_templates"]
 #
 source_suffix = {
     ".rst": "restructuredtext",
-    ".txt": "markdown",
+    # ".txt": "markdown",
     ".md": "markdown",
 }
 
