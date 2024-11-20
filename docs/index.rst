@@ -33,7 +33,8 @@ Welcome to aicspylibczi's documentation!
    Package modules <modules>
    contributing
 
-.. mdinclude:: ../README.md
+.. include:: ../README.md
+   :parser: myst_parser.docutils_
 
 
 Indices and tables

@@ -121,3 +121,4 @@ dummy_test.py
 *.ipynb
 .DS_Store
 cmake-build-debug/
+cmake_build_debug/
