@@ -1,0 +1,28 @@
+name: Docs
+
+on: [pull_request]
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install Dependencies
+        run: |
+          pip install --upgrade pip setuptools
+          pip install .[dev]
+      - name: Generate Docs
+        env:
+          BUILD_DOCS: true
+        run: |
+          mkdir cmake_build_debug
+          cd cmake_build_debug
+          cmake ..
+          cmake --build . --target docs
+        shell: bash

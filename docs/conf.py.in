@@ -18,6 +18,7 @@
 # relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
 #
+from datetime import datetime
 import os
 import sys
 
@@ -40,12 +41,13 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
     "sphinx.ext.mathjax",
-    "m2r2",
+    "myst_parser",
 ]
 
 # Control napoleon
 napoleon_google_docstring = False
-napolean_include_init_with_doc = True
+napoleon_numpy_docstring = True
+napoleon_include_init_with_doc = True
 napoleon_use_ivar = True
 napoleon_use_param = False
 
@@ -60,7 +62,7 @@ templates_path = ["_templates"]
 #
 source_suffix = {
     ".rst": "restructuredtext",
-    ".txt": "markdown",
+    # ".txt": "markdown",
     ".md": "markdown",
 }
 
@@ -69,7 +71,7 @@ master_doc = "index"
 
 # General information about the project.
 project = u"aicspylibczi"
-copyright = u'2019, Allen Institute for Cell Science'
+project_copyright = f'2019-{datetime.now().year}, Allen Institute for Cell Science'
 author = u"Allen Institute for Cell Science"
 
 # The version info for the project you"re documenting, acts as replacement
