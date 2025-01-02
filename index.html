@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
@@ -6,18 +8,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Welcome to aicspylibczi’s documentation! &mdash; aicspylibczi 3.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=4f6ddb47"></script>
-        <script src="_static/doctools.js?v=9a2dae69"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=4f6ddb47"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -35,9 +33,6 @@
           <a href="#" class="icon icon-home">
             aicspylibczi
           </a>
-              <div class="version">
-                3.2.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -107,19 +102,18 @@
 <h1>Welcome to aicspylibczi’s documentation!<a class="headerlink" href="#welcome-to-aicspylibczi-s-documentation" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
-</section>
 <section id="aicspylibczi">
-<h1>aicspylibczi<a class="headerlink" href="#aicspylibczi" title="Link to this heading"></a></h1>
-<a class="reference external image-reference" href="https://github.com/AllenCellModeling/aicspylibczi/actions"><img alt="C++ Build &amp; Test" src="https://github.com/AllenCellModeling/aicspylibczi/workflows/C%2B%2B%20Main%20Build/badge.svg" /></a>
-<a class="reference external image-reference" href="https://github.com/AllenCellModeling/aicspylibczi/actions"><img alt="Python Build &amp; Test" src="https://github.com/AllenCellModeling/aicspylibczi/workflows/Python%20Build%20Main/badge.svg" /></a>
-<a class="reference external image-reference" href="https://github.com/AllenCellModeling/aicspylibczi/blob/master/LICENSE"><img alt="License: GPLv3" src="https://img.shields.io/badge/License-GPLv3-blue.svg" /></a>
+<h2>aicspylibczi<a class="headerlink" href="#aicspylibczi" title="Link to this heading"></a></h2>
+<p><a class="reference external" href="https://github.com/AllenCellModeling/aicspylibczi/actions"><img alt="C++ Build &amp; Test" src="https://github.com/AllenCellModeling/aicspylibczi/workflows/C%2B%2B%20Main%20Build/badge.svg" /></a>
+<a class="reference external" href="https://github.com/AllenCellModeling/aicspylibczi/actions"><img alt="Python Build &amp; Test" src="https://github.com/AllenCellModeling/aicspylibczi/workflows/Python%20Build%20Main/badge.svg" /></a>
+<a class="reference external" href="https://github.com/AllenCellModeling/aicspylibczi/blob/master/LICENSE"><img alt="License: GPLv3" src="https://img.shields.io/badge/License-GPLv3-blue.svg" /></a></p>
 <p>Python module to expose <a class="reference external" href="https://github.com/zeiss-microscopy/libCZI">libCZI</a> functionality for reading (subset of) Zeiss
 CZI files and meta-data. We only support 64bit architectures currently if you desperately need 32 bit support please make an issue or modify the source and build it for your use case.</p>
 <section id="usage">
-<h2>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h2>
+<h3>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h3>
 <p>The first example show how to work with a standard CZI file (Single or Multi-Scene). The second example shows how to work with a Mosaic CZI file.</p>
 <section id="example-1-read-in-a-czi-and-select-a-portion-of-the-image-to-display">
-<h3>Example 1: Read in a czi and select a portion of the image to display<a class="headerlink" href="#example-1-read-in-a-czi-and-select-a-portion-of-the-image-to-display" title="Link to this heading"></a></h3>
+<h4>Example 1: Read in a czi and select a portion of the image to display<a class="headerlink" href="#example-1-read-in-a-czi-and-select-a-portion-of-the-image-to-display" title="Link to this heading"></a></h4>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">aicspylibczi</span> <span class="kn">import</span> <span class="n">CziFile</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
@@ -172,10 +166,10 @@ CZI files and meta-data. We only support 64bit architectures currently if you de
 <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<a class="reference external image-reference" href="images/cardio.png"><img alt="Cardio Image" src="images/cardio.png" /></a>
+<p><img alt="Cardio Image" src="images/cardio.png" /></p>
 </section>
 <section id="example-2-read-in-a-mosaic-file">
-<h3>Example 2: Read in a mosaic file<a class="headerlink" href="#example-2-read-in-a-mosaic-file" title="Link to this heading"></a></h3>
+<h4>Example 2: Read in a mosaic file<a class="headerlink" href="#example-2-read-in-a-mosaic-file" title="Link to this heading"></a></h4>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">aicspylibczi</span>
 <span class="kn">import</span> <span class="nn">pathlib</span>
@@ -202,11 +196,11 @@ CZI files and meta-data. We only support 64bit architectures currently if you de
 <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">normed_mosaic_data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">))</span>
 </pre></div>
 </div>
-<a class="reference external image-reference" href="images/mosaic.png"><img alt="Mosaic Image" src="images/mosaic.png" /></a>
+<p><img alt="Mosaic Image" src="images/mosaic.png" /></p>
 </section>
 </section>
 <section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<h3>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h3>
 <p>The preferred installation method is with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code>.
 This will install the aicspylibczi python module and extension binaries (<a class="reference external" href="https://pypi.org/project/aicspylibczi/">hosted on PyPI</a>):</p>
 <p><code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">aicspylibczi</span></code></p>
@@ -219,12 +213,12 @@ This will install the aicspylibczi python module and extension binaries (<a clas
 <p>If you have tried this and are still having trouble please reach out to us and we will endeavor to help.</p>
 </section>
 <section id="documentation">
-<h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading"></a></h2>
+<h3>Documentation<a class="headerlink" href="#documentation" title="Link to this heading"></a></h3>
 <p>Documentation is available at
 <a class="reference external" href="https://allencellmodeling.github.io/aicspylibczi">github.io</a>.</p>
 </section>
 <section id="build">
-<h2>Build<a class="headerlink" href="#build" title="Link to this heading"></a></h2>
+<h3>Build<a class="headerlink" href="#build" title="Link to this heading"></a></h3>
 <p>Use these steps to build and install aicspylibczi locally:</p>
 <ul>
 <li><p>Clone the repository including submodules (<code class="docutils literal notranslate"><span class="pre">--recurse-submodules</span></code>).</p></li>
@@ -250,14 +244,14 @@ This will install the aicspylibczi python module and extension binaries (<a clas
 </div>
 </section>
 <section id="known-issues">
-<h2>Known Issues<a class="headerlink" href="#known-issues" title="Link to this heading"></a></h2>
+<h3>Known Issues<a class="headerlink" href="#known-issues" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>with read_mosaic if the scale_factor is not 1.0 Zeiss’s libCZI will, on some files, fail to render certain subblocks
 within the composite mosaic image. It is not currently known if this is an issue with the file or with libCZI.</p></li>
 </ul>
 </section>
 <section id="history">
-<h2>History<a class="headerlink" href="#history" title="Link to this heading"></a></h2>
+<h3>History<a class="headerlink" href="#history" title="Link to this heading"></a></h3>
 <p>aicspylibczi was originally a fork of <a class="reference external" href="https:://github.com/elhuhdron/pylibczi">pylibczi</a> that was developed by
 Paul Watkins and focused on mSEM data. In attempting to extend the work to we transitioned
 to pybind11, implemented c++ and python tests, added continuous integration via github actions,
@@ -267,7 +261,7 @@ Metadata reading, including specific subblock metadata reading has also been add
 the original work.</p>
 </section>
 <section id="licenses-acknowledgements">
-<h2>Licenses &amp; Acknowledgements<a class="headerlink" href="#licenses-acknowledgements" title="Link to this heading"></a></h2>
+<h3>Licenses &amp; Acknowledgements<a class="headerlink" href="#licenses-acknowledgements" title="Link to this heading"></a></h3>
 <p>This project was created from a fork of pylibczi as explained above in the history section and Paul Watkins
 is a developer on our repo as well. Pylibczi, from
 the <a class="reference external" href="https://www.caesar.de/en/about-caesar/">Center of Advanced European Studies And Research</a>
@@ -275,6 +269,7 @@ and the core dependency libCZI, are covered by the GPLv3 license.</p>
 <p>The <a class="reference external" href="https://www.gnu.org/licenses/gpl-3.0.en.html">GPLv3 license</a> is a consequence of libCZI which imposes GPLv3. If
 you wish to use libCZI or this derivative in a commercial product you may need to talk to
 Zeiss and CAESAR. <a class="reference external" href="https://choosealicense.com/licenses/gpl-3.0/">A discussion about GPLv3</a>.</p>
+</section>
 </section>
 </section>
 <section id="indices-and-tables">
@@ -294,7 +289,7 @@ Zeiss and CAESAR. <a class="reference external" href="https://choosealicense.com
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2019, Allen Institute for Cell Science.</p>
+    <p>&#169; Copyright 2019-2025, Allen Institute for Cell Science.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
