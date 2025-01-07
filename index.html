@@ -6,14 +6,14 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to aicspylibczi’s documentation! &mdash; aicspylibczi 3.2.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+  <title>Welcome to aicspylibczi’s documentation! &mdash; aicspylibczi 3.2.1.dev0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=4f6ddb47"></script>
+      <script src="_static/documentation_options.js?v=c91016b8"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -114,10 +114,10 @@ CZI files and meta-data. We only support 64bit architectures currently if you de
 <p>The first example show how to work with a standard CZI file (Single or Multi-Scene). The second example shows how to work with a Mosaic CZI file.</p>
 <section id="example-1-read-in-a-czi-and-select-a-portion-of-the-image-to-display">
 <h4>Example 1: Read in a czi and select a portion of the image to display<a class="headerlink" href="#example-1-read-in-a-czi-and-select-a-portion-of-the-image-to-display" title="Link to this heading"></a></h4>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">aicspylibczi</span> <span class="kn">import</span> <span class="n">CziFile</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aicspylibczi</span><span class="w"> </span><span class="kn">import</span> <span class="n">CziFile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
 <span class="n">pth</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;20190610_S02-02.czi&#39;</span><span class="p">)</span>
 <span class="n">czi</span> <span class="o">=</span> <span class="n">CziFile</span><span class="p">(</span><span class="n">pth</span><span class="p">)</span>
@@ -137,13 +137,13 @@ CZI files and meta-data. We only support 64bit architectures currently if you de
 <span class="c1"># img.shape = (1, 1, 4, 1, 1300, 1900)   # numpy.ndarray</span>
 
 <span class="c1"># define helper functions</span>
-<span class="k">def</span> <span class="nf">norm_by</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">min_</span><span class="p">,</span> <span class="n">max_</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">norm_by</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">min_</span><span class="p">,</span> <span class="n">max_</span><span class="p">):</span>
     <span class="n">norms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">[</span><span class="n">min_</span><span class="p">,</span> <span class="n">max_</span><span class="p">])</span>
     <span class="n">i2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">norms</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">norms</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">norms</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">i2</span>
 
 
-<span class="k">def</span> <span class="nf">recolor</span><span class="p">(</span><span class="n">im</span><span class="p">):</span>  <span class="c1"># transform from rgb to cyan-magenta-yellow</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">recolor</span><span class="p">(</span><span class="n">im</span><span class="p">):</span>  <span class="c1"># transform from rgb to cyan-magenta-yellow</span>
     <span class="n">im_shape</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
     <span class="n">color_transform</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span><span class="o">.</span><span class="n">T</span>
     <span class="n">im_reshape</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">im_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]),</span> <span class="n">im_shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]])</span><span class="o">.</span><span class="n">T</span>
@@ -170,10 +170,10 @@ CZI files and meta-data. We only support 64bit architectures currently if you de
 </section>
 <section id="example-2-read-in-a-mosaic-file">
 <h4>Example 2: Read in a mosaic file<a class="headerlink" href="#example-2-read-in-a-mosaic-file" title="Link to this heading"></a></h4>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">aicspylibczi</span>
-<span class="kn">import</span> <span class="nn">pathlib</span>
-<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">aicspylibczi</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
 
 <span class="n">mosaic_file</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="s1">&#39;mosaic_test.czi&#39;</span><span class="p">)</span>
 <span class="n">czi</span> <span class="o">=</span> <span class="n">aicspylibczi</span><span class="o">.</span><span class="n">CziFile</span><span class="p">(</span><span class="n">mosaic_file</span><span class="p">)</span>

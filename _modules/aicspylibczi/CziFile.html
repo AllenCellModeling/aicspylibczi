@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>aicspylibczi.CziFile &mdash; aicspylibczi 3.2.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+  <title>aicspylibczi.CziFile &mdash; aicspylibczi 3.2.1.dev0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=4f6ddb47"></script>
+      <script src="../../_static/documentation_options.js?v=c91016b8"></script>
       <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -97,20 +97,20 @@
   <h1>Source code for aicspylibczi.CziFile</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Parent class for python wrapper to libczi file for accessing Zeiss czi image and metadata.</span>
 
-<span class="kn">import</span> <span class="nn">io</span>
-<span class="kn">import</span> <span class="nn">multiprocessing</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">BinaryIO</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">BinaryIO</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">ET</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xml.etree.ElementTree</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ET</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">types</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">types</span>
 
 
 <div class="viewcode-block" id="CziFile">
 <a class="viewcode-back" href="../../aicspylibczi.html#aicspylibczi.CziFile.CziFile">[docs]</a>
-<span class="k">class</span> <span class="nc">CziFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CziFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Zeiss CZI file object.</span>
 
 <span class="sd">    Args:</span>
@@ -147,7 +147,7 @@
     <span class="c1">####</span>
     <span class="n">ZISRAW_DIMS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="s2">&quot;R&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;V&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">}</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">czi_filename</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">FileLike</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -156,7 +156,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_bytes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_to_buffer</span><span class="p">(</span><span class="n">czi_filename</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">czifile_verbose</span> <span class="o">=</span> <span class="n">verbose</span>
 
-        <span class="kn">import</span> <span class="nn">_aicspylibczi</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">_aicspylibczi</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">czilib</span> <span class="o">=</span> <span class="n">_aicspylibczi</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">czilib</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bytes</span><span class="p">)</span>
@@ -164,7 +164,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">meta_root</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">shape_is_consistent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">shape_is_consistent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Query if the file shape is consistent across scenes.</span>
 
@@ -177,7 +177,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">has_consistent_shape</span><span class="p">()</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">dims</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dims</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the dimensions present the binary data (not the metadata)</span>
 <span class="sd">        M, Y, X, A are included for completeness but can not be used as constraints.</span>
@@ -210,7 +210,7 @@
 
 <div class="viewcode-block" id="CziFile.get_dims_shape">
 <a class="viewcode-back" href="../../aicspylibczi.html#aicspylibczi.CziFile.CziFile.get_dims_shape">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_dims_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_dims_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the dimensions for the opened file from the binary data (not the metadata)</span>
 
@@ -240,7 +240,7 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">pixel_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pixel_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The pixelType of the images. If the pixelType is different in the different subblocks it returns Invalid.</span>
 
@@ -253,7 +253,7 @@
 
 <div class="viewcode-block" id="CziFile.get_tile_bounding_box">
 <a class="viewcode-back" href="../../aicspylibczi.html#aicspylibczi.CziFile.CziFile.get_tile_bounding_box">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_tile_bounding_box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_tile_bounding_box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get a single tile (subblock) bounding box (pyramid=0) for the specified dimensions.</span>
 <span class="sd">        For non-mosaic files.</span>
@@ -289,7 +289,7 @@
 
 <div class="viewcode-block" id="CziFile.get_scene_bounding_box">
 <a class="viewcode-back" href="../../aicspylibczi.html#aicspylibczi.CziFile.CziFile.get_scene_bounding_box">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_scene_bounding_box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_scene_bounding_box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the bounding box (pyramid=0) for the specified scene. For non-mosaic files.</span>
 <span class="sd">        This should be equivalent to the results from get_tile_bounding_box but requiring only one arguments.</span>
@@ -315,7 +315,7 @@
 
 <div class="viewcode-block" id="CziFile.get_all_tile_bounding_boxes">
 <a class="viewcode-back" href="../../aicspylibczi.html#aicspylibczi.CziFile.CziFile.get_all_tile_bounding_boxes">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_all_tile_bounding_boxes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_all_tile_bounding_boxes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get one or more tiles (subblocks) bounding boxes (pyramid=0) for the specified dimensions.</span>
 <span class="sd">        For non-mosaic files.</span>
@@ -353,7 +353,7 @@
 
 <div class="viewcode-block" id="CziFile.get_all_scene_bounding_boxes">
 <a class="viewcode-back" href="../../aicspylibczi.html#aicspylibczi.CziFile.CziFile.get_all_scene_bounding_boxes">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_all_scene_bounding_boxes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_all_scene_bounding_boxes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get one or more tiles (subblocks) bounding boxes (pyramid=0) for the specified dimensions.</span>
 <span class="sd">        For non-mosaic files.</span>
@@ -375,7 +375,7 @@
 
 <div class="viewcode-block" id="CziFile.get_mosaic_tile_bounding_box">
 <a class="viewcode-back" href="../../aicspylibczi.html#aicspylibczi.CziFile.CziFile.get_mosaic_tile_bounding_box">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_mosaic_tile_bounding_box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_mosaic_tile_bounding_box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get a single tile (subblock) bounding box (pyramid=0) for the specified dimensions.</span>
 <span class="sd">        For mosaic files.</span>
@@ -415,7 +415,7 @@
 
 <div class="viewcode-block" id="CziFile.get_mosaic_scene_bounding_box">
 <a class="viewcode-back" href="../../aicspylibczi.html#aicspylibczi.CziFile.CziFile.get_mosaic_scene_bounding_box">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_mosaic_scene_bounding_box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_mosaic_scene_bounding_box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the bounding box (pyramid=0) for the specified scene. For mosaic files.</span>
 <span class="sd">        This is not equivalent to the results from get_mosaic_tile_bounding_box.</span>
@@ -440,7 +440,7 @@
 
 <div class="viewcode-block" id="CziFile.get_all_mosaic_tile_bounding_boxes">
 <a class="viewcode-back" href="../../aicspylibczi.html#aicspylibczi.CziFile.CziFile.get_all_mosaic_tile_bounding_boxes">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_all_mosaic_tile_bounding_boxes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_all_mosaic_tile_bounding_boxes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get one or more tiles (subblocks) bounding boxes (pyramid=0) for the specified dimensions.</span>
 <span class="sd">        For mosaic files.</span>
@@ -479,7 +479,7 @@
 
 <div class="viewcode-block" id="CziFile.get_all_mosaic_scene_bounding_boxes">
 <a class="viewcode-back" href="../../aicspylibczi.html#aicspylibczi.CziFile.CziFile.get_all_mosaic_scene_bounding_boxes">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_all_mosaic_scene_bounding_boxes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_all_mosaic_scene_bounding_boxes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the scene (subblocks) bounding boxes (pyramid=0) for the specified dimensions.</span>
 <span class="sd">        For mosaic files.</span>
@@ -501,7 +501,7 @@
 
 <div class="viewcode-block" id="CziFile.get_mosaic_bounding_box">
 <a class="viewcode-back" href="../../aicspylibczi.html#aicspylibczi.CziFile.CziFile.get_mosaic_bounding_box">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_mosaic_bounding_box</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_mosaic_bounding_box</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the bounding box for the entire mosaic image.</span>
 
@@ -519,7 +519,7 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This returns the Size of each dimension in the dims string. So if S had valid indexes of [0, 1, 2, 3, 4]</span>
 <span class="sd">        the returned tuple would have a value of 5 in the same position as the S occurs in the dims string.</span>
@@ -535,7 +535,7 @@
 
 <div class="viewcode-block" id="CziFile.is_mosaic">
 <a class="viewcode-back" href="../../aicspylibczi.html#aicspylibczi.CziFile.CziFile.is_mosaic">[docs]</a>
-    <span class="k">def</span> <span class="nf">is_mosaic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_mosaic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Test if the loaded file is a mosaic file</span>
 
@@ -551,7 +551,7 @@
 <div class="viewcode-block" id="CziFile.convert_to_buffer">
 <a class="viewcode-back" href="../../aicspylibczi.html#aicspylibczi.CziFile.CziFile.convert_to_buffer">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">convert_to_buffer</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">FileLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">BinaryIO</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">convert_to_buffer</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">FileLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">BinaryIO</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">)):</span>
             <span class="c1"># This will both fully expand and enforce that the filepath exists</span>
             <span class="n">f</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -578,7 +578,7 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">meta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">meta</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract the metadata block from the czi file.</span>
 
@@ -596,7 +596,7 @@
 
 <div class="viewcode-block" id="CziFile.read_subblock_metadata">
 <a class="viewcode-back" href="../../aicspylibczi.html#aicspylibczi.CziFile.CziFile.read_subblock_metadata">[docs]</a>
-    <span class="k">def</span> <span class="nf">read_subblock_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unified_xml</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_subblock_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unified_xml</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read the subblock specific metadata, ie time subblock was acquired / position at acquisition time etc.</span>
 
@@ -645,7 +645,7 @@
 
 <div class="viewcode-block" id="CziFile.read_image">
 <a class="viewcode-back" href="../../aicspylibczi.html#aicspylibczi.CziFile.CziFile.read_image">[docs]</a>
-    <span class="k">def</span> <span class="nf">read_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Read the subblocks in the CZI file and for any subblocks that match all the constraints in kwargs return</span>
 <span class="sd">        that data. This allows you to select channels/scenes/time-points/Z-slices etc. Note if passed a BGR image</span>
@@ -695,7 +695,7 @@
 
 <div class="viewcode-block" id="CziFile.read_mosaic">
 <a class="viewcode-back" href="../../aicspylibczi.html#aicspylibczi.CziFile.CziFile.read_mosaic">[docs]</a>
-    <span class="k">def</span> <span class="nf">read_mosaic</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_mosaic</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">region</span><span class="p">:</span> <span class="n">Tuple</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">scale_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
@@ -775,7 +775,7 @@
         <span class="k">return</span> <span class="n">img</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_get_coords_from_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_coords_from_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
         <span class="n">plane_constraints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">czilib</span><span class="o">.</span><span class="n">DimCoord</span><span class="p">()</span>
         <span class="p">[</span>
             <span class="n">plane_constraints</span><span class="o">.</span><span class="n">set_dim</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
@@ -784,7 +784,7 @@
         <span class="p">]</span>
         <span class="k">return</span> <span class="n">plane_constraints</span>
 
-    <span class="k">def</span> <span class="nf">_get_m_index_from_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_m_index_from_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
         <span class="n">m_index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="k">if</span> <span class="s2">&quot;M&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_mosaic</span><span class="p">():</span>
@@ -795,7 +795,7 @@
         <span class="k">return</span> <span class="n">m_index</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_get_cores_from_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_cores_from_kwargs</span><span class="p">(</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">cores</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="s2">&quot;cores&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">cores</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cores&quot;</span><span class="p">)</span>
