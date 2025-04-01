@@ -114,10 +114,8 @@ setup(
     long_description_content_type="text/markdown",
     include_package_data=True,
     keywords="aicspylibczi, allen cell, imaging, computational biology",
-    license="GPLv3",
-    classifiers=[
-        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-    ],
+    license="GPL-3.0-or-later",
+    classifiers=[],
     ext_modules=[CMakeExtension('_aicspylibczi')],
     packages=['aicspylibczi'],
     cmdclass=dict(build_ext=CMakeBuild),
